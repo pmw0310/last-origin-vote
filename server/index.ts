@@ -2,9 +2,10 @@ import Koa from "koa";
 import morgan from "koa-morgan";
 import mount from "koa-mount";
 import Router from "koa-router";
+import { ApolloServer, gql } from "apollo-server-koa";
 import next from "next";
 
-const port = parseInt(process.env.PORT || "3000", 10);
+const port = parseInt(process.env.PORT || "4000", 10);
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
@@ -22,9 +23,23 @@ function renderNext(route: string) {
   };
 }
 
+const typeDefs = gql`
+  type Query {
+    hello: String
+  }
+`;
+ 
+const resolvers = {
+  Query: {
+    hello: () => 'Hello world!',
+  },
+};
+
 app.prepare().then(() => {
   const server = new Koa()
   const router = new Router()
+  const apolloServer = new ApolloServer({ typeDefs, resolvers });
+  apolloServer.applyMiddleware({app: server});
 
   router.get("/", renderNext("/"));
 
@@ -38,6 +53,7 @@ app.prepare().then(() => {
     );
 
   server.listen(port, () => {
-    console.log(`> Ready on http://localhost:${port}`)
+    console.log(`> Next on http://localhost:${port}`)
+    console.log(`> GraphQL on http://localhost:${port}${apolloServer.graphqlPath}`)
   })
 })
