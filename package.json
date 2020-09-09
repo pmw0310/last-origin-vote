@@ -7,15 +7,19 @@
         "start": "cross-env NODE_ENV=production node dist/index.js"
     },
     "dependencies": {
-        "@koa/router": "^9.4.0",
         "cross-env": "^7.0.2",
         "koa": "^2.13.0",
+        "koa-morgan": "^1.0.1",
+        "koa-mount": "^4.0.0",
+        "koa-router": "^9.4.0",
         "next": "latest",
         "react": "^16.13.1",
         "react-dom": "^16.13.1"
     },
     "devDependencies": {
         "@types/koa": "^2.11.4",
+        "@types/koa-morgan": "^1.0.4",
+        "@types/koa-mount": "^4.0.0",
         "@types/koa-router": "^7.4.1",
         "@types/node": "^12.0.12",
         "@types/react": "^16.9.44",

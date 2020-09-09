@@ -1,30 +1,43 @@
-import { createServer } from 'http'
-import { parse } from 'url'
-import next from 'next'
+import Koa from "koa";
+import morgan from "koa-morgan";
+import mount from "koa-mount";
+import Router from "koa-router";
+import next from "next";
 
-const port = parseInt(process.env.PORT || '3000', 10)
+const port = parseInt(process.env.PORT || "3000", 10);
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
 
+function renderNext(route: string) {
+  return (ctx: any) => {
+    ctx.res.statusCode = 200;
+    ctx.respond = false;
+
+    app.render(ctx.req, ctx.res, route, {
+      ...((ctx.request && ctx.request.body) || {}),
+      ...ctx.params,
+      ...ctx.query,
+    });
+  };
+}
+
 app.prepare().then(() => {
-  createServer((req, res) => {
-    const parsedUrl = parse(req.url!, true)
-    const { pathname, query } = parsedUrl
+  const server = new Koa()
+  const router = new Router()
 
-    if (pathname === '/a') {
-      app.render(req, res, '/a', query)
-    } else if (pathname === '/b') {
-      app.render(req, res, '/b', query)
-    } else {
-      handle(req, res, parsedUrl)
-    }
-  }).listen(port)
+  router.get("/", renderNext("/"));
 
-  // tslint:disable-next-line:no-console
-  console.log(
-    `> Server listening at http://localhost:${port} as ${
-      dev ? 'development' : process.env.NODE_ENV
-    }`
-  )
+  server
+    .use(morgan("combined"))
+    .use(
+      mount("/", (ctx: Koa.Context) => {
+        ctx.respond = false;
+        handle(ctx.req, ctx.res);
+      })
+    );
+
+  server.listen(port, () => {
+    console.log(`> Ready on http://localhost:${port}`)
+  })
 })
