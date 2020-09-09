@@ -1,3 +1,5 @@
-export default function B() {
-  return <div>b</div>
+import React from "react";
+
+export default function B(): JSX.Element {
+	return <div>b</div>;
 }
