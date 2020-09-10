@@ -3,6 +3,7 @@ import morgan from 'koa-morgan';
 import mount from 'koa-mount';
 import Router from 'koa-router';
 import Bodyparser from 'koa-bodyparser';
+import helmet from 'koa-helmet';
 import { ApolloServer, gql } from 'apollo-server-koa';
 import next from 'next';
 
@@ -45,7 +46,8 @@ app.prepare().then(() => {
 	router.get('/', renderNext('/'));
 
 	server
-		.use(Bodyparser())
+    .use(helmet())
+    .use(Bodyparser())
 		.use(morgan('combined'))
 		.use(
 			mount('/', (ctx: Koa.Context) => {
