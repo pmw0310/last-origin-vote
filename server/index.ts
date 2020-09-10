@@ -13,7 +13,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 function renderNext(route: string) {
-	return (ctx: Koa.Context) => {
+	return async (ctx: Koa.Context) => {
 		ctx.res.statusCode = 200;
 		ctx.respond = false;
 
@@ -39,15 +39,15 @@ const resolvers = {
 
 app.prepare().then(() => {
 	const server = new Koa();
-	const router = new Router();
+	const router = new Router<Koa.DefaultState, Koa.Context>();
 	const apolloServer = new ApolloServer({ typeDefs, resolvers });
 	apolloServer.applyMiddleware({ app: server });
 
 	router.get('/', renderNext('/'));
 
 	server
-    .use(helmet())
-    .use(Bodyparser())
+		.use(Bodyparser())
+		.use(helmet())
 		.use(morgan('combined'))
 		.use(
 			mount('/', (ctx: Koa.Context) => {
