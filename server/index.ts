@@ -6,6 +6,10 @@ import Bodyparser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
 import { ApolloServer, gql } from 'apollo-server-koa';
 import next from 'next';
+import { readFileSync } from 'fs';
+
+const t = readFileSync(`${__dirname}/t.txt`, 'utf-8');
+console.log(t);
 
 const port = parseInt(process.env.PORT || '4000', 10);
 const dev = process.env.NODE_ENV !== 'production';
