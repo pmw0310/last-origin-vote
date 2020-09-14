@@ -1,21 +1,28 @@
 import Koa from 'koa';
-import morgan from 'koa-morgan';
+// import morgan from 'koa-morgan';
 import mount from 'koa-mount';
 import Router from 'koa-router';
 import Bodyparser from 'koa-bodyparser';
 // import proxy from 'koa-proxies';
 import helmet from 'koa-helmet';
 import passport from 'koa-passport';
+// import CSRF from 'koa-csrf';
 import { Strategy, Profile } from 'passport-naver';
 import { ApolloServer } from 'apollo-server-koa';
 import mongoose from 'mongoose';
 import next from 'next';
 // import { readFileSync } from 'fs';
 
+import { generateToken } from './lib/token';
+import typeDefs from './graphql/schema/typeDefs.graphql';
+
 // const t = readFileSync(`${__dirname}/t.json`, 'utf-8');
 // console.log(t);
 
-import typeDefs from './graphql/schema/typeDefs.graphql';
+type naverUser = {
+    id: string;
+    token: string;
+};
 
 const port = parseInt(process.env.PORT || '4000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -50,37 +57,11 @@ const resolvers = {
 app.prepare().then(() => {
     const server = new Koa();
     const router = new Router<Koa.DefaultState, Koa.Context>();
-    const apolloServer = new ApolloServer({
-        typeDefs,
-        resolvers,
-        debug: dev,
-    });
+    const apolloServer = new ApolloServer({ typeDefs, resolvers });
     apolloServer.applyMiddleware({ app: server });
 
-    passport.use(
-        new Strategy(
-            {
-                clientID: process.env.NAVER_CLIENT_ID as string,
-                clientSecret: process.env.NAVER_CLIENT_SECRET as string,
-                callbackURL: `http://localhost:${port}/naver/callback`,
-            },
-            (
-                accessToken: string,
-                refreshToken: string,
-                profile: Profile,
-                done: (error: null, user?: null) => void,
-            ): void => {
-                console.log(accessToken);
-                console.log(refreshToken);
-                console.log(profile);
-
-                return done(null, null);
-            },
-        ),
-    );
-
     mongoose
-        .connect(process.env.MONGO_URI as string, {
+        .connect(process.env.MONGODB_URI as string, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         })
@@ -92,19 +73,87 @@ app.prepare().then(() => {
         });
 
     router.get('/', renderNext('/'));
-    router.get('/naver', passport.authenticate('naver', {}));
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    router.get('/naver', passport.authenticate('naver', { session: false }));
+
+    router.get(
+        '/naver/callback',
+        passport.authenticate('naver', {
+            session: false,
+            failureRedirect: '/end',
+        }),
+        (ctx: Koa.Context) => {
+            ctx.cookies.set('access_token', ctx.state.user.token, {
+                httpOnly: true,
+                maxAge: 1000 * 60 * 60 * 12,
+            });
+            ctx.redirect('/');
+        },
+    );
+
+    router.get('/logout', async (ctx: Koa.Context) => {
+        console.log('logout');
+        ctx.cookies.set('access_token');
+        ctx.redirect('/');
+    });
 
     server
         .use(Bodyparser())
         .use(helmet())
+        .use(router.routes())
+        .use(router.allowedMethods())
         .use(passport.initialize())
-        .use(morgan('combined'))
+        // .use(morgan('combined'))
+        // .use(
+        // 	new CSRF({
+        // 		invalidTokenMessage: 'Invalid CSRF token',
+        // 		invalidTokenStatusCode: 403,
+        // 		excludedMethods: ['GET', 'HEAD', 'OPTIONS'],
+        // 		disableQuery: false,
+        // 	}),
+        // )
         .use(
-            mount('/', (ctx: Koa.Context) => {
+            mount('/', async (ctx: Koa.Context) => {
                 ctx.respond = false;
                 handle(ctx.req, ctx.res);
             }),
         );
+
+    passport.serializeUser((user, done) => {
+        done(null, user);
+    });
+
+    passport.deserializeUser((obj, done) => {
+        done(null, obj);
+    });
+
+    passport.use(
+        new Strategy(
+            {
+                clientID: process.env.NAVER_CLIENT_ID as string,
+                clientSecret: process.env.NAVER_CLIENT_SECRET as string,
+                callbackURL: `http://localhost:${port}/naver/callback`,
+            },
+            (
+                _accessToken: string,
+                _refreshToken: string,
+                profile: Profile,
+                done: (error: null, user: naverUser) => void,
+            ): void => {
+                process.nextTick(async () => {
+                    const token = await generateToken(profile);
+
+                    const user: naverUser = {
+                        id: profile.id,
+                        token,
+                    };
+
+                    return done(null, user);
+                });
+            },
+        ),
+    );
 
     server.listen(port, () => {
         console.log(`> Next on http://localhost:${port}`);

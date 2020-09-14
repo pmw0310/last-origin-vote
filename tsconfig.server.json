@@ -5,9 +5,7 @@
         "outDir": "dist",
         "target": "es2017",
         "isolatedModules": false,
-        "noEmit": false,
-        "typeRoots": ["node_modules/@types", "src/@types"]
+        "noEmit": false
     },
-    "files": ["src/@types/graphql.d.ts"],
-    "include": ["server/**/*.ts", "src/**/*.ts", "server/graphql/**/*.graphql"]
+    "include": ["server/**/*.ts", "server/**/*.graphql"]
 }

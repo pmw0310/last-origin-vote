@@ -1,16 +1,27 @@
 {
-  "env": {
-    "development": {
-      "presets": ["next/babel"],
-      "plugins": [["styled-components", { "ssr": true }]]
-    },
-    "production": {
-      "presets": ["next/babel"],
-      "plugins": [["styled-components", { "ssr": true }]]
-    },
-    "test": {
-      "presets": [["next/babel", { "preset-env": { "modules": "commonjs" } }]],
-      "plugins": [["styled-components", { "ssr": true }]]
+    "env": {
+        "development": {
+            "presets": ["next/babel"],
+            "plugins": [
+                ["styled-components", { "ssr": true }],
+                "import-graphql"
+            ]
+        },
+        "production": {
+            "presets": ["next/babel"],
+            "plugins": [
+                ["styled-components", { "ssr": true }],
+                "import-graphql"
+            ]
+        },
+        "test": {
+            "presets": [
+                ["next/babel", { "preset-env": { "modules": "commonjs" } }]
+            ],
+            "plugins": [
+                ["styled-components", { "ssr": true }],
+                "import-graphql"
+            ]
+        }
     }
-  }
 }
