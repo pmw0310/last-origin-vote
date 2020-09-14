@@ -1,11 +1,13 @@
 {
-	"extends": "./tsconfig.json",
-	"compilerOptions": {
-		"module": "commonjs",
-		"outDir": "dist",
-		"target": "es2017",
-		"isolatedModules": false,
-		"noEmit": false
-	},
-	"include": ["server/**/*.ts"]
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "commonjs",
+        "outDir": "dist",
+        "target": "es2017",
+        "isolatedModules": false,
+        "noEmit": false,
+        "typeRoots": ["node_modules/@types", "src/@types"]
+    },
+    "files": ["src/@types/graphql.d.ts"],
+    "include": ["server/**/*.ts", "src/**/*.ts", "server/graphql/**/*.graphql"]
 }
