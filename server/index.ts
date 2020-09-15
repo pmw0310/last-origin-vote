@@ -1,4 +1,4 @@
-import Koa from 'koa';
+import Koa, { DefaultState, Context } from 'koa';
 // import morgan from 'koa-morgan';
 import mount from 'koa-mount';
 import Router from 'koa-router';
@@ -6,18 +6,14 @@ import Bodyparser from 'koa-bodyparser';
 // import proxy from 'koa-proxies';
 import helmet from 'koa-helmet';
 import passport from 'koa-passport';
-// import CSRF from 'koa-csrf';
 import { Strategy, Profile } from 'passport-naver';
 import { ApolloServer } from 'apollo-server-koa';
 import mongoose from 'mongoose';
 import next from 'next';
-// import { readFileSync } from 'fs';
 
 import { generateToken } from './lib/token';
-import typeDefs from './graphql/schema/typeDefs.graphql';
-
-// const t = readFileSync(`${__dirname}/t.json`, 'utf-8');
-// console.log(t);
+import { schema } from './graphql';
+import api from './api';
 
 type naverUser = {
     id: string;
@@ -30,7 +26,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 function renderNext(route: string) {
-    return async (ctx: Koa.Context) => {
+    return async (ctx: Context) => {
         ctx.res.statusCode = 200;
         ctx.respond = false;
 
@@ -42,22 +38,15 @@ function renderNext(route: string) {
     };
 }
 
-// const typeDefs = gql`
-//     type Query {
-//         hello: String
-//     }
-// `;
-
-const resolvers = {
-    Query: {
-        hello: () => 'Hello world!',
-    },
-};
-
 app.prepare().then(() => {
     const server = new Koa();
-    const router = new Router<Koa.DefaultState, Koa.Context>();
-    const apolloServer = new ApolloServer({ typeDefs, resolvers });
+    const router = new Router<DefaultState, Context>();
+    const apolloServer = new ApolloServer({
+        schema,
+        debug: dev,
+        introspection: dev,
+        playground: dev,
+    });
     apolloServer.applyMiddleware({ app: server });
 
     mongoose
@@ -73,30 +62,7 @@ app.prepare().then(() => {
         });
 
     router.get('/', renderNext('/'));
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    router.get('/naver', passport.authenticate('naver', { session: false }));
-
-    router.get(
-        '/naver/callback',
-        passport.authenticate('naver', {
-            session: false,
-            failureRedirect: '/end',
-        }),
-        (ctx: Koa.Context) => {
-            ctx.cookies.set('access_token', ctx.state.user.token, {
-                httpOnly: true,
-                maxAge: 1000 * 60 * 60 * 12,
-            });
-            ctx.redirect('/');
-        },
-    );
-
-    router.get('/logout', async (ctx: Koa.Context) => {
-        console.log('logout');
-        ctx.cookies.set('access_token');
-        ctx.redirect('/');
-    });
+    router.use('/api', api.routes());
 
     server
         .use(Bodyparser())
@@ -105,35 +71,19 @@ app.prepare().then(() => {
         .use(router.allowedMethods())
         .use(passport.initialize())
         // .use(morgan('combined'))
-        // .use(
-        // 	new CSRF({
-        // 		invalidTokenMessage: 'Invalid CSRF token',
-        // 		invalidTokenStatusCode: 403,
-        // 		excludedMethods: ['GET', 'HEAD', 'OPTIONS'],
-        // 		disableQuery: false,
-        // 	}),
-        // )
         .use(
-            mount('/', async (ctx: Koa.Context) => {
+            mount('/', async (ctx: Context) => {
                 ctx.respond = false;
                 handle(ctx.req, ctx.res);
             }),
         );
-
-    passport.serializeUser((user, done) => {
-        done(null, user);
-    });
-
-    passport.deserializeUser((obj, done) => {
-        done(null, obj);
-    });
 
     passport.use(
         new Strategy(
             {
                 clientID: process.env.NAVER_CLIENT_ID as string,
                 clientSecret: process.env.NAVER_CLIENT_SECRET as string,
-                callbackURL: `http://localhost:${port}/naver/callback`,
+                callbackURL: `http://localhost:${port}/api/auth/naver/callback`,
             },
             (
                 _accessToken: string,

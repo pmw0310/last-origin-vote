@@ -22,7 +22,6 @@
         "resolveJsonModule": true,
         "typeRoots": ["./src/@types", "./node_modules/@types"]
     },
-    "files": ["./src/@types/graphql.d.ts"],
     "exclude": ["dist", ".next", "out", "next.config.js"],
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }
