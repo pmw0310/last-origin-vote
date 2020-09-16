@@ -11,14 +11,8 @@ import { ApolloServer } from 'apollo-server-koa';
 import mongoose from 'mongoose';
 import next from 'next';
 
-import { generateToken } from './lib/token';
 import { schema } from './graphql';
 import api from './api';
-
-type naverUser = {
-    id: string;
-    token: string;
-};
 
 const port = parseInt(process.env.PORT || '4000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -89,17 +83,10 @@ app.prepare().then(() => {
                 _accessToken: string,
                 _refreshToken: string,
                 profile: Profile,
-                done: (error: null, user: naverUser) => void,
+                done: (error: null, user: Profile) => void,
             ): void => {
                 process.nextTick(async () => {
-                    const token = await generateToken(profile);
-
-                    const user: naverUser = {
-                        id: profile.id,
-                        token,
-                    };
-
-                    return done(null, user);
+                    return done(null, profile);
                 });
             },
         ),

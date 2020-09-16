@@ -15,7 +15,7 @@ export interface UserTypeModel extends Document {
 }
 
 const UserSchema = new Schema<UserTypeModel>({
-    _id: { type: String, required: true, unique: true, index: true },
+    _id: String,
     token: String,
     nickname: String,
     profileImage: String,
@@ -24,7 +24,12 @@ const UserSchema = new Schema<UserTypeModel>({
         default: Date.now,
         required: true,
     },
-    authority: { type: [String], required: true, default: ['user'] },
+    authority: {
+        type: String,
+        required: true,
+        enum: ['user', 'admin'],
+        default: 'user',
+    },
 });
 
 UserSchema.methods.generateAccessToken = function (): string {
@@ -46,7 +51,7 @@ UserSchema.methods.generateRefreshToken = function (): string {
     const token = jwt.sign(
         {
             token: this.token,
-            hash: bcrypt.hash(this.createdAt, 10),
+            key: bcrypt.hash(this.createdAt, 10),
         },
         process.env.JWT_SECRET as string,
         {
