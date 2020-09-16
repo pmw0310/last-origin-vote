@@ -5,6 +5,25 @@ import User from '../../../models/user';
 
 const router = new Router<DefaultState, Context>();
 
+const setCookise = (
+    ctx: Context,
+    accessToken: string,
+    refreshToken: string,
+): void => {
+    ctx.cookies.set('access_token', accessToken, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 10,
+    });
+
+    ctx.cookies.set('refresh_token', refreshToken, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 14,
+    });
+
+    console.log('accessToken', accessToken);
+    console.log('refreshToken', refreshToken);
+};
+
 router.get('/', passport.authenticate('naver', { session: false }));
 
 router.get(
@@ -22,6 +41,11 @@ router.get(
             exists.nickname = ctx.state.user._json.nickname;
             exists.profileImage = ctx.state.user._json.profile_image;
             await exists.save();
+
+            const accessToken = exists.generateAccessToken();
+            const refreshToken = exists.generateRefreshToken();
+
+            setCookise(ctx, accessToken, refreshToken);
         } else {
             const count = await User.count({});
 
@@ -32,11 +56,13 @@ router.get(
                 authority: count === 0 ? 'admin' : 'user',
             });
             await user.save();
+
+            const accessToken = user.generateAccessToken();
+            const refreshToken = user.generateRefreshToken();
+
+            setCookise(ctx, accessToken, refreshToken);
         }
-        // ctx.cookies.set('access_token', ctx.state.user.token, {
-        //     httpOnly: true,
-        //     maxAge: 1000 * 60 * 60 * 12,
-        // });
+
         ctx.redirect('/');
     },
 );

@@ -1456,7 +1456,14 @@
     "@types/bson" "*"
     "@types/node" "*"
 
-"@types/mongoose@^5.7.36":
+"@types/mongoose-auto-increment@^5.0.33":
+  version "5.0.33"
+  resolved "https://registry.yarnpkg.com/@types/mongoose-auto-increment/-/mongoose-auto-increment-5.0.33.tgz#af8e6abba858a38ced76b6c9da719ae35755eebc"
+  integrity sha512-d7NKIVOUrs3fxrGc55qbIvvxg1mvm/TpCet9VCF3wlLPofznDjuM/OMga6tbo812mYYioBvLpPFN5xYgvlUB9g==
+  dependencies:
+    "@types/mongoose" "*"
+
+"@types/mongoose@*", "@types/mongoose@^5.7.36":
   version "5.7.36"
   resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.7.36.tgz#2dae28c63041c6afba8a83ea02969f463b3f1021"
   integrity sha512-ggFXgvkHgCNlT35B9d/heDYfSqOSwTmQjkRoR32sObGV5Xjd0N0WWuYlLzqeCg94j4hYN/OZxZ1VNNLltX/IVQ==
@@ -3972,6 +3979,11 @@ extend-shallow@^3.0.0, extend-shallow@^3.0.2:
     assign-symbols "^1.0.0"
     is-extendable "^1.0.1"
 
+extend@^3.0.0:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
+  integrity sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==
+
 extglob@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/extglob/-/extglob-2.0.4.tgz#ad00fe4dc612a9232e8718711dc5cb5ab0285543"
@@ -5696,6 +5708,13 @@ mongodb@3.6.1:
     safe-buffer "^5.1.2"
   optionalDependencies:
     saslprep "^1.0.0"
+
+mongoose-auto-increment@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/mongoose-auto-increment/-/mongoose-auto-increment-5.0.1.tgz#827e051d9cc371dabe8bff1a704431d341cb79df"
+  integrity sha1-gn4FHZzDcdq+i/8acEQx00HLed8=
+  dependencies:
+    extend "^3.0.0"
 
 mongoose-legacy-pluralize@1.0.2:
   version "1.0.2"

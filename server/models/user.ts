@@ -1,10 +1,12 @@
-import { Document, Schema, model } from 'mongoose';
+import { Document, Schema, model, connection } from 'mongoose';
+import autoIncrement from 'mongoose-auto-increment';
 import { uid } from 'rand-token';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 export interface UserTypeModel extends Document {
     _id: string;
+    uid: number;
     token?: string;
     nickname?: string;
     profileImage?: string;
@@ -16,6 +18,11 @@ export interface UserTypeModel extends Document {
 
 const UserSchema = new Schema<UserTypeModel>({
     _id: String,
+    uid: {
+        type: Number,
+        unique: true,
+        index: true,
+    },
     token: String,
     nickname: String,
     profileImage: String,
@@ -36,10 +43,11 @@ UserSchema.methods.generateAccessToken = function (): string {
     const token = jwt.sign(
         {
             _id: this._id,
+            uid: this.uid,
         },
         process.env.JWT_SECRET as string,
         {
-            expiresIn: '1h',
+            expiresIn: 60 * 10,
         },
     );
     return token;
@@ -51,7 +59,7 @@ UserSchema.methods.generateRefreshToken = function (): string {
     const token = jwt.sign(
         {
             token: this.token,
-            key: bcrypt.hash(this.createdAt, 10),
+            key: bcrypt.hash(this.createdAt.toString(), 10),
         },
         process.env.JWT_SECRET as string,
         {
@@ -63,3 +71,11 @@ UserSchema.methods.generateRefreshToken = function (): string {
 };
 
 export default model<UserTypeModel>('User', UserSchema);
+
+autoIncrement.initialize(connection);
+UserSchema.plugin(autoIncrement.plugin, {
+    model: 'User',
+    field: 'uid',
+    startAt: 1,
+    increment: 1,
+});

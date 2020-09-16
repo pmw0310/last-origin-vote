@@ -45,6 +45,7 @@ app.prepare().then(() => {
 
     mongoose
         .connect(process.env.MONGODB_URI as string, {
+            useCreateIndex: true,
             useNewUrlParser: true,
             useUnifiedTopology: true,
         })
