@@ -40,6 +40,7 @@ app.prepare().then(() => {
         debug: dev,
         introspection: dev,
         playground: dev,
+        // context: async (ctx: Context) => {},
     });
     apolloServer.applyMiddleware({ app: server });
 
