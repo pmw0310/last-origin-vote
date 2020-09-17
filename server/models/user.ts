@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import { Document, Schema, model, connection } from 'mongoose';
+import { Document, Schema, model, connection, Model } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 import { uid } from 'rand-token';
 import bcrypt from 'bcrypt';
@@ -15,7 +15,10 @@ export interface UserTypeModel extends Document {
     authority: string[];
     generateAccessToken: (ctx?: Context) => string;
     generateRefreshToken: (ctx?: Context) => Promise<string>;
-    verifyToken: (ctx: Context) => Promise<unknown>;
+}
+
+export interface UserStaticsModel extends Model<UserTypeModel> {
+    verify: (ctx: Context) => Promise<unknown>;
 }
 
 const UserSchema = new Schema<UserTypeModel>({
@@ -90,7 +93,7 @@ UserSchema.methods.generateRefreshToken = async function (
     return token;
 };
 
-UserSchema.methods.verifyToken = async function (ctx: Context) {
+UserSchema.statics.verify = async function (ctx: Context) {
     const accessToken = ctx.cookies.get('access_token') as string;
     const refreshToken = ctx.cookies.get('refresh_token') as string;
 
@@ -110,6 +113,9 @@ UserSchema.methods.verifyToken = async function (ctx: Context) {
         exp: number;
     };
 
+    const { _id: userId, uid: userUid } = jwt.decode(accessToken) as User;
+    const user = await this.findOne({ _id: userId });
+
     const jwtVerify = (token: string, secret: string): Promise<JwtVerify> => {
         return new Promise((resolve) => {
             jwt.verify(token, secret, (error, decoded) => {
@@ -126,10 +132,7 @@ UserSchema.methods.verifyToken = async function (ctx: Context) {
 
     if (accessTokenVerify.error) {
         if (accessTokenVerify.error.name === 'TokenExpiredError') {
-            const decode = jwt.decode(accessToken);
-            const dc: User = decode as User;
-
-            if (dc._id !== this._id || dc.uid !== this.uid) {
+            if (userId !== user._id || userUid !== user.uid) {
                 return { error: 403, user: undefined };
             }
 
@@ -144,16 +147,16 @@ UserSchema.methods.verifyToken = async function (ctx: Context) {
                     const dc: Refresh = decode as Refresh;
 
                     if (
-                        dc.token !== this.token ||
+                        dc.token !== user.token ||
                         !(await bcrypt.compare(
-                            this.createdAt.toString(),
+                            user.createdAt.toString(),
                             dc.key,
                         ))
                     ) {
                         return { error: 403, user: undefined };
                     }
 
-                    await this.generateRefreshToken(ctx);
+                    await user.generateRefreshToken(ctx);
                 }
             }
 
@@ -162,26 +165,26 @@ UserSchema.methods.verifyToken = async function (ctx: Context) {
                 (refreshTokenVerify.decoded as Refresh).exp - now <
                 60 * 60 * 24
             ) {
-                await this.generateRefreshToken(ctx);
+                await user.generateRefreshToken(ctx);
             }
 
-            this.generateAccessToken(ctx);
+            user.generateAccessToken(ctx);
 
-            return { error: undefined, user: this };
+            return { error: undefined, user };
         }
         return { error: 403, user: undefined };
     }
 
     const dc: User = accessTokenVerify.decoded as User;
 
-    if (dc._id === this._id && dc.uid === this.uid) {
-        return { error: undefined, user: this };
+    if (dc._id === user._id && dc.uid === user.uid) {
+        return { error: undefined, user };
     }
 
     return { error: 403, user: undefined };
 };
 
-export default model<UserTypeModel>('User', UserSchema);
+export default model<UserTypeModel, UserStaticsModel>('User', UserSchema);
 
 autoIncrement.initialize(connection);
 UserSchema.plugin(autoIncrement.plugin, {

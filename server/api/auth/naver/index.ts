@@ -10,15 +10,15 @@ const router = new Router<DefaultState, Context>();
 //     accessToken: string,
 //     refreshToken: string,
 // ): void => {
-//     ctx.cookies.set('access_token', accessToken, {
-//         httpOnly: true,
-//         maxAge: 1000 * 60 * 10,
-//     });
+// ctx.cookies.set('access_token', accessToken, {
+//     httpOnly: true,
+//     maxAge: 1000 * 60 * 10,
+// });
 
-//     ctx.cookies.set('refresh_token', refreshToken, {
-//         httpOnly: true,
-//         maxAge: 1000 * 60 * 60 * 24 * 14,
-//     });
+// ctx.cookies.set('refresh_token', refreshToken, {
+//     httpOnly: true,
+//     maxAge: 1000 * 60 * 60 * 24 * 14,
+// });
 
 //     console.log('accessToken', accessToken);
 //     console.log('refreshToken', refreshToken);
@@ -65,7 +65,15 @@ router.get(
 
 router.get('/logout', async (ctx: Context) => {
     console.log('logout');
-    ctx.cookies.set('access_token');
+    ctx.cookies.set('access_token', '', {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 10,
+    });
+
+    ctx.cookies.set('refresh_token', '', {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 14,
+    });
     ctx.redirect('/');
 });
 

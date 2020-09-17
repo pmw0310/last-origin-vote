@@ -13,6 +13,7 @@ import next from 'next';
 
 import { schema } from './graphql';
 import api from './api';
+// import User from './models/user';
 
 const port = parseInt(process.env.PORT || '4000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -40,7 +41,11 @@ app.prepare().then(() => {
         debug: dev,
         introspection: dev,
         playground: dev,
-        // context: async (ctx: Context) => {},
+        context: async (ctx: Context) => {
+            console.log(ctx.req);
+            // const test = User.verify(ctx);
+            // console.log(test);
+        },
     });
     apolloServer.applyMiddleware({ app: server });
 
@@ -59,6 +64,13 @@ app.prepare().then(() => {
 
     router.get('/', renderNext('/'));
     router.use('/api', api.routes());
+
+    router.get('/test', (ctx: Context) => {
+        const accessToken = ctx.cookies.get('access_token') as string;
+        const refreshToken = ctx.cookies.get('refresh_token') as string;
+        console.log('accessToken', accessToken);
+        console.log('refreshToken', refreshToken);
+    });
 
     server
         .use(Bodyparser())
