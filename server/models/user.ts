@@ -3,7 +3,7 @@ import { Document, Schema, model, connection, Model } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 import { uid } from 'rand-token';
 import jwt, { VerifyErrors } from 'jsonwebtoken';
-import aes from '../lib/aes256cbc';
+import { encrypt, decrypt } from '../lib/aes256cbc';
 
 export interface UserTypeModel extends Document {
     _id: string;
@@ -49,7 +49,7 @@ const UserSchema = new Schema<UserTypeModel>({
 });
 
 UserSchema.methods.generateAccessToken = function (ctx: Context): string {
-    const token = aes.encrypt(
+    const token = encrypt(
         jwt.sign(
             {
                 _id: this._id,
@@ -69,7 +69,7 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
         });
     }
 
-    return t;
+    return token;
 };
 
 UserSchema.methods.generateRefreshToken = async function (
@@ -117,7 +117,7 @@ UserSchema.statics.verify = async function (ctx: Context) {
     try {
         if (accessToken) {
             const accessTokenVerify = await jwtVerify<Access>(
-                aes.decrypt(accessToken as string),
+                decrypt(accessToken as string),
                 process.env.JWT_SECRET as string,
             );
 
