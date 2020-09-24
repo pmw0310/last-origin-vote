@@ -103,11 +103,6 @@ UserSchema.statics.verify = async function (ctx: Context) {
         exp: number;
     };
 
-    type Refresh = {
-        token: string;
-        key: string;
-    };
-
     const jwtVerify = <T>(
         token: string,
         secret: string,
