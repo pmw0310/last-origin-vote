@@ -9,9 +9,10 @@ export interface UserTypeModel extends Document {
     _id: string;
     uid: number;
     token?: string;
+    tokenMaxAge?: Date;
     nickname?: string;
     profileImage?: string;
-    createdAt: number;
+    createdAt: Date;
     authority: string[];
     generateAccessToken: (ctx: Context) => string;
     generateRefreshToken: (ctx: Context) => Promise<string>;
@@ -33,6 +34,7 @@ const UserSchema = new Schema<UserTypeModel>({
         unique: true,
         index: true,
     },
+    tokenMaxAge: Date,
     nickname: String,
     profileImage: String,
     createdAt: {
@@ -76,6 +78,7 @@ UserSchema.methods.generateRefreshToken = async function (
     ctx: Context,
 ): Promise<string> {
     this.token = uid(16);
+    this.tokenMaxAge = new Date();
     await this.save();
 
     if (ctx) {
@@ -128,9 +131,15 @@ UserSchema.statics.verify = async function (ctx: Context) {
             const { _id, uid } = accessTokenVerify.decoded as Access;
 
             const user = await this.findOne({ _id, uid });
+            return user;
         } else if (refreshToken) {
             const user = await this.findOne({ token: refreshToken as string });
+            if (user.tokenMaxAge.getTime() > Date.now()) {
+                return;
+            }
+
             user.generateAccessToken(ctx);
+            return user;
         }
     } catch (e) {
         return;
