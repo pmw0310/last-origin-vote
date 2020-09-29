@@ -19,7 +19,7 @@ export interface UserTypeModel extends Document {
 }
 
 export interface UserVerifyResult {
-    error?: Error | undefined;
+    error?: string | undefined;
     user?: UserTypeModel | undefined;
 }
 
@@ -82,14 +82,22 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
 UserSchema.methods.generateRefreshToken = async function (
     ctx: Context,
 ): Promise<string> {
-    this.token = uid(16);
-    this.tokenMaxAge = new Date();
-    await this.save();
+    while (true) {
+        try {
+            this.token = uid(16);
+            this.tokenMaxAge = new Date();
+            this.tokenMaxAge.setDate(this.tokenMaxAge.getDate() + 1);
+            await this.save();
+            break;
+        } catch {
+            console.warn('retry generate token');
+        }
+    }
 
     if (ctx) {
         ctx.cookies.set('refresh_token', this.token, {
             httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24 * 14,
+            maxAge: 1000 * 60 * 60 * 24,
         });
     }
 
@@ -132,86 +140,44 @@ UserSchema.statics.verify = async function (
             );
 
             if (accessTokenVerify.error) {
-                return { error: new Error(accessTokenVerify.error.message) };
+                return { error: accessTokenVerify.error.message };
             }
 
             const { _id, uid, exp } = accessTokenVerify.decoded as Access;
+            const user: UserTypeModel = await this.findOne({ _id, uid });
+            const now = Math.floor(Date.now() * 0.001);
+            if (exp - now < 60 * 5) {
+                await user.generateAccessToken(ctx);
+            }
 
-            console.log('exp', exp);
-            console.log('now', Math.floor(Date.now() * 0.001));
-
-            const user = await this.findOne({ _id, uid });
             return { user };
         } else if (refreshToken) {
-            const user = await this.findOne({ token: refreshToken as string });
-            if (user.tokenMaxAge.getTime() > Date.now()) {
-                return { error: new Error('token timeout') };
+            const user: UserTypeModel = await this.findOne({
+                token: refreshToken as string,
+            });
+
+            if (!user) {
+                return { error: 'token modulation' };
+            }
+
+            const exp = (user.tokenMaxAge as Date).getTime();
+            const now = Date.now();
+
+            if (exp < now) {
+                return { error: 'token timeout' };
+            } else if (exp - now < 60 * 60) {
+                await user.generateRefreshToken(ctx);
             }
 
             user.generateAccessToken(ctx);
             return { user };
         }
     } catch (e) {
-        return { error: e };
+        console.error(e);
+        return { error: 'code error' };
     }
 
-    return { error: new Error('unknown') };
-
-    // const { _id: userId, uid: userUid } = jwt.decode(accessToken) as User;
-    // const user = await this.findOne({ _id: userId });
-
-    // if (accessTokenVerify.error) {
-    //     if (accessTokenVerify.error.name === 'TokenExpiredError') {
-    //         if (userId !== user._id || userUid !== user.uid) {
-    //             return { error: 403, user: undefined };
-    //         }
-
-    //         const refreshTokenVerify = await jwtVerify(
-    //             refreshToken,
-    //             process.env.JWT_SECRET as string,
-    //         );
-
-    //         if (refreshTokenVerify.error) {
-    //             if (accessTokenVerify.error.name === 'TokenExpiredError') {
-    //                 const decode = jwt.decode(refreshToken);
-    //                 const dc: Refresh = decode as Refresh;
-
-    //                 if (
-    //                     dc.token !== user.token ||
-    //                     !(await bcrypt.compare(
-    //                         user.createdAt.toString(),
-    //                         dc.key,
-    //                     ))
-    //                 ) {
-    //                     return { error: 403, user: undefined };
-    //                 }
-
-    //                 await user.generateRefreshToken(ctx);
-    //             }
-    //         }
-
-    //         const now = Math.floor(Date.now() * 0.001);
-    //         if (
-    //             (refreshTokenVerify.decoded as Refresh).exp - now <
-    //             60 * 60 * 24
-    //         ) {
-    //             await user.generateRefreshToken(ctx);
-    //         }
-
-    //         user.generateAccessToken(ctx);
-
-    //         return { error: undefined, user };
-    //     }
-    //     return { error: 403, user: undefined };
-    // }
-
-    // const dc: User = accessTokenVerify.decoded as User;
-
-    // if (dc._id === user._id && dc.uid === user.uid) {
-    //     return { error: undefined, user };
-    // }
-
-    // return { error: 403, user: undefined };
+    return { error: 'tokenless' };
 };
 
 autoIncrement.initialize(connection);
