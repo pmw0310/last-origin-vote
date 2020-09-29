@@ -138,7 +138,7 @@ UserSchema.statics.verify = async function (
             const { _id, uid, exp } = accessTokenVerify.decoded as Access;
 
             console.log('exp', exp);
-            console.log('now', Date.now);
+            console.log('now', Math.floor(Date.now() * 0.001));
 
             const user = await this.findOne({ _id, uid });
             return { user };
@@ -214,8 +214,6 @@ UserSchema.statics.verify = async function (
     // return { error: 403, user: undefined };
 };
 
-export default model<UserTypeModel, UserStaticsModel>('User', UserSchema);
-
 autoIncrement.initialize(connection);
 UserSchema.plugin(autoIncrement.plugin, {
     model: 'User',
@@ -223,3 +221,5 @@ UserSchema.plugin(autoIncrement.plugin, {
     startAt: 1,
     increment: 1,
 });
+
+export default model<UserTypeModel, UserStaticsModel>('User', UserSchema);
