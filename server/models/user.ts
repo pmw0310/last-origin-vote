@@ -18,8 +18,13 @@ export interface UserTypeModel extends Document {
     generateRefreshToken: (ctx: Context) => Promise<string>;
 }
 
+export interface UserVerifyResult {
+    error?: Error | undefined;
+    user?: UserTypeModel | undefined;
+}
+
 export interface UserStaticsModel extends Model<UserTypeModel> {
-    verify: (ctx: Context) => Promise<unknown>;
+    verify: (ctx: Context) => Promise<UserVerifyResult>;
 }
 
 const UserSchema = new Schema<UserTypeModel>({
@@ -91,7 +96,9 @@ UserSchema.methods.generateRefreshToken = async function (
     return this.token;
 };
 
-UserSchema.statics.verify = async function (ctx: Context) {
+UserSchema.statics.verify = async function (
+    ctx: Context,
+): Promise<UserVerifyResult> {
     const accessToken = ctx.cookies.get('access_token');
     const refreshToken = ctx.cookies.get('refresh_token');
 
@@ -125,25 +132,30 @@ UserSchema.statics.verify = async function (ctx: Context) {
             );
 
             if (accessTokenVerify.error) {
-                return;
+                return { error: new Error(accessTokenVerify.error.message) };
             }
 
-            const { _id, uid } = accessTokenVerify.decoded as Access;
+            const { _id, uid, exp } = accessTokenVerify.decoded as Access;
+
+            console.log('exp', exp);
+            console.log('now', Date.now);
 
             const user = await this.findOne({ _id, uid });
-            return user;
+            return { user };
         } else if (refreshToken) {
             const user = await this.findOne({ token: refreshToken as string });
             if (user.tokenMaxAge.getTime() > Date.now()) {
-                return;
+                return { error: new Error('token timeout') };
             }
 
             user.generateAccessToken(ctx);
-            return user;
+            return { user };
         }
     } catch (e) {
-        return;
+        return { error: e };
     }
+
+    return { error: new Error('unknown') };
 
     // const { _id: userId, uid: userUid } = jwt.decode(accessToken) as User;
     // const user = await this.findOne({ _id: userId });

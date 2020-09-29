@@ -48,8 +48,8 @@ app.prepare().then(() => {
               }
             : false,
         context: async ({ ctx }) => {
-            const test = await User.verify(ctx);
-            console.log(test);
+            const user = await User.verify(ctx);
+            return { user };
         },
     });
     apolloServer.applyMiddleware({ app: server });
