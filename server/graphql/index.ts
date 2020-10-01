@@ -1,8 +1,27 @@
-import { makeExecutableSchema } from 'apollo-server-koa';
-import typeDefs from './type';
-import resolvers from './resolvers';
+import { AuthChecker, buildSchemaSync } from 'type-graphql';
+import { UserVerifyResult } from '../models/user';
+import UserResolvers from './resolvers/user';
 
-export const schema = makeExecutableSchema({
-    typeDefs,
-    resolvers,
+const customAuthChecker: AuthChecker<{ currentUser: UserVerifyResult }> = (
+    { context },
+    roles,
+) => {
+    const user = context.currentUser.user;
+
+    if (!user) {
+        return false;
+    } else if (user.authority.includes('admin')) {
+        return true;
+    } else {
+        const difference = user.authority.filter((auth) =>
+            roles.includes(auth),
+        );
+        return difference.length === roles.length;
+    }
+};
+
+export const schema = buildSchemaSync({
+    resolvers: [UserResolvers],
+    dateScalarMode: 'timestamp',
+    authChecker: customAuthChecker,
 });

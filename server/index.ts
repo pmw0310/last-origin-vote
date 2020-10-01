@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import Koa, { DefaultState, Context } from 'koa';
 // import morgan from 'koa-morgan';
 import mount from 'koa-mount';
@@ -48,8 +50,8 @@ app.prepare().then(() => {
               }
             : false,
         context: async ({ ctx }) => {
-            const user = await User.verify(ctx);
-            return { user };
+            const currentUser = await User.verify(ctx);
+            return { currentUser };
         },
     });
     apolloServer.applyMiddleware({ app: server });

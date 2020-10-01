@@ -48,10 +48,9 @@ const UserSchema = new Schema<UserTypeModel>({
         required: true,
     },
     authority: {
-        type: String,
+        type: [String],
         required: true,
-        enum: ['user', 'admin'],
-        default: 'user',
+        default: [],
     },
 });
 
