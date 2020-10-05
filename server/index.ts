@@ -72,16 +72,6 @@ app.prepare().then(() => {
     router.get('/', renderNext('/'));
     router.use('/api', api.routes());
 
-    router.get('/test', async (ctx: Context) => {
-        // const accessToken = ctx.cookies.get('access_token') as string;
-        // const refreshToken = ctx.cookies.get('refresh_token') as string;
-        // console.log('accessToken', accessToken);
-        // console.log('refreshToken', refreshToken);
-        const user = await User.verify(ctx);
-
-        ctx.body = user;
-    });
-
     server
         .use(Bodyparser())
         .use(helmet())
