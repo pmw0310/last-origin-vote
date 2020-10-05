@@ -125,8 +125,10 @@ export class Character {
 export default class CharacterResolver {
     @Query(() => [Character])
     async characterList(
-        @Arg('page', () => Int, { nullable: true }) page: number = 1,
-        @Arg('limit', () => Int, { nullable: true }) limit: number = 15,
+        @Arg('page', () => Int, { nullable: true, defaultValue: 1 })
+        page: number = 1,
+        @Arg('limit', () => Int, { nullable: true, defaultValue: 15 })
+        limit: number = 15,
     ): Promise<Character[]> {
         const char = await CharacterModels.find()
             .sort({ _id: -1 })
