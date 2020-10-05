@@ -3,11 +3,10 @@ import {
     Query,
     Mutation,
     Field,
-    // InterfaceType,
     ObjectType,
     InputType,
     Int,
-    // Authorized,
+    Authorized,
     registerEnumType,
     Arg,
 } from 'type-graphql';
@@ -139,6 +138,7 @@ export default class CharacterResolver {
         return char as Character[];
     }
 
+    @Authorized('character')
     @Mutation(() => Boolean)
     async addCharacter(@Arg('data') data: Character): Promise<boolean> {
         try {

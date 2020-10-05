@@ -15,7 +15,7 @@ router.get(
     }),
     async (ctx: Context) => {
         const exists = await User.findOne({
-            _id: ctx.state.user.id,
+            _id: `naver::${ctx.state.user.id}`,
         });
 
         if (exists) {

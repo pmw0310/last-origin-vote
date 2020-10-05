@@ -50,7 +50,7 @@ export default class UserResolver {
         return user as User;
     }
 
-    @Authorized('admin')
+    @Authorized('user')
     @Query(() => [User])
     async allUsers(): Promise<User[]> {
         const users = await UserModels.find();
