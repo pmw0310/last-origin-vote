@@ -189,10 +189,10 @@ export default class CharacterResolver {
     @Mutation(() => Character)
     async updateCharacter(
         @Arg('id', () => ID, { nullable: false }) id: string,
-        @Arg('data') data: CharacterInterface,
+        @Arg('data', { nullable: false }) data: CharacterInterface,
     ): Promise<Character> {
         try {
-            const update = { ...data, updateAt: new Date() };
+            const update = { $set: { ...data, updateAt: new Date() } };
             const char = await CharacterModels.findByIdAndUpdate(id, update, {
                 new: true,
             }).exec();
