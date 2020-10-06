@@ -4,6 +4,7 @@ import {
     Ctx,
     Field,
     ObjectType,
+    ID,
     Int,
     Authorized,
 } from 'type-graphql';
@@ -11,7 +12,7 @@ import UserModels, { UserVerifyResult } from '../../models/user';
 
 @ObjectType({ description: '유저 정보' })
 export class User {
-    @Field({
+    @Field(() => ID, {
         name: 'id',
         description: '유저 ID (<sns type>::<sns id>)',
     })
@@ -52,7 +53,7 @@ export default class UserResolver {
 
     @Authorized('user')
     @Query(() => [User])
-    async allUsers(): Promise<User[]> {
+    async allUser(): Promise<User[]> {
         const users = await UserModels.find();
         return users as User[];
     }
