@@ -12,7 +12,7 @@ export interface Upload {
 }
 
 @Resolver()
-export class ProfilePictureResolver {
+export default class ImageUploadResolver {
     @Mutation(() => String)
     async imageUpload(
         @Arg('picture', () => GraphQLUpload)
