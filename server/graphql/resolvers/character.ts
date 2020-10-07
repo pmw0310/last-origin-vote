@@ -5,16 +5,21 @@ import {
     Field,
     ObjectType,
     InputType,
+    InterfaceType,
     Int,
+    ID,
     Authorized,
     registerEnumType,
     Arg,
+    Args,
+    ArgsType,
 } from 'type-graphql';
 import CharacterModels, {
     CharacterGrade,
     CharacterType,
     CharacterRole,
 } from '../../models/character';
+import { Min } from 'class-validator';
 
 registerEnumType(CharacterGrade, {
     name: 'CharacterGrade',
@@ -31,9 +36,25 @@ registerEnumType(CharacterRole, {
     description: '케릭터 역할',
 });
 
-@InputType('CharacterDataInput')
-@ObjectType('CharacterDataObject')
-export class CharacterData {
+@InterfaceType()
+@InputType('CharacterInput')
+export class CharacterInterface {
+    @Field({
+        description: '이름',
+        nullable: true,
+    })
+    name?: string;
+    @Field({
+        description: '프로필 url',
+        nullable: true,
+    })
+    profileImage?: string;
+    @Field(() => [String], {
+        description: '태그',
+        nullable: 'itemsAndList',
+        defaultValue: [],
+    })
+    tag?: string[];
     @Field(() => Int, {
         description: '번호',
         nullable: true,
@@ -91,49 +112,46 @@ export class CharacterData {
     description?: string;
 }
 
-@InputType('CharacterInput')
-@ObjectType('CharacterObject')
-export class Character {
-    @Field({
-        description: '이름',
+@ObjectType({ implements: CharacterInterface })
+export class Character extends CharacterInterface {
+    @Field(() => ID, {
+        name: 'id',
+        description: 'ID',
         nullable: true,
     })
-    name?: string;
+    _id?: string;
     @Field({
-        description: '프로필 url',
-        nullable: true,
-    })
-    profileImage?: string;
-    @Field({
-        description: '생성 날짜',
+        description: '생성일',
         nullable: true,
     })
     createdAt?: Date;
-    @Field(() => [String], {
-        description: '태그',
-        nullable: false,
-    })
-    tag?: string[];
-    @Field(() => CharacterData, {
-        description: '케릭터 데이터',
+    @Field({
+        description: '수정일',
         nullable: true,
     })
-    data?: CharacterData;
+    updateAt?: Date;
+}
+
+@ArgsType()
+class CharacterListArgs {
+    @Field(() => Int, { defaultValue: 1 })
+    @Min(1)
+    page?: number;
+    @Field(() => Int, { defaultValue: 10 })
+    @Min(1)
+    limit?: number;
 }
 
 @Resolver()
 export default class CharacterResolver {
     @Query(() => [Character])
     async characterList(
-        @Arg('page', () => Int, { nullable: true, defaultValue: 1 })
-        page: number = 1,
-        @Arg('limit', () => Int, { nullable: true, defaultValue: 15 })
-        limit: number = 15,
+        @Args() { page, limit }: CharacterListArgs,
     ): Promise<Character[]> {
         const char = await CharacterModels.find()
             .sort({ _id: -1 })
-            .limit(limit)
-            .skip((page - 1) * limit)
+            .limit(limit as number)
+            .skip(((page as number) - 1) * (limit as number))
             .lean()
             .exec();
 
@@ -141,14 +159,51 @@ export default class CharacterResolver {
     }
 
     @Authorized('character')
-    @Mutation(() => Boolean)
-    async addCharacter(@Arg('data') data: Character): Promise<boolean> {
+    @Mutation(() => Character)
+    async addCharacter(
+        @Arg('data') data: CharacterInterface,
+    ): Promise<Character> {
         try {
             const char = new CharacterModels(data);
             await char.save();
+            return char;
+        } catch (e) {
+            throw new Error('generation failure');
+        }
+    }
+
+    @Authorized('character')
+    @Mutation(() => Boolean)
+    async removeCharacter(
+        @Arg('id', () => ID, { nullable: false }) id: string,
+    ): Promise<boolean> {
+        try {
+            await CharacterModels.findByIdAndRemove(id).exec();
             return true;
         } catch (e) {
-            return false;
+            throw new Error('update failure');
+        }
+    }
+
+    @Authorized('character')
+    @Mutation(() => Character)
+    async updateCharacter(
+        @Arg('id', () => ID, { nullable: false }) id: string,
+        @Arg('data', { nullable: false }) data: CharacterInterface,
+    ): Promise<Character> {
+        try {
+            const update = { $set: { ...data, updateAt: new Date() } };
+            const char = await CharacterModels.findByIdAndUpdate(id, update, {
+                new: true,
+            }).exec();
+
+            if (!char) {
+                throw new Error('update failure');
+            }
+
+            return char as Character;
+        } catch (e) {
+            throw new Error('update failure');
         }
     }
 }

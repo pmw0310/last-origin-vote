@@ -1,11 +1,23 @@
 import { Document, Schema, model } from 'mongoose';
+import enumToArray from '../lib/enumToArray';
 
 export interface CharacterTypeModel extends Document {
     name?: string;
     profileImage?: string;
-    data?: CharacterData;
-    createdAt?: Date;
-    tag?: string[];
+    createdAt: Date;
+    updateAt: Date;
+    tag: string[];
+    number: number;
+    unit: string;
+    grade: CharacterGrade;
+    lastGrade?: CharacterGrade;
+    type: CharacterType;
+    role: CharacterRole;
+    class?: string;
+    arm?: string;
+    stature?: number;
+    weight?: number;
+    description?: string;
 }
 
 export enum CharacterGrade {
@@ -27,25 +39,14 @@ export enum CharacterRole {
     DEFEND,
 }
 
-export interface CharacterData {
-    number: number;
-    unit: string;
-    grade: CharacterGrade;
-    lastGrade?: CharacterGrade;
-    type: CharacterType;
-    role: CharacterRole;
-    class?: string;
-    arm?: string;
-    stature?: number;
-    weight?: number;
-    description?: string;
-}
-
 const CharacterSchema = new Schema<CharacterTypeModel>({
     name: String,
     profileImage: String,
-    data: Object,
     createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+    updateAt: {
         type: Date,
         default: Date.now,
     },
@@ -53,6 +54,29 @@ const CharacterSchema = new Schema<CharacterTypeModel>({
         type: [String],
         default: [],
     },
+    number: Number,
+    unit: String,
+    grade: {
+        type: Number,
+        enum: enumToArray(CharacterGrade),
+    },
+    lastGrade: {
+        type: Number,
+        enum: enumToArray(CharacterGrade),
+    },
+    type: {
+        type: Number,
+        enum: enumToArray(CharacterType),
+    },
+    role: {
+        type: Number,
+        enum: enumToArray(CharacterRole),
+    },
+    class: String,
+    arm: String,
+    stature: Number,
+    weight: Number,
+    description: String,
 });
 
 export default model<CharacterTypeModel>('Character', CharacterSchema);
