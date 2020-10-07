@@ -13,13 +13,13 @@ export interface Upload {
 
 @Resolver()
 export default class ImageUploadResolver {
-    @Mutation(() => String)
+    @Mutation(() => Boolean)
     async imageUpload(
-        @Arg('picture', () => GraphQLUpload)
+        @Arg('upload', () => GraphQLUpload)
         upload: Upload,
-    ): Promise<string> {
+    ): Promise<boolean> {
         console.log('upload', upload);
-        return 'test';
+        return true;
         // const randToken = generator({ chars: 'default' });
 
         // const token = randToken.generate(16);
