@@ -29,7 +29,12 @@ const App: React.FC = () => {
             <div>
                 <label>Single Upload</label>
                 <br />
-                <input type="file" required onChange={onChange} />
+                <input
+                    type="file"
+                    required
+                    accept="image/jpeg, image/png"
+                    onChange={onChange}
+                />
             </div>
         </div>
     );
