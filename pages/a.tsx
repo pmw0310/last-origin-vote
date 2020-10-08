@@ -10,22 +10,26 @@ const SINGLEUPLOAD = gql`
 const App: React.FC = () => {
     const [singleUploadMutation] = useMutation(SINGLEUPLOAD);
 
-    const onChange: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
-        const files = e.target.files as FileList;
-        const file = files[0];
-        console.log('file', file);
-        await singleUploadMutation({
-            variables: {
-                file: file,
-            },
-        });
+    const onChange: React.ChangeEventHandler<HTMLInputElement> = ({
+        target,
+    }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const [file] = target.files as any;
+
+        if (target.validity.valid) {
+            singleUploadMutation({
+                variables: {
+                    file,
+                },
+            });
+        }
     };
     return (
         <div>
             <div>
                 <label>Single Upload</label>
                 <br />
-                <input type="file" onChange={onChange} />
+                <input type="file" required onChange={onChange} />
             </div>
         </div>
     );

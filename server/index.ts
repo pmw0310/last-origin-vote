@@ -10,12 +10,17 @@ import helmet from 'koa-helmet';
 import passport from 'koa-passport';
 import { Strategy, Profile } from 'passport-naver';
 import { ApolloServer } from 'apollo-server-koa';
+import { graphqlUploadKoa } from 'graphql-upload';
 import mongoose from 'mongoose';
 import next from 'next';
+import { existsSync, mkdirSync } from 'fs';
 
 import { schema } from './graphql';
 import api from './api';
 import User from './models/user';
+
+const dir: string = __dirname + '/upload';
+!existsSync(dir) && mkdirSync(dir);
 
 const port = parseInt(process.env.PORT || '4000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -79,6 +84,7 @@ app.prepare().then(() => {
         .use(router.routes())
         .use(router.allowedMethods())
         .use(passport.initialize())
+        .use(graphqlUploadKoa({ maxFileSize: 16777216, maxFiles: 1 }))
         // .use(morgan('combined'))
         .use(
             mount('/', async (ctx: Context) => {

@@ -1,8 +1,8 @@
 import { Resolver, Mutation, Arg } from 'type-graphql';
-import { GraphQLUpload } from 'graphql-upload';
-// import { statSync, createWriteStream } from 'fs';
+import { GraphQLUpload } from 'apollo-server-koa';
+import { GraphQLScalarType } from 'graphql';
+import { createWriteStream } from 'fs';
 import { Stream } from 'stream';
-// import { generator } from 'rand-token';
 
 export interface Upload {
     filename: string;
@@ -14,26 +14,19 @@ export interface Upload {
 @Resolver()
 export default class ImageUploadResolver {
     @Mutation(() => Boolean)
-    async imageUpload(
-        @Arg('upload', () => GraphQLUpload)
-        upload: Upload,
+    imageUpload(
+        @Arg('upload', () => GraphQLUpload as GraphQLScalarType, {
+            nullable: true,
+        })
+        { createReadStream, filename }: Upload,
     ): Promise<boolean> {
-        console.log('upload', upload);
-        return true;
-        // const randToken = generator({ chars: 'default' });
-
-        // const token = randToken.generate(16);
-        // await statSync();
-
-        // return new Promise(async (resolve, reject) =>
-        //     createReadStream()
-        //         .pipe(
-        //             createWriteStream(
-        //                 __dirname + `/../../../upload/${filename}`,
-        //             ),
-        //         )
-        //         .on('finish', () => resolve(true))
-        //         .on('error', () => reject(false)),
-        // );
+        return new Promise((resolve, reject) =>
+            createReadStream()
+                .pipe(
+                    createWriteStream(__dirname + `/../../upload/${filename}`),
+                )
+                .on('finish', () => resolve(true))
+                .on('error', () => reject(false)),
+        );
     }
 }
