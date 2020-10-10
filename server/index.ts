@@ -1,8 +1,7 @@
 import 'reflect-metadata';
 
-import Koa, { DefaultState, Context } from 'koa';
+import Koa, { DefaultState, Context, Next } from 'koa';
 // import morgan from 'koa-morgan';
-import mount from 'koa-mount';
 import Router from 'koa-router';
 import Bodyparser from 'koa-bodyparser';
 // import proxy from 'koa-proxies';
@@ -14,6 +13,8 @@ import { graphqlUploadKoa } from 'graphql-upload';
 import mongoose from 'mongoose';
 import next from 'next';
 import { existsSync, mkdirSync } from 'fs';
+import LruCache from 'lru-cache';
+import url from 'url';
 
 import { schema } from './graphql';
 import api from './api';
@@ -27,20 +28,42 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-function renderNext(route: string) {
-    return async (ctx: Context) => {
-        ctx.res.statusCode = 200;
-        ctx.respond = false;
+const ssrCache = new LruCache({
+    max: 100,
+    maxAge: 1000 * 60 * 10,
+});
 
-        app.render(ctx.req, ctx.res, route, {
-            ...((ctx.request && ctx.request.body) || {}),
-            ...ctx.params,
-            ...ctx.query,
-        });
-    };
+async function renderAndCache(ctx: Context, next: Next) {
+    const parsedUrl = url.parse(ctx.url, true);
+    const { query, pathname, path: cacheKey } = parsedUrl;
+    if (ssrCache.has(cacheKey)) {
+        console.log('use cache', cacheKey);
+        ctx.body = ssrCache.get(cacheKey);
+        await next();
+        ctx.respond = false;
+        return;
+    }
+    try {
+        const html = await app.renderToHTML(
+            ctx.req,
+            ctx.res,
+            pathname as string,
+            query,
+        );
+        if (ctx.res.statusCode === 200) {
+            ssrCache.set(cacheKey, html);
+        }
+        ctx.body = html;
+        await next();
+        ctx.respond = false;
+    } catch (err) {
+        app.renderError(err, ctx.req, ctx.res, pathname as string, query);
+    }
 }
 
-app.prepare().then(() => {
+(async () => {
+    await app.prepare();
+
     const server = new Koa();
     const router = new Router<DefaultState, Context>();
     const apolloServer = new ApolloServer({
@@ -61,37 +84,38 @@ app.prepare().then(() => {
     });
     apolloServer.applyMiddleware({ app: server });
 
-    mongoose
-        .connect(process.env.MONGODB_URI as string, {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI as string, {
             useCreateIndex: true,
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false,
-        })
-        .then(() => {
-            console.log('Connected to MongoDB');
-        })
-        .catch((e) => {
-            console.error(e);
         });
+        console.log('Connected to MongoDB');
+    } catch (e) {
+        console.error(e);
+    }
 
-    router.get('/', renderNext('/'));
+    router.get('/', renderAndCache);
+    router.get('/a', renderAndCache);
+    router.get('/b', renderAndCache);
     router.use('/api', api.routes());
+    router.get('/(.*)', async (ctx: Context) => {
+        await handle(ctx.req, ctx.res);
+        ctx.respond = false;
+    });
 
     server
+        .use(async (ctx: Context, next: Next) => {
+            ctx.res.statusCode = 200;
+            await next();
+        })
         .use(Bodyparser())
         .use(helmet())
         .use(router.routes())
         .use(router.allowedMethods())
         .use(passport.initialize())
-        .use(graphqlUploadKoa({ maxFileSize: 16777216, maxFiles: 1 }))
-        // .use(morgan('combined'))
-        .use(
-            mount('/', async (ctx: Context) => {
-                ctx.respond = false;
-                handle(ctx.req, ctx.res);
-            }),
-        );
+        .use(graphqlUploadKoa({ maxFileSize: 16777216, maxFiles: 1 }));
 
     passport.use(
         new Strategy(
@@ -118,6 +142,5 @@ app.prepare().then(() => {
         console.log(
             `> GraphQL on http://localhost:${port}${apolloServer.graphqlPath}`,
         );
-        // console.log(process.env.MONGODB_HOST);
     });
-});
+})();

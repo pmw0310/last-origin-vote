@@ -11,12 +11,14 @@ const App: React.FC = () => {
     const [singleUploadMutation] = useMutation(SINGLEUPLOAD);
 
     const onChange: React.ChangeEventHandler<HTMLInputElement> = ({
-        target,
+        target: {
+            files,
+            validity: { valid },
+        },
     }) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const [file] = target.files as any;
+        const file = (files as FileList)[0];
 
-        if (target.validity.valid) {
+        if (valid) {
             singleUploadMutation({
                 variables: {
                     file,
