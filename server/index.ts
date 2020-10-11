@@ -4,6 +4,7 @@ import Koa, { DefaultState, Context, Next } from 'koa';
 // import morgan from 'koa-morgan';
 import Router from 'koa-router';
 import Bodyparser from 'koa-bodyparser';
+import staticServe from 'koa-static';
 // import proxy from 'koa-proxies';
 import helmet from 'koa-helmet';
 import passport from 'koa-passport';
@@ -104,6 +105,10 @@ async function renderAndCache(ctx: Context, next: Next) {
         await handle(ctx.req, ctx.res);
         ctx.respond = false;
     });
+
+    if (dev) {
+        server.use(staticServe(`${__dirname}/upload`));
+    }
 
     server
         .use(async (ctx: Context, next: Next) => {

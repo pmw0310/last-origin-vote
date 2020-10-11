@@ -47,18 +47,4 @@ router.get(
     },
 );
 
-router.get('/logout', async (ctx: Context) => {
-    console.log('logout');
-    ctx.cookies.set('access_token', '', {
-        httpOnly: true,
-        maxAge: 1000 * 60 * 10,
-    });
-
-    ctx.cookies.set('refresh_token', '', {
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 * 14,
-    });
-    ctx.redirect('/');
-});
-
 export default router;

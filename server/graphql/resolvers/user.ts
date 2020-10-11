@@ -15,22 +15,27 @@ export class User {
     @Field(() => ID, {
         name: 'id',
         description: '유저 ID (<sns type>::<sns id>)',
+        nullable: false,
     })
     _id?: string;
     @Field(() => Int, {
         description: '가입 순서',
+        nullable: false,
     })
     uid?: number;
     @Field({
         description: '닉네임',
+        nullable: true,
     })
     nickname?: string;
     @Field({
         description: '프로필 url',
+        nullable: true,
     })
     profileImage?: string;
     @Field({
         description: '가입 날짜',
+        nullable: false,
     })
     createdAt?: Date;
     @Field(() => [String], {
@@ -42,11 +47,11 @@ export class User {
 
 @Resolver()
 export default class UserResolver {
-    @Query(() => User)
-    me(@Ctx() ctx: { currentUser: UserVerifyResult }): User {
+    @Query(() => User, { nullable: true })
+    me(@Ctx() ctx: { currentUser: UserVerifyResult }): User | null {
         const { user, error } = ctx.currentUser;
         if (error) {
-            throw new Error(error);
+            return null;
         }
         return user as User;
     }

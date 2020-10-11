@@ -14,13 +14,13 @@ export interface Upload {
 
 @Resolver()
 export default class ImageUploadResolver {
-    @Mutation(() => Boolean)
+    @Mutation(() => String)
     imageUpload(
         @Arg('upload', () => GraphQLUpload as GraphQLScalarType, {
             nullable: true,
         })
         { createReadStream, mimetype }: Upload,
-    ): Promise<boolean> {
+    ): Promise<string> {
         let ext: string;
 
         if (mimetype === 'image/jpeg') {
@@ -32,17 +32,25 @@ export default class ImageUploadResolver {
         }
 
         const randToken = generator({ chars: 'base32' });
-        const name = randToken.generate(16);
+        const name = randToken.generate(12);
+        const now = Math.floor(
+            (Date.now() - new Date(new Date().getFullYear(), 0, 1).getTime()) *
+                0.001,
+        );
 
-        return new Promise((resolve, reject) => {
+        const filename = `${name.toLowerCase()}_${now}.${ext}`;
+
+        return new Promise((resolve) => {
             createReadStream()
                 .pipe(
-                    createWriteStream(
-                        __dirname + `/../../upload/${name}.${ext}`,
-                    ),
+                    createWriteStream(__dirname + `/../../upload/${filename}`),
                 )
-                .on('finish', () => resolve(true))
-                .on('error', () => reject(false));
+                .on('finish', () =>
+                    resolve(`http://localhost:4000/${filename}`),
+                )
+                .on('error', () => {
+                    throw new Error('upload error');
+                });
         });
     }
 }

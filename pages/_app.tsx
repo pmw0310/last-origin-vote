@@ -4,6 +4,7 @@ import App from 'next/app';
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { ApolloProvider } from '@apollo/react-hooks';
 import withApolloClient from '../src/apollo';
+import AppBar from '../src/appBar';
 
 interface Props {
     apollo: ApolloClient<NormalizedCacheObject>;
@@ -15,6 +16,7 @@ class MyApp extends App<Props> {
 
         return (
             <ApolloProvider client={apollo}>
+                <AppBar />
                 <Component {...pageProps} />
             </ApolloProvider>
         );
