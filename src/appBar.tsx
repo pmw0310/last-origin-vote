@@ -5,12 +5,16 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import MenuIcon from '@material-ui/icons/Menu';
+import Container from '@material-ui/core/Container';
 import styled from 'styled-components';
 import { gql, useQuery } from '@apollo/client';
 import { currentUserVar } from '../src/apollo';
 
 const Root = styled.div`
-    flex-grow: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
 `;
 const MenuButton = styled(IconButton)`
     margin-right: 2px;
@@ -49,29 +53,38 @@ export default function MenuAppBar(): JSX.Element {
     return (
         <Root>
             <AppBar position="static">
-                <Toolbar>
-                    <MenuButton edge="start" color="inherit" aria-label="menu">
-                        <MenuIcon />
-                    </MenuButton>
-                    {loading ? (
-                        <div />
-                    ) : data.me ? (
-                        <>
-                            <Avatar src={data.me.profileImage} />
-                            <div>{data.me.nickname}</div>
+                <Container fixed>
+                    <Toolbar>
+                        <MenuButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="menu"
+                        >
+                            <MenuIcon />
+                        </MenuButton>
+                        {loading ? (
+                            <div />
+                        ) : data.me ? (
+                            <>
+                                <Avatar src={data.me.profileImage} />
+                                <div>{data.me.nickname}</div>
+                                <Button
+                                    color="inherit"
+                                    onClick={onLogoutButtonClick}
+                                >
+                                    Logout
+                                </Button>
+                            </>
+                        ) : (
                             <Button
                                 color="inherit"
-                                onClick={onLogoutButtonClick}
+                                onClick={onLoginButtonClick}
                             >
-                                Logout
+                                Login
                             </Button>
-                        </>
-                    ) : (
-                        <Button color="inherit" onClick={onLoginButtonClick}>
-                            Login
-                        </Button>
-                    )}
-                </Toolbar>
+                        )}
+                    </Toolbar>
+                </Container>
             </AppBar>
         </Root>
     );

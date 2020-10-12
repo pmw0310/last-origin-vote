@@ -76,3 +76,22 @@ declare module 'next-with-apollo' {
         getInitialProps(pageCtx: ApolloContext<any>): Promise<{}>;
     };
 }
+
+declare enum CharacterGrade {
+    B = 1,
+    A,
+    S,
+    SS,
+}
+
+declare enum CharacterType {
+    LIGHT = 1,
+    FLYING,
+    HEAVY,
+}
+
+declare enum CharacterRole {
+    ASSAULT = 1,
+    SUPPORT,
+    DEFEND,
+}

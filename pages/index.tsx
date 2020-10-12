@@ -2,15 +2,11 @@ import React, { useState } from 'react';
 // import Link from 'next/link';
 import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import styled from 'styled-components';
-
-const Item = styled.div`
-    height: 300px;
-`;
+import Item, { CharacterData } from '../src/characterItem';
 
 const CHARACTER_LIST = gql`
     query($page: Int!) {
-        characterList(page: $page, limit: 5) {
+        characterList(page: $page) {
             id
             name
         }
@@ -63,11 +59,9 @@ export default function Home(): JSX.Element {
                 hasMore={more}
                 loader={<h4>Loading...</h4>}
             >
-                {data.characterList.map(
-                    (data: { id: string; name: string }) => (
-                        <Item key={data.id}>#{data.name}</Item>
-                    ),
-                )}
+                {data.characterList.map((data: CharacterData) => (
+                    <Item data={data} key={data.id} />
+                ))}
             </InfiniteScroll>
         </div>
     );

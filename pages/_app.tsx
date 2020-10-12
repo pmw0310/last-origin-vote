@@ -5,6 +5,7 @@ import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { ApolloProvider } from '@apollo/react-hooks';
 import withApolloClient from '../src/apollo';
 import AppBar from '../src/appBar';
+import Container from '@material-ui/core/Container';
 
 interface Props {
     apollo: ApolloClient<NormalizedCacheObject>;
@@ -17,7 +18,9 @@ class MyApp extends App<Props> {
         return (
             <ApolloProvider client={apollo}>
                 <AppBar />
-                <Component {...pageProps} />
+                <Container fixed style={{ paddingTop: '70px' }}>
+                    <Component {...pageProps} />
+                </Container>
             </ApolloProvider>
         );
     }
