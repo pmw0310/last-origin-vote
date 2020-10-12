@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 // import Link from 'next/link';
 import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Item, { CharacterData } from '../src/characterItem';
+import Item from '../characterItem';
+import { CharacterInterface } from 'Module';
 
 const CHARACTER_LIST = gql`
     query($page: Int!) {
@@ -59,7 +60,7 @@ export default function Home(): JSX.Element {
                 hasMore={more}
                 loader={<h4>Loading...</h4>}
             >
-                {data.characterList.map((data: CharacterData) => (
+                {data.characterList.map((data: CharacterInterface) => (
                     <Item data={data} key={data.id} />
                 ))}
             </InfiniteScroll>

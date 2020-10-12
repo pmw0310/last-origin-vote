@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardMedia, Typography } from '@material-ui/core';
 import styled from 'styled-components';
+import { CharacterInterface } from 'Module';
 
 export enum CharacterGrade {
     B = 1,
@@ -21,28 +22,8 @@ export enum CharacterRole {
     DEFEND,
 }
 
-export interface CharacterData {
-    name?: string;
-    profileImage?: string;
-    tag?: string[];
-    number?: number;
-    unit?: string;
-    grade?: CharacterGrade;
-    lastGrade?: CharacterGrade;
-    type?: CharacterType;
-    role?: CharacterRole;
-    class?: string;
-    arm?: string;
-    stature?: number;
-    weight?: number;
-    description?: string;
-    id?: string;
-    createdAt?: Date;
-    updateAt?: Date;
-}
-
 export interface CharacterItemProps {
-    data: CharacterData;
+    data: CharacterInterface;
 }
 
 const ItemCard = styled(Card)`
