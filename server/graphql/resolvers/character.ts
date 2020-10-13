@@ -18,8 +18,10 @@ import CharacterModels, {
     CharacterGrade,
     CharacterType,
     CharacterRole,
+    CharacterTypeModel,
 } from '../../models/character';
 import { Min } from 'class-validator';
+import { Types, FilterQuery } from 'mongoose';
 
 registerEnumType(CharacterGrade, {
     name: 'CharacterGrade',
@@ -140,15 +142,25 @@ class CharacterListArgs {
     @Field(() => Int, { defaultValue: 10 })
     @Min(1)
     limit?: number;
+    @Field(() => [String], { name: 'ids', nullable: true, defaultValue: [] })
+    ids?: string[];
 }
 
 @Resolver()
 export default class CharacterResolver {
     @Query(() => [Character])
-    async characterList(
-        @Args() { page, limit }: CharacterListArgs,
+    async getCharacter(
+        @Args() { page, limit, ids }: CharacterListArgs,
     ): Promise<Character[]> {
-        const char = await CharacterModels.find()
+        const query: FilterQuery<CharacterTypeModel> = {};
+
+        if (ids && ids.length > 0) {
+            query._id = {
+                $in: ids?.map((id) => Types.ObjectId(id)),
+            };
+        }
+
+        const char = await CharacterModels.find(query)
             .sort({ _id: -1 })
             .limit(limit as number)
             .skip(((page as number) - 1) * (limit as number))

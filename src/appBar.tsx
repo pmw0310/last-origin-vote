@@ -9,6 +9,7 @@ import Container from '@material-ui/core/Container';
 import styled from 'styled-components';
 import { gql, useQuery } from '@apollo/client';
 import { currentUserVar } from '../src/apollo';
+import { UserInterface } from 'Module';
 
 const Root = styled.div`
     position: fixed;
@@ -34,7 +35,7 @@ const ME = gql`
 `;
 
 export default function MenuAppBar(): JSX.Element {
-    const { loading, data } = useQuery(ME);
+    const { loading, data } = useQuery<{ me: UserInterface }>(ME);
     const onLoginButtonClick = () => {
         window.location.href = '/api/auth/naver';
     };
@@ -43,7 +44,7 @@ export default function MenuAppBar(): JSX.Element {
     };
 
     useEffect(() => {
-        if (data) {
+        if (data?.me) {
             currentUserVar(data.me);
         } else {
             currentUserVar(null);
@@ -64,10 +65,10 @@ export default function MenuAppBar(): JSX.Element {
                         </MenuButton>
                         {loading ? (
                             <div />
-                        ) : data.me ? (
+                        ) : data?.me ? (
                             <>
-                                <Avatar src={data.me.profileImage} />
-                                <div>{data.me.nickname}</div>
+                                <Avatar src={data?.me.profileImage} />
+                                <div>{data?.me.nickname}</div>
                                 <Button
                                     color="inherit"
                                     onClick={onLogoutButtonClick}

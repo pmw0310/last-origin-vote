@@ -1,23 +1,15 @@
 import { ApolloClient, InMemoryCache, makeVar, gql } from '@apollo/client';
 import { createUploadLink } from 'apollo-upload-client';
 import { withApollo } from 'next-with-apollo';
+import { UserInterface } from 'Module';
 
 const prod = process.env.NODE_ENV === 'production';
 
-export interface User {
-    id: string;
-    uid: string;
-    nickname?: string;
-    profileImage?: string;
-    createdAt: number;
-    authority: string[];
-}
-
 export interface CurrentUserData {
-    currentUser: User;
+    currentUser: UserInterface;
 }
 
-export const currentUserVar = makeVar<User | null>(null);
+export const currentUserVar = makeVar<UserInterface | null>(null);
 
 export const GET_CURRENT_USER = gql`
     query {

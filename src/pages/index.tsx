@@ -7,7 +7,7 @@ import { CharacterInterface } from 'Module';
 
 const CHARACTER_LIST = gql`
     query($page: Int!) {
-        characterList(page: $page) {
+        getCharacter(page: $page) {
             id
             name
         }
