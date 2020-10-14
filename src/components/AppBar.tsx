@@ -8,7 +8,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Container from '@material-ui/core/Container';
 import styled from 'styled-components';
 import { gql, useQuery } from '@apollo/client';
-import { currentUserVar } from '../src/apollo';
+import { currentUserVar } from '../lib/apollo';
 import { UserInterface } from 'Module';
 
 const Root = styled.div`

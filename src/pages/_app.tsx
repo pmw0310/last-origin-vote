@@ -3,8 +3,8 @@ import React from 'react';
 import App from 'next/app';
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { ApolloProvider } from '@apollo/react-hooks';
-import withApolloClient from '../apollo';
-import AppBar from '../appBar';
+import withApolloClient from '../lib/apollo';
+import AppBar from '../components/appBar';
 import Container from '@material-ui/core/Container';
 
 interface Props {

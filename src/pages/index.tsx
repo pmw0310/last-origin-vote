@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 // import Link from 'next/link';
 import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Item from '../characterItem';
+import Item from '../components/characterItem';
 import { CharacterInterface } from 'Module';
 
 const CHARACTER_LIST = gql`
@@ -34,12 +34,12 @@ export default function Home(): JSX.Element {
 
                 if (
                     fetchMoreResult &&
-                    fetchMoreResult.characterList.length > 0
+                    fetchMoreResult.getCharacter.length > 0
                 ) {
                     return Object.assign({}, prev, {
-                        characterList: [
-                            ...prev.characterList,
-                            ...fetchMoreResult.characterList,
+                        getCharacter: [
+                            ...prev.getCharacter,
+                            ...fetchMoreResult.getCharacter,
                         ],
                     });
                 }
@@ -55,12 +55,12 @@ export default function Home(): JSX.Element {
     ) : (
         <div>
             <InfiniteScroll
-                dataLength={data.characterList.length}
+                dataLength={data.getCharacter.length}
                 next={onLoadMore}
                 hasMore={more}
                 loader={<h4>Loading...</h4>}
             >
-                {data.characterList.map((data: CharacterInterface) => (
+                {data.getCharacter.map((data: CharacterInterface) => (
                     <Item data={data} key={data.id} />
                 ))}
             </InfiniteScroll>

@@ -100,6 +100,7 @@ async function renderAndCache(ctx: Context, next: Next) {
     router.get('/', renderAndCache);
     router.get('/a', renderAndCache);
     router.get('/b', renderAndCache);
+    router.get('/char/add', renderAndCache);
     router.use('/api', api.routes());
     router.get('/(.*)', async (ctx: Context) => {
         await handle(ctx.req, ctx.res);
