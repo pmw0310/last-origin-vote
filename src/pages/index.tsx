@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 // import Link from 'next/link';
 import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Item from '../components/characterItem';
+import Item from '../components/CharacterItem';
 import { CharacterInterface } from 'Module';
 
 const CHARACTER_LIST = gql`

@@ -1,11 +1,11 @@
 declare module 'Module' {
     export interface UserInterface {
-        id: string;
-        uid: string;
+        id?: string;
+        uid?: number;
         nickname?: string;
         profileImage?: string;
-        createdAt: number;
-        authority: string[];
+        createdAt?: number | Date;
+        authority?: string[];
     }
 
     export interface CharacterInterface {
@@ -24,8 +24,8 @@ declare module 'Module' {
         weight?: number;
         description?: string;
         id?: string;
-        createdAt?: Date;
-        updateAt?: Date;
+        createdAt?: number | Date;
+        updateAt?: number | Date;
     }
 
     export enum CharacterGrade {
