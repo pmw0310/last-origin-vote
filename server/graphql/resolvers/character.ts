@@ -20,6 +20,8 @@ import CharacterModels, {
     CharacterRole,
     CharacterTypeModel,
 } from '../../models/character';
+import GroupModels from '../../models/group';
+import { Group } from './group';
 import { Min } from 'class-validator';
 import { Types, FilterQuery } from 'mongoose';
 
@@ -62,11 +64,11 @@ export class CharacterInterface {
         nullable: true,
     })
     number?: number;
-    @Field({
-        description: '부대',
+    @Field(() => ID, {
+        description: '부대 ID',
         nullable: true,
     })
-    unit?: string;
+    groupId?: string;
     @Field(() => CharacterGrade, {
         description: '등급',
         nullable: true,
@@ -132,6 +134,17 @@ export class Character extends CharacterInterface {
         nullable: true,
     })
     updateAt?: Date;
+    @Field(() => Group, {
+        description: '소속된 부대 정보',
+        nullable: true,
+    })
+    async group?(): Promise<Group | undefined> {
+        if (!this.groupId) {
+            return;
+        }
+        const group = await GroupModels.findById(this.groupId);
+        return group as Group;
+    }
 }
 
 @ArgsType()
@@ -176,7 +189,7 @@ export default class CharacterResolver {
         @Arg('data') data: CharacterInterface,
     ): Promise<Character> {
         try {
-            const char = new CharacterModels(data);
+            const char = new CharacterModels({ ...data, group: undefined });
             await char.save();
             return char;
         } catch (e) {
@@ -204,7 +217,9 @@ export default class CharacterResolver {
         @Arg('data', { nullable: false }) data: CharacterInterface,
     ): Promise<Character> {
         try {
-            const update = { $set: { ...data, updateAt: new Date() } };
+            const update = {
+                $set: { ...data, updateAt: new Date(), group: undefined },
+            };
             const char = await CharacterModels.findByIdAndUpdate(id, update, {
                 new: true,
             }).exec();

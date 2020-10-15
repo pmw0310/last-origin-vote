@@ -13,7 +13,7 @@ declare module 'Module' {
         profileImage?: string;
         tag?: string[];
         number?: number;
-        unit?: string;
+        groupId?: string;
         grade?: CharacterGrade;
         lastGrade?: CharacterGrade;
         type?: CharacterType;
@@ -26,6 +26,18 @@ declare module 'Module' {
         id?: string;
         createdAt?: number | Date;
         updateAt?: number | Date;
+        group?: GroupInterface;
+    }
+
+    export interface GroupInterface {
+        name?: string;
+        image?: string;
+        tag?: string[];
+        description?: string;
+        id?: string;
+        createdAt?: number | Date;
+        updateAt?: number | Date;
+        character?: CharacterInterface[];
     }
 
     export enum CharacterGrade {

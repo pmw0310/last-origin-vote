@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-// import { gql } from '@apollo/client';
 import Editor from '../../components/CharacterEditor';
-import { CharacterInterface } from 'Module';
-
-// const CHARACTER = gql``;
+import { GroupInterface } from 'Module';
 
 export default function AdddCharacter(): JSX.Element {
-    const [data, setData] = useState<CharacterInterface>({
+    const [data, setData] = useState<GroupInterface>({
         name: '',
         tag: [],
-        number: undefined,
     });
 
     const test = () => {
@@ -18,7 +14,7 @@ export default function AdddCharacter(): JSX.Element {
 
     return (
         <>
-            <Editor data={data} setData={setData} type="character" />
+            <Editor data={data} setData={setData} type="group" />
             <button onClick={test}>test!</button>
         </>
     );

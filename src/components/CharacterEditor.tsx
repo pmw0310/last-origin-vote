@@ -1,13 +1,29 @@
 import React, { useState, Dispatch } from 'react';
-import { TextField } from '@material-ui/core';
+import {
+    TextField,
+    InputAdornment,
+    Button,
+    Typography,
+} from '@material-ui/core';
 // import styled from 'styled-components';
-import { CharacterInterface } from 'Module';
+import { CharacterInterface, GroupInterface } from 'Module';
 import ChipInput from 'material-ui-chip-input';
+import { gql } from '@apollo/client';
+import { useMutation } from '@apollo/react-hooks';
 
-export interface CharacterItemProps {
-    data: CharacterInterface;
-    setData: Dispatch<React.SetStateAction<CharacterInterface>>;
+export interface Props {
+    data: CharacterInterface | GroupInterface;
+    setData: Dispatch<
+        React.SetStateAction<CharacterInterface | GroupInterface>
+    >;
+    type: 'character' | 'group';
 }
+
+const IMAGEUPLOAD = gql`
+    mutation imageUpload($file: Upload!) {
+        imageUpload(upload: $file)
+    }
+`;
 
 // const ItemCard = styled(Card)`
 //     display: flex;
@@ -19,11 +35,45 @@ export interface CharacterItemProps {
 //     height: 150px;
 // `;
 
-const CharacterEdit: React.FC<CharacterItemProps> = ({
+const CharacterEdit: React.FC<Props> = ({
     data,
     setData,
+    type,
 }): JSX.Element => {
     const [last, setLast] = useState<number>(0);
+
+    const [singleUploadMutation] = useMutation(IMAGEUPLOAD);
+
+    const handleChangeImage: React.ChangeEventHandler<HTMLInputElement> = async ({
+        target: {
+            files,
+            validity: { valid },
+        },
+    }) => {
+        const file = (files as FileList)[0];
+
+        if (valid) {
+            try {
+                const {
+                    data: { imageUpload: url },
+                } = await singleUploadMutation({
+                    variables: {
+                        file,
+                    },
+                });
+
+                setData({
+                    ...data,
+                    [type === 'character' ? 'profileImage' : 'image']: url,
+                });
+            } catch (e) {
+                setData({
+                    ...data,
+                    [type === 'character' ? 'profileImage' : 'image']: null,
+                });
+            }
+        }
+    };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setData({ ...data, [event.target.name]: event.target.value });
@@ -52,13 +102,55 @@ const CharacterEdit: React.FC<CharacterItemProps> = ({
                 onChange={handleChange}
                 name="name"
             />
+            {type === 'character' && (
+                <TextField
+                    label="번호"
+                    value={(data as CharacterInterface).number}
+                    onChange={handleChange}
+                    name="number"
+                    type="number"
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                no.
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            )}
             <ChipInput
                 label="태그"
-                // onUpdateInput={onTest}
                 value={data.tag}
                 onAdd={(chip) => handleTagAdd(chip, Date.now())}
                 onDelete={(chip, index) => handleTagDelete(chip, index)}
             />
+            <TextField
+                label="설명"
+                multiline
+                rowsMax={4}
+                value={data.description}
+                onChange={handleChange}
+                name="description"
+            />
+            <img
+                src={
+                    (data as CharacterInterface).profileImage ||
+                    (data as GroupInterface).image ||
+                    'https://via.placeholder.com/150x150.png?text=NoImage'
+                }
+                width="150"
+                height="150"
+            />
+            <Button variant="contained" component="label">
+                <Typography>{'변경'}</Typography>
+
+                <input
+                    style={{ display: 'none' }}
+                    type="file"
+                    accept="image/jpeg, image/png"
+                    onChange={handleChangeImage}
+                />
+            </Button>
         </>
     );
 };

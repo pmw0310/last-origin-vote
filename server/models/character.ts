@@ -1,4 +1,4 @@
-import { Document, Schema, model } from 'mongoose';
+import { Document, Schema, model, Types } from 'mongoose';
 import enumToArray from '../lib/enumToArray';
 
 export interface CharacterTypeModel extends Document {
@@ -8,7 +8,7 @@ export interface CharacterTypeModel extends Document {
     updateAt: Date;
     tag: string[];
     number: number;
-    unit: string;
+    groupId: string;
     grade: CharacterGrade;
     lastGrade?: CharacterGrade;
     type: CharacterType;
@@ -55,7 +55,7 @@ const CharacterSchema = new Schema<CharacterTypeModel>({
         default: [],
     },
     number: Number,
-    unit: String,
+    groupId: { type: Types.ObjectId, index: true },
     grade: {
         type: Number,
         enum: enumToArray(CharacterGrade),

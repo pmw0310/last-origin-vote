@@ -3,6 +3,7 @@ import { UserVerifyResult } from '../models/user';
 import UserResolvers from './resolvers/user';
 import CharacterResolvers from './resolvers/character';
 import ImageUploadResolver from './resolvers/imageUpload';
+import GroupResolver from './resolvers/group';
 
 const customAuthChecker: AuthChecker<{ currentUser: UserVerifyResult }> = (
     { context },
@@ -23,7 +24,12 @@ const customAuthChecker: AuthChecker<{ currentUser: UserVerifyResult }> = (
 };
 
 export const schema = buildSchemaSync({
-    resolvers: [UserResolvers, CharacterResolvers, ImageUploadResolver],
+    resolvers: [
+        UserResolvers,
+        CharacterResolvers,
+        ImageUploadResolver,
+        GroupResolver,
+    ],
     dateScalarMode: 'timestamp',
     authChecker: customAuthChecker,
 });
