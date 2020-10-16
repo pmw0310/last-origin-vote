@@ -49,7 +49,7 @@ export default function MenuAppBar(): JSX.Element {
         } else {
             currentUserVar(null);
         }
-    }, [loading, data]);
+    }, [data]);
 
     return (
         <Root>

@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable @typescript-eslint/ban-types */
 import React from 'react';
 import App from 'next/app';
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';

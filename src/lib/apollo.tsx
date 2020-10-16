@@ -2,6 +2,7 @@ import { ApolloClient, InMemoryCache, makeVar, gql } from '@apollo/client';
 import { createUploadLink } from 'apollo-upload-client';
 import { withApollo } from 'next-with-apollo';
 import { UserInterface } from 'Module';
+import { offsetLimitPagination } from '@apollo/client/utilities';
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -24,6 +25,7 @@ const cache = new InMemoryCache({
                 currentUser() {
                     return currentUserVar();
                 },
+                // getCharacter: offsetLimitPagination(),
             },
         },
     },

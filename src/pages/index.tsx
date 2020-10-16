@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import Link from 'next/link';
+import Link from 'next/link';
 import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Item from '../components/CharacterItem';
@@ -48,12 +48,17 @@ export default function Home(): JSX.Element {
                 return prev;
             },
         });
+
+        setPage(page + 1);
     };
 
     return loading ? (
         <div />
     ) : (
         <div>
+            <Link href="/b" as="/b">
+                <a>b</a>
+            </Link>
             <InfiniteScroll
                 dataLength={data.getCharacter.length}
                 next={onLoadMore}
@@ -76,9 +81,9 @@ export default function Home(): JSX.Element {
     //                 </Link>
     //             </li>
     //             <li>
-    //                 <Link href="/b" as="/b">
-    //                     <a>b</a>
-    //                 </Link>
+    // <Link href="/b" as="/b">
+    //     <a>b</a>
+    // </Link>
     //             </li>
     //         </ul>
     //     </>
