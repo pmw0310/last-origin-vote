@@ -102,6 +102,7 @@ async function renderAndCache(ctx: Context, next: Next) {
     router.get('/b', renderAndCache);
     router.get('/char/add', renderAndCache);
     router.get('/group/add', renderAndCache);
+    router.get('/group/:id', renderAndCache);
     router.use('/api', api.routes());
     router.get('/(.*)', async (ctx: Context) => {
         await handle(ctx.req, ctx.res);

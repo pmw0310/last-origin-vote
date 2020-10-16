@@ -4,12 +4,14 @@ import {
     InputAdornment,
     Button,
     Typography,
+    Grid,
 } from '@material-ui/core';
-// import styled from 'styled-components';
+import styled from 'styled-components';
 import { CharacterInterface, GroupInterface } from 'Module';
 import ChipInput from 'material-ui-chip-input';
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/react-hooks';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export interface Props {
     data: CharacterInterface | GroupInterface;
@@ -25,15 +27,34 @@ const IMAGEUPLOAD = gql`
     }
 `;
 
-// const ItemCard = styled(Card)`
-//     display: flex;
-//     margin: 10px;
-// `;
+const ItemInputField = styled(TextField)`
+    width: 100%;
+`;
 
-// const ItemCardMedia = styled(CardMedia)`
-//     width: 150px;
-//     height: 150px;
-// `;
+const ItemGrid: React.FC<{
+    div: 1 | 2 | 3;
+    children: React.ReactNode;
+}> = ({ div, children }): JSX.Element => {
+    if (div === 1) {
+        return (
+            <Grid item xs={12}>
+                {children}
+            </Grid>
+        );
+    } else if (div === 2) {
+        return (
+            <Grid item lg={6} md={12}>
+                {children}
+            </Grid>
+        );
+    } else {
+        return (
+            <Grid item lg={3} md={6} sm={12}>
+                {children}
+            </Grid>
+        );
+    }
+};
 
 const CharacterEdit: React.FC<Props> = ({
     data,
@@ -41,7 +62,6 @@ const CharacterEdit: React.FC<Props> = ({
     type,
 }): JSX.Element => {
     const [last, setLast] = useState<number>(0);
-
     const [singleUploadMutation] = useMutation(IMAGEUPLOAD);
 
     const handleChangeImage: React.ChangeEventHandler<HTMLInputElement> = async ({
@@ -95,63 +115,85 @@ const CharacterEdit: React.FC<Props> = ({
     };
 
     return (
-        <>
-            <TextField
-                label="이름"
-                value={data.name}
-                onChange={handleChange}
-                name="name"
-            />
-            {type === 'character' && (
-                <TextField
-                    label="번호"
-                    value={(data as CharacterInterface).number}
+        <Grid container spacing={2}>
+            <ItemGrid div={3}>
+                <ItemInputField
+                    label="이름"
+                    value={data.name}
                     onChange={handleChange}
-                    name="number"
-                    type="number"
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                no.
-                            </InputAdornment>
-                        ),
-                    }}
+                    name="name"
+                    variant="outlined"
                 />
-            )}
-            <ChipInput
-                label="태그"
-                value={data.tag}
-                onAdd={(chip) => handleTagAdd(chip, Date.now())}
-                onDelete={(chip, index) => handleTagDelete(chip, index)}
-            />
-            <TextField
-                label="설명"
-                multiline
-                rowsMax={4}
-                value={data.description}
-                onChange={handleChange}
-                name="description"
-            />
-            <img
-                src={
-                    (data as CharacterInterface).profileImage ||
-                    (data as GroupInterface).image ||
-                    'https://via.placeholder.com/150x150.png?text=NoImage'
-                }
-                width="150"
-                height="150"
-            />
-            <Button variant="contained" component="label">
-                <Typography>{'변경'}</Typography>
+            </ItemGrid>
 
-                <input
-                    style={{ display: 'none' }}
-                    type="file"
-                    accept="image/jpeg, image/png"
-                    onChange={handleChangeImage}
+            {type === 'character' && (
+                <ItemGrid div={3}>
+                    <TextField
+                        label="번호"
+                        value={(data as CharacterInterface).number}
+                        onChange={handleChange}
+                        name="number"
+                        type="number"
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    no.
+                                </InputAdornment>
+                            ),
+                        }}
+                        variant="outlined"
+                    />
+                </ItemGrid>
+            )}
+            <ItemGrid div={1}>
+                <hr />
+            </ItemGrid>
+            <ItemGrid div={1}>
+                <ChipInput
+                    label="태그"
+                    value={data.tag}
+                    onAdd={(chip) => handleTagAdd(chip, Date.now())}
+                    onDelete={(chip, index) => handleTagDelete(chip, index)}
+                    variant="outlined"
                 />
-            </Button>
-        </>
+            </ItemGrid>
+            <ItemGrid div={1}>
+                <hr />
+            </ItemGrid>
+            <ItemGrid div={1}>
+                <ItemInputField
+                    label="설명"
+                    multiline
+                    rowsMax={4}
+                    value={data.description}
+                    onChange={handleChange}
+                    name="description"
+                    variant="outlined"
+                />
+            </ItemGrid>
+            <ItemGrid div={1}>
+                <LazyLoadImage
+                    src={
+                        (data as CharacterInterface).profileImage ||
+                        (data as GroupInterface).image ||
+                        'https://via.placeholder.com/150x150.png?text=No+Image'
+                    }
+                    effect="opacity"
+                    width="150"
+                    height="150"
+                />
+                <Button variant="contained" component="label">
+                    <Typography>{'변경'}</Typography>
+
+                    <input
+                        style={{ display: 'none' }}
+                        type="file"
+                        accept="image/jpeg, image/png"
+                        onChange={handleChangeImage}
+                    />
+                </Button>
+            </ItemGrid>
+        </Grid>
     );
 };
 

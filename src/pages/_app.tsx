@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/ban-types */
 import React from 'react';
 import App from 'next/app';
@@ -17,10 +20,16 @@ class MyApp extends App<Props> {
 
         return (
             <ApolloProvider client={apollo}>
-                <AppBar />
-                <Container fixed style={{ paddingTop: '70px' }}>
+                {pageProps.statusCode === 404 ? (
                     <Component {...pageProps} />
-                </Container>
+                ) : (
+                    <>
+                        <AppBar />
+                        <Container fixed style={{ paddingTop: '70px' }}>
+                            <Component {...pageProps} />
+                        </Container>
+                    </>
+                )}
             </ApolloProvider>
         );
     }

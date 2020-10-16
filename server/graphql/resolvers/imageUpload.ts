@@ -27,7 +27,7 @@ export default class ImageUploadResolver {
         })
         { createReadStream, mimetype, filename }: Upload,
     ): Promise<string> {
-        if (mimetype !== 'image/jpeg' && mimetype === 'image/png') {
+        if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
             throw new Error('Not an image');
         }
 
