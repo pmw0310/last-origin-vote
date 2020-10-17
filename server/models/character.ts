@@ -1,4 +1,5 @@
-import { Document, Schema, model, Types } from 'mongoose';
+import { Document, Schema, model, Types, PaginateModel } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 import enumToArray from '../lib/enumToArray';
 
 export interface CharacterTypeModel extends Document {
@@ -79,4 +80,9 @@ const CharacterSchema = new Schema<CharacterTypeModel>({
     description: String,
 });
 
-export default model<CharacterTypeModel>('Character', CharacterSchema);
+CharacterSchema.plugin(mongoosePaginate);
+
+export default model<CharacterTypeModel, PaginateModel<CharacterTypeModel>>(
+    'Character',
+    CharacterSchema,
+);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -7,16 +7,14 @@ import { CharacterInterface } from 'Module';
 
 const CHARACTER_LIST = gql`
     query GetCharacter($page: Int!) {
-        getCharacter(page: $page) {
+        getCharacter(page: $page, limit: 15) {
             edges {
                 node {
                     id
                     name
                 }
-                cursor
             }
             pageInfo {
-                endCursor
                 hasNextPage
             }
         }
@@ -25,7 +23,6 @@ const CHARACTER_LIST = gql`
 
 export default function Home(): JSX.Element {
     const [page, setPage] = useState<number>(1);
-    // const [more, setMore] = useState<boolean>(true);
 
     const { data, loading, fetchMore } = useQuery(CHARACTER_LIST, {
         variables: {
@@ -38,37 +35,10 @@ export default function Home(): JSX.Element {
             variables: {
                 page: page + 1,
             },
-            // updateQuery: (prev, { fetchMoreResult }) => {
-            //     console.log(page, prev, fetchMoreResult);
-            //     setPage(page + 1);
-
-            //     if (
-            //         fetchMoreResult &&
-            //         fetchMoreResult.getCharacter.length > 0
-            //     ) {
-            //         return Object.assign({}, prev, {
-            //             getCharacter: [
-            //                 ...prev.getCharacter,
-            //                 ...fetchMoreResult.getCharacter,
-            //             ],
-            //         });
-            //     }
-
-            //     setMore(false);
-            //     return prev;
-            // },
         });
 
         setPage(page + 1);
     };
-
-    useEffect(() => {
-        console.log(data);
-
-        // setTimeout(() => {
-        //     onLoadMore();
-        // }, 1000);
-    }, [data]);
 
     return loading ? (
         <div>

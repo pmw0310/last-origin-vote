@@ -1,4 +1,5 @@
-import { Document, Schema, model } from 'mongoose';
+import { Document, Schema, model, PaginateModel } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export interface GroupTypeModel extends Document {
     name?: string;
@@ -27,4 +28,9 @@ const GroupSchema = new Schema<GroupTypeModel>({
     description: String,
 });
 
-export default model<GroupTypeModel>('Group', GroupSchema);
+GroupSchema.plugin(mongoosePaginate);
+
+export default model<GroupTypeModel, PaginateModel<GroupTypeModel>>(
+    'Group',
+    GroupSchema,
+);

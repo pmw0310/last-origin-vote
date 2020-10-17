@@ -18,12 +18,13 @@ import CharacterModels, {
     CharacterGrade,
     CharacterType,
     CharacterRole,
-    // CharacterTypeModel,
+    CharacterTypeModel,
 } from '../../models/character';
 import GroupModels from '../../models/group';
 import { Group } from './group';
+import RelayStylePagination, { EdgesInterface } from '../relayStylePagination';
 import { Min } from 'class-validator';
-// import { Types, FilterQuery } from 'mongoose';
+import { Types, FilterQuery } from 'mongoose';
 
 registerEnumType(CharacterGrade, {
     name: 'CharacterGrade',
@@ -148,79 +149,60 @@ export class Character extends CharacterInterface {
 }
 
 @ObjectType()
-class pageInfo {
-    @Field()
-    endCursor?: string;
-    @Field(() => Boolean)
-    hasNextPage?: boolean;
-}
-
-@ObjectType()
-export class Test2 {
-    @Field(() => Character)
-    node?: Character;
-    @Field()
-    cursor!: string;
-}
-
-@ObjectType()
-export class Test {
-    @Field(() => [Test2], { defaultValue: [] })
-    edges: Test2[] = [];
-    @Field({ defaultValue: {} })
-    pageInfo: pageInfo = {};
-}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+class CharacterRelayStylePagination extends RelayStylePagination(Character) {}
 
 @ArgsType()
 class CharacterListArgs {
     @Field(() => Int, { defaultValue: 1 })
     @Min(1)
-    page?: number;
+    page: number = 1;
     @Field(() => Int, { defaultValue: 10 })
     @Min(1)
-    limit?: number;
-    @Field(() => [String], { name: 'ids', nullable: true, defaultValue: [] })
-    ids?: string[];
+    limit: number = 10;
+    @Field(() => [String], { name: 'ids', nullable: true })
+    ids: string[] = [];
 }
 
 @Resolver()
 export default class CharacterResolver {
-    @Query(() => Test)
+    @Query(() => CharacterRelayStylePagination)
     async getCharacter(
-        @Args() { page, limit }: CharacterListArgs,
-    ): Promise<Test> {
-        const test = new Test();
-
-        for (let i = 0; i < (limit as number); i++) {
-            const index = i + ((page as number) - 1) * (limit as number);
-
-            const node: Character = {
-                _id: index.toString(),
-                name: index.toString(),
+        @Args() { ids, page, limit }: CharacterListArgs,
+    ): Promise<CharacterRelayStylePagination> {
+        const query: FilterQuery<CharacterTypeModel> = {};
+        if (ids.length > 0) {
+            query._id = {
+                $in: ids?.map((id) => Types.ObjectId(id)),
             };
-
-            test.edges?.push({
-                node,
-                cursor: index.toString(),
-            });
-            test.pageInfo.hasNextPage = true;
-            test.pageInfo.endCursor = index.toString();
         }
 
-        return test;
-        // const query: FilterQuery<CharacterTypeModel> = {};
-        // if (ids && ids.length > 0) {
-        //     query._id = {
-        //         $in: ids?.map((id) => Types.ObjectId(id)),
-        //     };
-        // }
-        // const char = await CharacterModels.find(query)
-        //     .sort({ _id: -1 })
-        //     .limit(limit as number)
-        //     .skip(((page as number) - 1) * (limit as number))
-        //     .lean()
-        //     .exec();
-        // return char as Character[];
+        const {
+            docs,
+            hasNextPage,
+            hasPrevPage,
+            nextPage,
+            prevPage,
+            totalPages,
+        } = await CharacterModels.paginate(query, { page, limit });
+
+        const char = new CharacterRelayStylePagination();
+
+        char.edges = docs.map<EdgesInterface<Character>>((d) => ({
+            node: d as Character,
+            cursor: d.id,
+        }));
+
+        char.pageInfo = {
+            hasNextPage,
+            hasPrevPage,
+            nextPage,
+            prevPage,
+            totalPages,
+            endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
+        };
+
+        return char;
     }
 
     @Authorized('character')

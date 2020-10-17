@@ -16,6 +16,7 @@ import {
 import GroupModels, { GroupTypeModel } from '../../models/group';
 import CharacterModels from '../../models/character';
 import { Character } from './character';
+import RelayStylePagination, { EdgesInterface } from '../relayStylePagination';
 import { Min } from 'class-validator';
 import { Types, FilterQuery } from 'mongoose';
 
@@ -74,6 +75,10 @@ export class Group extends GroupInterface {
     }
 }
 
+@ObjectType()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+class GroupRelayStylePagination extends RelayStylePagination(Group) {}
+
 @ArgsType()
 class GroupListArgs {
     @Field(() => Int, { defaultValue: 1 })
@@ -88,10 +93,10 @@ class GroupListArgs {
 
 @Resolver()
 export default class GroupResolver {
-    @Query(() => [Group])
+    @Query(() => [GroupRelayStylePagination])
     async getGroup(
         @Args() { page, limit, ids }: GroupListArgs,
-    ): Promise<Group[]> {
+    ): Promise<GroupRelayStylePagination> {
         const query: FilterQuery<GroupTypeModel> = {};
 
         if (ids && ids.length > 0) {
@@ -100,14 +105,32 @@ export default class GroupResolver {
             };
         }
 
-        const group = await GroupModels.find(query)
-            .sort({ _id: -1 })
-            .limit(limit as number)
-            .skip(((page as number) - 1) * (limit as number))
-            .lean()
-            .exec();
+        const {
+            docs,
+            hasNextPage,
+            hasPrevPage,
+            nextPage,
+            prevPage,
+            totalPages,
+        } = await CharacterModels.paginate(query, { page, limit });
 
-        return group as Group[];
+        const group = new GroupRelayStylePagination();
+
+        group.edges = docs.map<EdgesInterface<Group>>((d) => ({
+            node: d as Group,
+            cursor: d.id,
+        }));
+
+        group.pageInfo = {
+            hasNextPage,
+            hasPrevPage,
+            nextPage,
+            prevPage,
+            totalPages,
+            endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
+        };
+
+        return group;
     }
 
     @Authorized('group')
