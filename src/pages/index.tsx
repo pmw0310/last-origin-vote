@@ -22,6 +22,8 @@ export default function Home(): JSX.Element {
         variables: {
             page,
         },
+        fetchPolicy: 'network-only',
+        notifyOnNetworkStatusChange: true,
     });
 
     const onLoadMore = async () => {
@@ -30,6 +32,7 @@ export default function Home(): JSX.Element {
                 page: page + 1,
             },
             updateQuery: (prev, { fetchMoreResult }) => {
+                console.log(page, prev, fetchMoreResult);
                 setPage(page + 1);
 
                 if (

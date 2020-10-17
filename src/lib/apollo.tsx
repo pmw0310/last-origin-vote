@@ -1,8 +1,14 @@
-import { ApolloClient, InMemoryCache, makeVar, gql } from '@apollo/client';
+import { useMemo } from 'react';
+import {
+    ApolloClient,
+    InMemoryCache,
+    makeVar,
+    gql,
+    NormalizedCacheObject,
+} from '@apollo/client';
 import { createUploadLink } from 'apollo-upload-client';
-import { withApollo } from 'next-with-apollo';
 import { UserInterface } from 'Module';
-import { offsetLimitPagination } from '@apollo/client/utilities';
+// import { offsetLimitPagination } from '@apollo/client/utilities';
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -25,17 +31,37 @@ const cache = new InMemoryCache({
                 currentUser() {
                     return currentUserVar();
                 },
-                // getCharacter: offsetLimitPagination(),
+                // getCharacter: offsetLimitPagination(['page']),
             },
         },
     },
 });
 
-export default withApollo(({ initialState }) => {
+export function createApolloClient(): ApolloClient<NormalizedCacheObject> {
     return new ApolloClient({
-        cache: cache.restore(initialState || {}),
+        ssrMode: typeof window === 'undefined',
         link: createUploadLink({
-            uri: prod ? '' : 'http://localhost:4000/graphql',
+            uri: prod ? '' : '/graphql',
         }),
+        cache,
     });
-});
+}
+
+export function initializeApollo(
+    initialState?: NormalizedCacheObject,
+): ApolloClient<NormalizedCacheObject> {
+    const _apolloClient = createApolloClient();
+
+    if (initialState) {
+        _apolloClient.cache.restore(initialState);
+    }
+
+    return _apolloClient;
+}
+
+export function useApollo(
+    initialState?: NormalizedCacheObject,
+): ApolloClient<NormalizedCacheObject> {
+    const store = useMemo(() => initializeApollo(initialState), [initialState]);
+    return store;
+}

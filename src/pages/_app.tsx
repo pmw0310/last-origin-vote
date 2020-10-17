@@ -1,34 +1,30 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import App from 'next/app';
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { ApolloProvider } from '@apollo/react-hooks';
-import withApolloClient from '../lib/apollo';
+import { ApolloProvider } from '@apollo/client';
 import AppBar from '../components/AppBar';
 import Container from '@material-ui/core/Container';
+import { useApollo } from '../lib/apollo';
 
 interface Props {
-    apollo: ApolloClient<NormalizedCacheObject>;
+    Component: any;
+    pageProps: any;
 }
 
-class MyApp extends App<Props> {
-    render() {
-        const { Component, pageProps, apollo } = this.props;
+export default function App({ Component, pageProps }: Props): JSX.Element {
+    const apolloClient = useApollo(pageProps.initialApolloState);
 
-        return (
-            <ApolloProvider client={apollo}>
-                {pageProps.statusCode === 404 ? (
-                    <Component {...pageProps} />
-                ) : (
-                    <>
-                        <AppBar />
-                        <Container fixed style={{ paddingTop: '70px' }}>
-                            <Component {...pageProps} />
-                        </Container>
-                    </>
-                )}
-            </ApolloProvider>
-        );
-    }
+    return (
+        <ApolloProvider client={apolloClient}>
+            {pageProps.statusCode === 404 ? (
+                <Component {...pageProps} />
+            ) : (
+                <>
+                    <AppBar />
+                    <Container fixed style={{ paddingTop: '70px' }}>
+                        <Component {...pageProps} />
+                    </Container>
+                </>
+            )}
+        </ApolloProvider>
+    );
 }
-
-export default withApolloClient(MyApp);
