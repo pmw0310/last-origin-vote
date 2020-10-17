@@ -8,9 +8,7 @@ import {
 } from '@apollo/client';
 import { createUploadLink } from 'apollo-upload-client';
 import { UserInterface } from 'Module';
-// import { offsetLimitPagination } from '@apollo/client/utilities';
-
-const prod = process.env.NODE_ENV === 'production';
+import { relayStylePagination } from '@apollo/client/utilities';
 
 export interface CurrentUserData {
     currentUser: UserInterface;
@@ -31,7 +29,7 @@ const cache = new InMemoryCache({
                 currentUser() {
                     return currentUserVar();
                 },
-                // getCharacter: offsetLimitPagination(['page']),
+                getCharacter: relayStylePagination(['page']),
             },
         },
     },
@@ -41,7 +39,7 @@ export function createApolloClient(): ApolloClient<NormalizedCacheObject> {
     return new ApolloClient({
         ssrMode: typeof window === 'undefined',
         link: createUploadLink({
-            uri: prod ? '' : '/graphql',
+            uri: '/graphql',
         }),
         cache,
     });

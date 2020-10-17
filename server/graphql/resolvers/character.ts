@@ -18,12 +18,12 @@ import CharacterModels, {
     CharacterGrade,
     CharacterType,
     CharacterRole,
-    CharacterTypeModel,
+    // CharacterTypeModel,
 } from '../../models/character';
 import GroupModels from '../../models/group';
 import { Group } from './group';
 import { Min } from 'class-validator';
-import { Types, FilterQuery } from 'mongoose';
+// import { Types, FilterQuery } from 'mongoose';
 
 registerEnumType(CharacterGrade, {
     name: 'CharacterGrade',
@@ -147,6 +147,30 @@ export class Character extends CharacterInterface {
     }
 }
 
+@ObjectType()
+class pageInfo {
+    @Field()
+    endCursor?: string;
+    @Field(() => Boolean)
+    hasNextPage?: boolean;
+}
+
+@ObjectType()
+export class Test2 {
+    @Field(() => Character)
+    node?: Character;
+    @Field()
+    cursor!: string;
+}
+
+@ObjectType()
+export class Test {
+    @Field(() => [Test2], { defaultValue: [] })
+    edges: Test2[] = [];
+    @Field({ defaultValue: {} })
+    pageInfo: pageInfo = {};
+}
+
 @ArgsType()
 class CharacterListArgs {
     @Field(() => Int, { defaultValue: 1 })
@@ -161,26 +185,42 @@ class CharacterListArgs {
 
 @Resolver()
 export default class CharacterResolver {
-    @Query(() => [Character])
+    @Query(() => Test)
     async getCharacter(
-        @Args() { page, limit, ids }: CharacterListArgs,
-    ): Promise<Character[]> {
-        const query: FilterQuery<CharacterTypeModel> = {};
+        @Args() { page, limit }: CharacterListArgs,
+    ): Promise<Test> {
+        const test = new Test();
 
-        if (ids && ids.length > 0) {
-            query._id = {
-                $in: ids?.map((id) => Types.ObjectId(id)),
+        for (let i = 0; i < (limit as number); i++) {
+            const index = i + ((page as number) - 1) * (limit as number);
+
+            const node: Character = {
+                _id: index.toString(),
+                name: index.toString(),
             };
+
+            test.edges?.push({
+                node,
+                cursor: index.toString(),
+            });
+            test.pageInfo.hasNextPage = true;
+            test.pageInfo.endCursor = index.toString();
         }
 
-        const char = await CharacterModels.find(query)
-            .sort({ _id: -1 })
-            .limit(limit as number)
-            .skip(((page as number) - 1) * (limit as number))
-            .lean()
-            .exec();
-
-        return char as Character[];
+        return test;
+        // const query: FilterQuery<CharacterTypeModel> = {};
+        // if (ids && ids.length > 0) {
+        //     query._id = {
+        //         $in: ids?.map((id) => Types.ObjectId(id)),
+        //     };
+        // }
+        // const char = await CharacterModels.find(query)
+        //     .sort({ _id: -1 })
+        //     .limit(limit as number)
+        //     .skip(((page as number) - 1) * (limit as number))
+        //     .lean()
+        //     .exec();
+        // return char as Character[];
     }
 
     @Authorized('character')
