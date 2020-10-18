@@ -19,7 +19,8 @@ import url from 'url';
 
 import { schema } from './graphql';
 import api from './api';
-import User from './models/user';
+import User, { UserTypeModel } from './models/user';
+import authChecker from './lib/authChecker';
 
 const dir: string = __dirname + '/upload';
 !existsSync(dir) && mkdirSync(dir);
@@ -62,6 +63,22 @@ async function renderAndCache(ctx: Context, next: Next) {
     }
 }
 
+const authCheck = (roles: Array<string>) => async (
+    ctx: Context,
+    next: Next,
+) => {
+    const { user, error } = await User.verify(ctx);
+    if (error) {
+        ctx.redirect('/');
+    }
+
+    const auth = authChecker(user as UserTypeModel, roles);
+    if (auth) {
+        return await next();
+    }
+    ctx.redirect('/');
+};
+
 (async () => {
     await app.prepare();
 
@@ -100,8 +117,8 @@ async function renderAndCache(ctx: Context, next: Next) {
     router.get('/', renderAndCache);
     router.get('/a', renderAndCache);
     router.get('/b', renderAndCache);
-    router.get('/char/add', renderAndCache);
-    router.get('/group/add', renderAndCache);
+    router.get('/char/add', authCheck(['character']), renderAndCache);
+    router.get('/group/add', authCheck(['group']), renderAndCache);
     router.get('/group/:id', renderAndCache);
     router.use('/api', api.routes());
     router.get('/(.*)', async (ctx: Context) => {

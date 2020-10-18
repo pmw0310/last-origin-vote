@@ -16,7 +16,7 @@ import {
 import GroupModels, { GroupTypeModel } from '../../models/group';
 import CharacterModels from '../../models/character';
 import { Character } from './character';
-import RelayStylePagination, { EdgesInterface } from '../relayStylePagination';
+import RelayStylePagination, { Edges } from '../relayStylePagination';
 import { Min } from 'class-validator';
 import { Types, FilterQuery } from 'mongoose';
 
@@ -76,8 +76,13 @@ export class Group extends GroupInterface {
 }
 
 @ObjectType()
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-class GroupRelayStylePagination extends RelayStylePagination(Group) {}
+class GroupEdges extends Edges(Group) {}
+
+@ObjectType()
+class GroupRelayStylePagination extends RelayStylePagination(
+    Group,
+    GroupEdges,
+) {}
 
 @ArgsType()
 class GroupListArgs {
@@ -116,7 +121,7 @@ export default class GroupResolver {
 
         const group = new GroupRelayStylePagination();
 
-        group.edges = docs.map<EdgesInterface<Group>>((d) => ({
+        group.edges = docs.map<GroupEdges>((d) => ({
             node: d as Group,
             cursor: d.id,
         }));

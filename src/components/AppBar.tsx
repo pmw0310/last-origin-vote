@@ -6,11 +6,22 @@ import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import MenuIcon from '@material-ui/icons/Menu';
 import Container from '@material-ui/core/Container';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { gql, useQuery } from '@apollo/client';
 import { currentUserVar } from '../lib/apollo';
 import { UserInterface } from 'Module';
 
+const GlobalStyles = createGlobalStyle`
+       html body {
+            height: 100%;
+            overflow: auto;
+            margin: 0;
+            background-color: #F3F5F8;
+          }
+          #__next {
+            height: 100%;
+          }
+`;
 const Root = styled.div`
     position: fixed;
     top: 0;
@@ -53,6 +64,7 @@ export default function MenuAppBar(): JSX.Element {
 
     return (
         <Root>
+            <GlobalStyles />
             <AppBar position="static">
                 <Container fixed>
                     <Toolbar>

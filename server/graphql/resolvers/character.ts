@@ -22,7 +22,7 @@ import CharacterModels, {
 } from '../../models/character';
 import GroupModels from '../../models/group';
 import { Group } from './group';
-import RelayStylePagination, { EdgesInterface } from '../relayStylePagination';
+import RelayStylePagination, { Edges } from '../relayStylePagination';
 import { Min } from 'class-validator';
 import { Types, FilterQuery } from 'mongoose';
 
@@ -149,8 +149,13 @@ export class Character extends CharacterInterface {
 }
 
 @ObjectType()
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-class CharacterRelayStylePagination extends RelayStylePagination(Character) {}
+class CharacterEdges extends Edges(Character) {}
+
+@ObjectType()
+class CharacterRelayStylePagination extends RelayStylePagination(
+    Character,
+    CharacterEdges,
+) {}
 
 @ArgsType()
 class CharacterListArgs {
@@ -188,7 +193,7 @@ export default class CharacterResolver {
 
         const char = new CharacterRelayStylePagination();
 
-        char.edges = docs.map<EdgesInterface<Character>>((d) => ({
+        char.edges = docs.map<CharacterEdges>((d) => ({
             node: d as Character,
             cursor: d.id,
         }));

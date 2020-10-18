@@ -31,6 +31,12 @@ const ItemInputField = styled(TextField)`
     width: 100%;
 `;
 
+const HR = styled.hr`
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.12);
+    border-bottom-width: 0;
+`;
+
 const ItemGrid: React.FC<{
     div: 1 | 2 | 3;
     children: React.ReactNode;
@@ -146,7 +152,7 @@ const CharacterEdit: React.FC<Props> = ({
                 </ItemGrid>
             )}
             <ItemGrid div={1}>
-                <hr />
+                <HR />
             </ItemGrid>
             <ItemGrid div={1}>
                 <ChipInput
@@ -158,7 +164,7 @@ const CharacterEdit: React.FC<Props> = ({
                 />
             </ItemGrid>
             <ItemGrid div={1}>
-                <hr />
+                <HR />
             </ItemGrid>
             <ItemGrid div={1}>
                 <ItemInputField
@@ -172,26 +178,31 @@ const CharacterEdit: React.FC<Props> = ({
                 />
             </ItemGrid>
             <ItemGrid div={1}>
-                <LazyLoadImage
-                    src={
-                        (data as CharacterInterface).profileImage ||
-                        (data as GroupInterface).image ||
-                        'https://via.placeholder.com/150x150.png?text=No+Image'
-                    }
-                    effect="opacity"
-                    width="150"
-                    height="150"
-                />
-                <Button variant="contained" component="label">
-                    <Typography>{'변경'}</Typography>
-
-                    <input
-                        style={{ display: 'none' }}
-                        type="file"
-                        accept="image/jpeg, image/png"
-                        onChange={handleChangeImage}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <LazyLoadImage
+                        src={
+                            (data as CharacterInterface).profileImage ||
+                            (data as GroupInterface).image ||
+                            'https://via.placeholder.com/125x125.png?text=No+Image'
+                        }
+                        effect="opacity"
+                        width="125"
+                        height="125"
                     />
-                </Button>
+                    <Button
+                        variant="contained"
+                        component="label"
+                        style={{ marginLeft: '30px' }}
+                    >
+                        <Typography>이미지 업로드</Typography>
+                        <input
+                            style={{ display: 'none' }}
+                            type="file"
+                            accept="image/jpeg, image/png"
+                            onChange={handleChangeImage}
+                        />
+                    </Button>
+                </div>
             </ItemGrid>
         </Grid>
     );

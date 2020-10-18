@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Field, ObjectType, Int, ID, ClassType } from 'type-graphql';
 
 @ObjectType()
@@ -16,37 +18,30 @@ export class PageInfo {
     nextPage?: number | null;
 }
 
-export interface EdgesInterface<T> {
-    node: T;
-    cursor: string;
-}
-
-export interface RelayStylePaginationInterface<T> {
-    edges?: EdgesInterface<T>[];
-    pageInfo?: PageInfo;
-    data?: () => Array<T>;
-}
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export default function RelayStylePagination<T>(itemClass: ClassType<T>) {
+export function Edges<OBJECT>(objectClass: ClassType<OBJECT>) {
     @ObjectType({ isAbstract: true })
-    abstract class Edges<T> implements EdgesInterface<T> {
-        @Field(() => itemClass, { nullable: false })
-        node!: T;
+    abstract class Edges {
+        @Field(() => objectClass, { nullable: false })
+        node!: OBJECT;
         @Field(() => ID, { nullable: false })
         cursor!: string;
     }
+    return Edges;
+}
 
+export default function RelayStylePagination<OBJECT, EDGES>(
+    objectClass: ClassType<OBJECT>,
+    edgesClass: ClassType<EDGES>,
+) {
     @ObjectType({ isAbstract: true })
-    abstract class RelayStylePagination
-        implements RelayStylePaginationInterface<T> {
-        @Field(() => [Edges], { defaultValue: [] })
-        edges?: Edges<T>[] = [];
+    abstract class RelayStylePagination {
+        @Field(() => [edgesClass], { defaultValue: [] })
+        edges?: EDGES[] = [];
         @Field(() => PageInfo)
         pageInfo?: PageInfo;
-        @Field(() => [itemClass])
-        data?(): Array<T> {
-            const data = this.edges?.map((e) => e.node);
+        @Field(() => [objectClass])
+        data?(): Array<OBJECT> {
+            const data = this.edges?.map<OBJECT>((e: any) => e.node);
             return data ? data : [];
         }
     }

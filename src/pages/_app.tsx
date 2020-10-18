@@ -2,7 +2,7 @@
 import React from 'react';
 import { ApolloProvider } from '@apollo/client';
 import AppBar from '../components/AppBar';
-import Container from '@material-ui/core/Container';
+import AppContainer from '../components/AppContainer';
 import { useApollo } from '../lib/apollo';
 
 interface Props {
@@ -20,9 +20,9 @@ export default function App({ Component, pageProps }: Props): JSX.Element {
             ) : (
                 <>
                     <AppBar />
-                    <Container fixed style={{ paddingTop: '70px' }}>
+                    <AppContainer>
                         <Component {...pageProps} />
-                    </Container>
+                    </AppContainer>
                 </>
             )}
         </ApolloProvider>
