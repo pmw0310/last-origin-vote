@@ -7,8 +7,10 @@ import {
     ID,
     Int,
     Authorized,
+    Arg,
 } from 'type-graphql';
 import UserModels, { UserVerifyResult } from '../../models/user';
+import authChecker from '../../lib/authChecker';
 
 @ObjectType({ description: '유저 정보' })
 export class User {
@@ -61,5 +63,16 @@ export default class UserResolver {
     async allUser(): Promise<User[]> {
         const users = await UserModels.find();
         return users as User[];
+    }
+
+    @Query(() => Boolean)
+    authChecker(
+        @Ctx() ctx: { currentUser: UserVerifyResult },
+        @Arg('roles', () => [String], { nullable: false }) roles: Array<string>,
+    ): boolean {
+        if (ctx.currentUser.user) {
+            return authChecker(ctx.currentUser.user, roles);
+        }
+        return false;
     }
 }

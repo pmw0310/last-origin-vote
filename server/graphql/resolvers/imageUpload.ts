@@ -39,6 +39,10 @@ export default class ImageUploadResolver {
                 .on('finish', () => {
                     cloudinary.v2.uploader.upload(
                         path,
+                        {
+                            use_filename: true,
+                            unique_filename: true,
+                        },
                         async (error, result) => {
                             if (error) {
                                 throw new Error(error.message);

@@ -30,6 +30,7 @@ const cache = new InMemoryCache({
                     return currentUserVar();
                 },
                 getCharacter: relayStylePagination(['page']),
+                getGroup: relayStylePagination(['page']),
             },
         },
     },

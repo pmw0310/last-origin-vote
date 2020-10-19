@@ -1,4 +1,4 @@
-import React, { useState, Dispatch } from 'react';
+import React, { useState } from 'react';
 import {
     TextField,
     InputAdornment,
@@ -12,14 +12,7 @@ import ChipInput from 'material-ui-chip-input';
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/react-hooks';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-
-export interface Props {
-    data: CharacterInterface | GroupInterface;
-    setData: Dispatch<
-        React.SetStateAction<CharacterInterface | GroupInterface>
-    >;
-    type: 'character' | 'group';
-}
+import { EditorProps } from './EditorForm';
 
 const IMAGEUPLOAD = gql`
     mutation imageUpload($file: Upload!) {
@@ -62,7 +55,7 @@ const ItemGrid: React.FC<{
     }
 };
 
-const CharacterEdit: React.FC<Props> = ({
+const CharacterEdit: React.FC<EditorProps> = ({
     data,
     setData,
     type,

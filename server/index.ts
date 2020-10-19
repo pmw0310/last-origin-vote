@@ -119,7 +119,7 @@ const authCheck = (roles: Array<string>) => async (
     router.get('/b', renderAndCache);
     router.get('/char/add', authCheck(['character']), renderAndCache);
     router.get('/group/add', authCheck(['group']), renderAndCache);
-    router.get('/group/:id', renderAndCache);
+    router.get('/group/:id', authCheck(['group']), renderAndCache);
     router.use('/api', api.routes());
     router.get('/(.*)', async (ctx: Context) => {
         await handle(ctx.req, ctx.res);

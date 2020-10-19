@@ -1,10 +1,18 @@
 import React from 'react';
-import { Card, CardContent, CardMedia, Typography } from '@material-ui/core';
+import {
+    Card,
+    CardContent,
+    CardMedia,
+    Typography,
+    IconButton,
+} from '@material-ui/core';
 import styled from 'styled-components';
 import { CharacterInterface } from 'Module';
+import { Edit, Delete } from '@material-ui/icons';
 
 export interface CharacterItemProps {
     data: CharacterInterface;
+    auth?: boolean;
 }
 
 const ItemCard = styled(Card)`
@@ -17,7 +25,10 @@ const ItemCardMedia = styled(CardMedia)`
     height: 150px;
 `;
 
-const CharacterItem: React.FC<CharacterItemProps> = ({ data }): JSX.Element => {
+const CharacterItem: React.FC<CharacterItemProps> = ({
+    data,
+    auth,
+}): JSX.Element => {
     return (
         <ItemCard>
             <ItemCardMedia
@@ -29,6 +40,16 @@ const CharacterItem: React.FC<CharacterItemProps> = ({ data }): JSX.Element => {
                     {data.name}
                 </Typography>
             </CardContent>
+            {auth && (
+                <>
+                    <IconButton>
+                        <Edit />
+                    </IconButton>
+                    <IconButton>
+                        <Delete />
+                    </IconButton>
+                </>
+            )}
         </ItemCard>
     );
 };

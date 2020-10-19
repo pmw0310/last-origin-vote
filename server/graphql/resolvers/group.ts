@@ -86,19 +86,19 @@ class GroupRelayStylePagination extends RelayStylePagination(
 
 @ArgsType()
 class GroupListArgs {
-    @Field(() => Int, { defaultValue: 1 })
+    @Field(() => Int, { defaultValue: 1, nullable: true })
     @Min(1)
-    page?: number;
-    @Field(() => Int, { defaultValue: 10 })
+    page?: number = 1;
+    @Field(() => Int, { defaultValue: 10, nullable: true })
     @Min(1)
-    limit?: number;
+    limit?: number = 10;
     @Field(() => [String], { name: 'ids', nullable: true, defaultValue: [] })
     ids?: string[];
 }
 
 @Resolver()
 export default class GroupResolver {
-    @Query(() => [GroupRelayStylePagination])
+    @Query(() => GroupRelayStylePagination)
     async getGroup(
         @Args() { page, limit, ids }: GroupListArgs,
     ): Promise<GroupRelayStylePagination> {
