@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Item from '../../components/CharacterItem';
@@ -42,6 +43,7 @@ const GroupList = (): JSX.Element => {
         variables: {
             page,
         },
+        fetchPolicy: 'no-cache',
     });
 
     const onLoadMore = () => {
@@ -74,10 +76,13 @@ const GroupList = (): JSX.Element => {
                     />
                 ))}
             </InfiniteScroll>
+
             <AddFabTop>
-                <AddFab aria-label="test" color="primary">
-                    <AddIcon />
-                </AddFab>
+                <Link href="/group/add">
+                    <AddFab aria-label="test" color="primary">
+                        <AddIcon />
+                    </AddFab>
+                </Link>
             </AddFabTop>
         </>
     );

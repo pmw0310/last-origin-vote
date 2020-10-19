@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import {
     Card,
     CardContent,
@@ -42,9 +43,11 @@ const CharacterItem: React.FC<CharacterItemProps> = ({
             </CardContent>
             {auth && (
                 <>
-                    <IconButton>
-                        <Edit />
-                    </IconButton>
+                    <Link href="/group/[id]" as={`/group/${data.id}`}>
+                        <IconButton>
+                            <Edit />
+                        </IconButton>
+                    </Link>
                     <IconButton>
                         <Delete />
                     </IconButton>

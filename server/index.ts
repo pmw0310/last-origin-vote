@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 
 import Koa, { DefaultState, Context, Next } from 'koa';
+import cors from '@koa/cors';
 // import morgan from 'koa-morgan';
 import Router from 'koa-router';
 import Bodyparser from 'koa-bodyparser';
@@ -135,6 +136,7 @@ const authCheck = (roles: Array<string>) => async (
             ctx.res.statusCode = 200;
             await next();
         })
+        .use(cors())
         .use(Bodyparser())
         .use(helmet())
         .use(router.routes())

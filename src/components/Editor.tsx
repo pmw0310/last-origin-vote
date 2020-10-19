@@ -171,6 +171,9 @@ const CharacterEdit: React.FC<EditorProps> = ({
                 />
             </ItemGrid>
             <ItemGrid div={1}>
+                <HR />
+            </ItemGrid>
+            <ItemGrid div={1}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <LazyLoadImage
                         src={

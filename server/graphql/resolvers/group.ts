@@ -117,7 +117,7 @@ export default class GroupResolver {
             nextPage,
             prevPage,
             totalPages,
-        } = await CharacterModels.paginate(query, { page, limit });
+        } = await GroupModels.paginate(query, { page, limit });
 
         const group = new GroupRelayStylePagination();
 
@@ -164,11 +164,12 @@ export default class GroupResolver {
     }
 
     @Authorized('group')
-    @Mutation(() => Group)
+    @Mutation(() => Boolean)
     async updateGroup(
         @Arg('id', () => ID, { nullable: false }) id: string,
-        @Arg('data', { nullable: false }) data: GroupInterface,
-    ): Promise<Group> {
+        @Arg('data', { nullable: false })
+        data: GroupInterface,
+    ): Promise<boolean> {
         try {
             const update = { $set: { ...data, updateAt: new Date() } };
             const group = await GroupModels.findByIdAndUpdate(id, update, {
@@ -178,8 +179,7 @@ export default class GroupResolver {
             if (!group) {
                 throw new Error('update failure');
             }
-
-            return group as Group;
+            return true;
         } catch (e) {
             throw new Error('update failure');
         }

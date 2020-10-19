@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import EditorForm from '../../components/EditorForm';
 import { GroupInterface } from 'Module';
-import { gql, useLazyQuery } from '@apollo/client';
+import { gql, useLazyQuery, useMutation } from '@apollo/client';
 
 const GET_GROUP = gql`
     query getGroup($id: String!) {
@@ -17,11 +17,25 @@ const GET_GROUP = gql`
     }
 `;
 
+const SET_GROUP = gql`
+    mutation setGroup($id: ID!, $data: GroupInput!) {
+        updateGroup(id: $id, data: $data)
+    }
+`;
+
 const AdddCharacter = (): JSX.Element => {
     const router = useRouter();
 
-    const [data, setData] = useState<GroupInterface>({});
-    const [getGroup, { data: group, error }] = useLazyQuery(GET_GROUP);
+    const [data, setData] = useState<GroupInterface>({
+        name: '',
+        image: '',
+        tag: [],
+        description: '',
+    });
+    const [getGroup, { data: group, error }] = useLazyQuery(GET_GROUP, {
+        fetchPolicy: 'no-cache',
+    });
+    const [setGroup] = useMutation(SET_GROUP);
 
     useEffect(() => {
         if (!router.query.id) {
@@ -42,8 +56,15 @@ const AdddCharacter = (): JSX.Element => {
         setData({ ...group.getGroup.data[0] });
     }, [group, error]);
 
-    const test = async () => {
-        await console.log(data);
+    const save = async () => {
+        await setGroup({
+            variables: {
+                id: router.query.id,
+                data: { ...data, __typename: undefined },
+            },
+        });
+
+        router.push('/group');
     };
 
     if (!group) {
@@ -58,7 +79,7 @@ const AdddCharacter = (): JSX.Element => {
                 type="group"
                 title="그룹 추가"
                 subtitle="그룹 추가"
-                onClickSave={test}
+                onClickSave={save}
             />
         </>
     );
