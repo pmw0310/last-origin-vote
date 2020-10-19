@@ -9,8 +9,7 @@ import {
 import styled from 'styled-components';
 import { CharacterInterface, GroupInterface } from 'Module';
 import ChipInput from 'material-ui-chip-input';
-import { gql } from '@apollo/client';
-import { useMutation } from '@apollo/react-hooks';
+import { gql, useMutation } from '@apollo/client';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { EditorProps } from './EditorForm';
 
