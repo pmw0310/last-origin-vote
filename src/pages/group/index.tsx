@@ -3,6 +3,20 @@ import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Item from '../../components/CharacterItem';
 import { GroupInterface } from 'Module';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+import styled from 'styled-components';
+
+const AddFab = styled(Fab)`
+    position: relative;
+    margin: 0 auto;
+    z-index: 1000;
+`;
+const AddFabTop = styled.div`
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+`;
 
 const GROUP_LIST = gql`
     query getGroup($page: Int!) {
@@ -60,6 +74,11 @@ const GroupList = (): JSX.Element => {
                     />
                 ))}
             </InfiniteScroll>
+            <AddFabTop>
+                <AddFab aria-label="test" color="primary">
+                    <AddIcon />
+                </AddFab>
+            </AddFabTop>
         </>
     );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // import { gql } from '@apollo/client';
-import Editor from '../../components/CharacterEditor';
+import Editor from '../../components/Editor';
 import { CharacterInterface } from 'Module';
 
 // const CHARACTER = gql``;
