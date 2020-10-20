@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Item from '../../components/ListItem';
 import { GroupInterface } from 'Module';
-import Fab from '@material-ui/core/Fab';
+import {
+    Fab,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import styled from 'styled-components';
 
@@ -43,8 +51,16 @@ const AUTH_CHECKER = gql`
     }
 `;
 
+const REMOVE_GROUP = gql`
+    mutation removeGroup($id: ID!) {
+        removeGroup(id: $id)
+    }
+`;
+
 const GroupList = (): JSX.Element => {
     const [page, setPage] = useState<number>(1);
+    const [open, setOpen] = useState<boolean>(false);
+    const [removeId, setremoveId] = useState<string>('');
 
     const { data: list, loading, fetchMore } = useQuery(GROUP_LIST, {
         variables: {
@@ -56,6 +72,24 @@ const GroupList = (): JSX.Element => {
     const { data: auth, loading: authLoding } = useQuery(AUTH_CHECKER, {
         fetchPolicy: 'no-cache',
     });
+
+    const [removeGroup] = useMutation(REMOVE_GROUP);
+
+    const handleDialogOpen = (id: string) => () => {
+        setremoveId(id);
+        setOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setOpen(false);
+    };
+
+    const handleOnRemove = async () => {
+        handleDialogClose();
+        await removeGroup({ variables: { id: removeId } });
+
+        window.location.href = '/group';
+    };
 
     const onLoadMore = () => {
         const _page = page + 1;
@@ -84,18 +118,49 @@ const GroupList = (): JSX.Element => {
                         data={data.node}
                         key={data.node.id}
                         auth={!authLoding && (auth.authChecker as boolean)}
+                        removeDialogOpen={handleDialogOpen}
+                        type="group"
                     />
                 ))}
             </InfiniteScroll>
 
             {!authLoding && auth.authChecker && (
-                <AddFabTop>
-                    <Link href="/group/add">
-                        <AddFab aria-label="test" color="primary">
-                            <AddIcon />
-                        </AddFab>
-                    </Link>
-                </AddFabTop>
+                <>
+                    <Dialog
+                        open={open}
+                        onClose={handleDialogClose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogTitle id="alert-dialog-title">
+                            그룹을 삭제 하시겠습니까?
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                그룹을 삭제 하시겠습니까?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleDialogClose} color="primary">
+                                아니오
+                            </Button>
+                            <Button
+                                onClick={handleOnRemove}
+                                color="primary"
+                                autoFocus
+                            >
+                                예
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <AddFabTop>
+                        <Link href="/group/add">
+                            <AddFab aria-label="add" color="primary">
+                                <AddIcon />
+                            </AddFab>
+                        </Link>
+                    </AddFabTop>
+                </>
             )}
         </>
     );

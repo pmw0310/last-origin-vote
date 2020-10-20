@@ -9,6 +9,8 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 export interface CharacterItemProps {
     data: CharacterInterface | GroupInterface;
     auth: boolean;
+    removeDialogOpen: (id: string) => () => void;
+    type: 'char' | 'group';
 }
 
 const ItemPaper = styled(Paper)`
@@ -31,10 +33,15 @@ const Auth = styled.div`
     display: flex;
     align-items: flex-end;
 `;
+const TagChip = styled(Chip)`
+    margin-right: 4px;
+`;
 
 const ListItem: React.FC<CharacterItemProps> = ({
     data,
     auth,
+    removeDialogOpen,
+    type,
 }): JSX.Element => {
     return (
         <ItemPaper>
@@ -50,15 +57,15 @@ const ListItem: React.FC<CharacterItemProps> = ({
                     height="150"
                 />
                 <Info>
-                    <Typography variant="h4" gutterBottom>
+                    <Typography variant="h5" gutterBottom>
                         {data.name}
                     </Typography>
                     <div>
                         {data.tag?.map((tag, index) => (
-                            <Chip
+                            <TagChip
                                 variant="outlined"
                                 size="small"
-                                label={tag}
+                                label={`#${tag}`}
                                 key={`${data.name}-${index}`}
                             />
                         ))}
@@ -66,12 +73,14 @@ const ListItem: React.FC<CharacterItemProps> = ({
                 </Info>
                 {auth && (
                     <Auth>
-                        <Link href="/group/[id]" as={`/group/${data.id}`}>
+                        <Link href={`/${type}/[id]`} as={`/${type}/${data.id}`}>
                             <IconButton>
                                 <Edit />
                             </IconButton>
                         </Link>
-                        <IconButton>
+                        <IconButton
+                            onClick={removeDialogOpen(data.id as string)}
+                        >
                             <Delete />
                         </IconButton>
                     </Auth>

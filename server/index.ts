@@ -116,9 +116,8 @@ const authCheck = (roles: Array<string>) => async (
     }
 
     router.get('/', renderAndCache);
-    router.get('/a', renderAndCache);
-    router.get('/b', renderAndCache);
     router.get('/char/add', authCheck(['character']), renderAndCache);
+    router.get('/char/:id', authCheck(['character']), renderAndCache);
     router.get('/group/add', authCheck(['group']), renderAndCache);
     router.get('/group/:id', authCheck(['group']), renderAndCache);
     router.use('/api', api.routes());

@@ -27,7 +27,7 @@ const Root = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    z-index: 10000000;
+    z-index: 1000;
 `;
 const MenuButton = styled(IconButton)`
     margin-right: 2px;
