@@ -44,7 +44,11 @@ const EditorForm: React.FC<EditorFormProps> = ({
                     <Typography variant="h5" gutterBottom>
                         {title}
                     </Typography>
-                    <Typography variant="caption" gutterBottom>
+                    <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        gutterBottom
+                    >
                         {subtitle}
                     </Typography>
                 </div>

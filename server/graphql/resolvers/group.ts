@@ -139,12 +139,12 @@ export default class GroupResolver {
     }
 
     @Authorized('group')
-    @Mutation(() => Group)
-    async addGroup(@Arg('data') data: GroupInterface): Promise<Group> {
+    @Mutation(() => Boolean)
+    async addGroup(@Arg('data') data: GroupInterface): Promise<boolean> {
         try {
             const group = new GroupModels(data);
             await group.save();
-            return group;
+            return true;
         } catch (e) {
             throw new Error('generation failure');
         }

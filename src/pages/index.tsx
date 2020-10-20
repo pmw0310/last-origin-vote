@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Item from '../components/CharacterItem';
+import Item from '../components/ListItem';
 import { CharacterInterface } from 'Module';
 
 const CHARACTER_LIST = gql`
@@ -12,6 +12,7 @@ const CHARACTER_LIST = gql`
                 node {
                     id
                     name
+                    tag
                 }
             }
             pageInfo {
@@ -61,7 +62,11 @@ export default function Home(): JSX.Element {
             >
                 {data.getCharacter.edges.map(
                     (data: { node: CharacterInterface }) => (
-                        <Item data={data.node} key={data.node.id} />
+                        <Item
+                            data={data.node}
+                            key={data.node.id}
+                            auth={false}
+                        />
                     ),
                 )}
             </InfiniteScroll>

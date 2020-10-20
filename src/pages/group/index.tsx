@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { gql, useQuery } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Item from '../../components/CharacterItem';
+import Item from '../../components/ListItem';
 import { GroupInterface } from 'Module';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
@@ -26,12 +26,19 @@ const GROUP_LIST = gql`
                 node {
                     id
                     name
+                    image
+                    tag
                 }
             }
             pageInfo {
                 hasNextPage
             }
         }
+    }
+`;
+
+const AUTH_CHECKER = gql`
+    query authChecker {
         authChecker(roles: ["group"])
     }
 `;
@@ -43,6 +50,10 @@ const GroupList = (): JSX.Element => {
         variables: {
             page,
         },
+        fetchPolicy: 'no-cache',
+    });
+
+    const { data: auth, loading: authLoding } = useQuery(AUTH_CHECKER, {
         fetchPolicy: 'no-cache',
     });
 
@@ -72,18 +83,20 @@ const GroupList = (): JSX.Element => {
                     <Item
                         data={data.node}
                         key={data.node.id}
-                        auth={list.authChecker as boolean}
+                        auth={!authLoding && (auth.authChecker as boolean)}
                     />
                 ))}
             </InfiniteScroll>
 
-            <AddFabTop>
-                <Link href="/group/add">
-                    <AddFab aria-label="test" color="primary">
-                        <AddIcon />
-                    </AddFab>
-                </Link>
-            </AddFabTop>
+            {!authLoding && auth.authChecker && (
+                <AddFabTop>
+                    <Link href="/group/add">
+                        <AddFab aria-label="test" color="primary">
+                            <AddIcon />
+                        </AddFab>
+                    </Link>
+                </AddFabTop>
+            )}
         </>
     );
 };

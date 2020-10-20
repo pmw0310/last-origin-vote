@@ -23,7 +23,7 @@ const SET_GROUP = gql`
     }
 `;
 
-const AdddCharacter = (): JSX.Element => {
+const UpdateGroup = (): JSX.Element => {
     const router = useRouter();
 
     const [data, setData] = useState<GroupInterface>({
@@ -77,12 +77,12 @@ const AdddCharacter = (): JSX.Element => {
                 data={data}
                 setData={setData}
                 type="group"
-                title="그룹 추가"
-                subtitle="그룹 추가"
+                title="그룹 변경"
+                subtitle="그룹 변경"
                 onClickSave={save}
             />
         </>
     );
 };
 
-export default AdddCharacter;
+export default UpdateGroup;

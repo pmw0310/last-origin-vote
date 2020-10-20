@@ -1,9 +1,9 @@
 import { Resolver, Mutation, Arg } from 'type-graphql';
 import { GraphQLUpload } from 'apollo-server-koa';
 import { GraphQLScalarType } from 'graphql';
-import { createWriteStream } from 'fs';
+import { createWriteStream, unlinkSync } from 'fs';
 import { Stream } from 'stream';
-import { generator } from 'rand-token';
+import cloudinary from 'cloudinary';
 
 export interface Upload {
     filename: string;
@@ -12,6 +12,12 @@ export interface Upload {
     createReadStream: () => Stream;
 }
 
+cloudinary.v2.config({
+    cloud_name: 'lastorigin',
+    api_key: '573186812215326',
+    api_secret: '7un0v5aRFlMLdXlMr_eDS8E2bUM',
+});
+
 @Resolver()
 export default class ImageUploadResolver {
     @Mutation(() => String)
@@ -19,35 +25,35 @@ export default class ImageUploadResolver {
         @Arg('upload', () => GraphQLUpload as GraphQLScalarType, {
             nullable: true,
         })
-        { createReadStream, mimetype }: Upload,
+        { createReadStream, mimetype, filename }: Upload,
     ): Promise<string> {
-        let ext: string;
-
-        if (mimetype === 'image/jpeg') {
-            ext = 'jpg';
-        } else if (mimetype === 'image/png') {
-            ext = 'png';
-        } else {
+        if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
             throw new Error('Not an image');
         }
 
-        const randToken = generator({ chars: 'base32' });
-        const name = randToken.generate(12);
-        const now = Math.floor(
-            (Date.now() - new Date(new Date().getFullYear(), 0, 1).getTime()) *
-                0.001,
-        );
-
-        const filename = `${name.toLowerCase()}_${now}.${ext}`;
+        const path = `${__dirname}/${filename}`;
 
         return new Promise((resolve) => {
             createReadStream()
-                .pipe(
-                    createWriteStream(__dirname + `/../../upload/${filename}`),
-                )
-                .on('finish', () =>
-                    resolve(`http://localhost:4000/${filename}`),
-                )
+                .pipe(createWriteStream(path))
+                .on('finish', () => {
+                    cloudinary.v2.uploader.upload(
+                        path,
+                        {
+                            use_filename: true,
+                            unique_filename: true,
+                        },
+                        async (error, result) => {
+                            if (error) {
+                                throw new Error(error.message);
+                            }
+
+                            await unlinkSync(path);
+
+                            return resolve(result?.url);
+                        },
+                    );
+                })
                 .on('error', () => {
                     throw new Error('upload error');
                 });
