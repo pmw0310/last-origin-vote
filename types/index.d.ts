@@ -40,20 +40,20 @@ declare module 'Module' {
         character?: CharacterInterface[];
     }
 
-    export enum CharacterGrade {
+    enum CharacterGrade {
         B = 1,
         A,
         S,
         SS,
     }
 
-    export enum CharacterType {
+    enum CharacterType {
         LIGHT = 1,
         FLYING,
         HEAVY,
     }
 
-    export enum CharacterRole {
+    enum CharacterRole {
         ASSAULT = 1,
         SUPPORT,
         DEFEND,
