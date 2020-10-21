@@ -5,7 +5,7 @@ import cors from '@koa/cors';
 // import morgan from 'koa-morgan';
 import Router from 'koa-router';
 import Bodyparser from 'koa-bodyparser';
-import staticServe from 'koa-static';
+// import staticServe from 'koa-static';
 // import proxy from 'koa-proxies';
 import helmet from 'koa-helmet';
 import passport from 'koa-passport';
@@ -14,17 +14,21 @@ import { ApolloServer } from 'apollo-server-koa';
 import { graphqlUploadKoa } from 'graphql-upload';
 import mongoose from 'mongoose';
 import next from 'next';
-import { existsSync, mkdirSync } from 'fs';
+// import { existsSync, mkdirSync } from 'fs';
 import LruCache from 'lru-cache';
 import url from 'url';
+
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 
 import { schema } from './graphql';
 import api from './api';
 import User, { UserTypeModel } from './models/user';
 import authChecker from './lib/authChecker';
 
-const dir: string = __dirname + '/upload';
-!existsSync(dir) && mkdirSync(dir);
+// const dir: string = __dirname + '/upload';
+// !existsSync(dir) && mkdirSync(dir);
 
 const port = parseInt(process.env.PORT || '4000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -121,14 +125,37 @@ const authCheck = (roles: Array<string>) => async (
     router.get('/group/add', authCheck(['group']), renderAndCache);
     router.get('/group/:id', authCheck(['group']), renderAndCache);
     router.use('/api', api.routes());
+    router.get('/image/:version/:file', async (ctx: Context) => {
+        const { version, file } = ctx.params;
+        const url = `https://res.cloudinary.com/lastorigin/image/upload/${version}/${file}`;
+        const _path = path.resolve(__dirname, 'upload', file);
+        const writer = fs.createWriteStream(_path);
+
+        const { data, headers } = await axios({
+            method: 'get',
+            url,
+            responseType: 'stream',
+        });
+
+        await new Promise((resolve, reject) => {
+            data.pipe(writer);
+            writer.on('finish', resolve);
+            writer.on('error', reject);
+        });
+
+        const src = fs.createReadStream(_path);
+
+        ctx.type = headers['content-type'];
+        ctx.body = src;
+    });
     router.get('/(.*)', async (ctx: Context) => {
         await handle(ctx.req, ctx.res);
         ctx.respond = false;
     });
 
-    if (dev) {
-        server.use(staticServe(`${__dirname}/upload`));
-    }
+    // if (dev) {
+    //     server.use(staticServe(`${__dirname}/upload`));
+    // }
 
     server
         .use(async (ctx: Context, next: Next) => {
