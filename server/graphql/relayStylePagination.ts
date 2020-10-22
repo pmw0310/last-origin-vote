@@ -35,8 +35,8 @@ export default function RelayStylePagination<OBJECT, EDGES>(
 ) {
     @ObjectType({ isAbstract: true })
     abstract class RelayStylePagination {
-        @Field(() => [edgesClass], { defaultValue: [] })
-        edges?: EDGES[] = [];
+        @Field(() => [edgesClass])
+        edges?: EDGES[];
         @Field(() => PageInfo)
         pageInfo?: PageInfo;
         @Field(() => [objectClass])

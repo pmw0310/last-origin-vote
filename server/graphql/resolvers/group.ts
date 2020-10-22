@@ -65,7 +65,6 @@ export class Group extends GroupInterface {
         nullable: true,
     })
     updateAt?: Date;
-
     @Field(() => [Character], {
         description: '소속된 케릭터 정보',
         nullable: true,
