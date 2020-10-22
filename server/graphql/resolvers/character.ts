@@ -211,14 +211,20 @@ export default class CharacterResolver {
     }
 
     @Authorized('character')
-    @Mutation(() => Character)
+    @Mutation(() => Boolean)
     async addCharacter(
         @Arg('data') data: CharacterInterface,
-    ): Promise<Character> {
+    ): Promise<boolean> {
         try {
-            const char = new CharacterModels({ ...data, group: undefined });
+            const char = new CharacterModels({
+                ...data,
+                groupId: data.groupId
+                    ? Types.ObjectId(data.groupId)
+                    : undefined,
+                group: undefined,
+            });
             await char.save();
-            return char;
+            return true;
         } catch (e) {
             throw new Error('generation failure');
         }
@@ -238,14 +244,20 @@ export default class CharacterResolver {
     }
 
     @Authorized('character')
-    @Mutation(() => Character)
+    @Mutation(() => Boolean)
     async updateCharacter(
         @Arg('id', () => ID, { nullable: false }) id: string,
         @Arg('data', { nullable: false }) data: CharacterInterface,
-    ): Promise<Character> {
+    ): Promise<boolean> {
         try {
             const update = {
-                $set: { ...data, updateAt: new Date(), group: undefined },
+                $set: {
+                    ...data,
+                    groupId: data.groupId
+                        ? ((Types.ObjectId(data.groupId) as unknown) as string)
+                        : undefined,
+                    group: undefined,
+                },
             };
             const char = await CharacterModels.findByIdAndUpdate(id, update, {
                 new: true,
@@ -255,7 +267,7 @@ export default class CharacterResolver {
                 throw new Error('update failure');
             }
 
-            return char as Character;
+            return true;
         } catch (e) {
             throw new Error('update failure');
         }

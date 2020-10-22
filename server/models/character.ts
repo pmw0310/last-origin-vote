@@ -22,22 +22,25 @@ export interface CharacterTypeModel extends Document {
 }
 
 export enum CharacterGrade {
-    B = 1,
-    A,
-    S,
-    SS,
+    NONE = 'NONE',
+    B = 'B',
+    A = 'A',
+    S = 'S',
+    SS = 'SS',
 }
 
 export enum CharacterType {
-    LIGHT = 1,
-    FLYING,
-    HEAVY,
+    NONE = 'NONE',
+    LIGHT = 'LIGHT',
+    FLYING = 'FLYING',
+    HEAVY = 'HEAVY',
 }
 
 export enum CharacterRole {
-    ASSAULT = 1,
-    SUPPORT,
-    DEFEND,
+    NONE = 'NONE',
+    ASSAULT = 'ASSAULT',
+    SUPPORT = 'SUPPORT',
+    DEFENDER = 'DEFENDER',
 }
 
 const CharacterSchema = new Schema<CharacterTypeModel>({
@@ -58,20 +61,24 @@ const CharacterSchema = new Schema<CharacterTypeModel>({
     number: Number,
     groupId: { type: Types.ObjectId, index: true },
     grade: {
-        type: Number,
+        type: String,
         enum: enumToArray(CharacterGrade),
+        default: CharacterGrade.NONE,
     },
     lastGrade: {
-        type: Number,
+        type: String,
         enum: enumToArray(CharacterGrade),
+        default: CharacterGrade.NONE,
     },
     type: {
-        type: Number,
+        type: String,
         enum: enumToArray(CharacterType),
+        default: CharacterType.NONE,
     },
     role: {
-        type: Number,
+        type: String,
         enum: enumToArray(CharacterRole),
+        default: CharacterRole.NONE,
     },
     class: String,
     arm: String,

@@ -14,10 +14,10 @@ declare module 'Module' {
         tag?: string[];
         number?: number;
         groupId?: string;
-        grade?: CharacterGrade;
-        lastGrade?: CharacterGrade;
-        type?: CharacterType;
-        role?: CharacterRole;
+        grade?: string;
+        lastGrade?: string;
+        type?: string;
+        role?: string;
         class?: string;
         arm?: string;
         stature?: number;
@@ -40,22 +40,22 @@ declare module 'Module' {
         character?: CharacterInterface[];
     }
 
-    enum CharacterGrade {
-        B = 1,
-        A,
-        S,
-        SS,
-    }
+    // enum CharacterGrade {
+    //     B = 1,
+    //     A,
+    //     S,
+    //     SS,
+    // }
 
-    enum CharacterType {
-        LIGHT = 1,
-        FLYING,
-        HEAVY,
-    }
+    // enum CharacterType {
+    //     LIGHT = 1,
+    //     FLYING,
+    //     HEAVY,
+    // }
 
-    enum CharacterRole {
-        ASSAULT = 1,
-        SUPPORT,
-        DEFEND,
-    }
+    // enum CharacterRole {
+    //     ASSAULT = 1,
+    //     SUPPORT,
+    //     DEFEND,
+    // }
 }

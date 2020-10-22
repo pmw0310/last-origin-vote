@@ -18,10 +18,10 @@ const AddCharacter = (): JSX.Element => {
         description: '',
         number: 0,
         groupId: '',
-        grade: 0,
-        lastGrade: 0,
-        type: 0,
-        role: 0,
+        grade: 'NONE',
+        lastGrade: 'NONE',
+        type: 'NONE',
+        role: 'NONE',
         class: '',
         arm: '',
         stature: 0,
@@ -56,29 +56,3 @@ const AddCharacter = (): JSX.Element => {
 };
 
 export default AddCharacter;
-
-// import React, { useState } from 'react';
-// // import { gql } from '@apollo/client';
-// import Editor from '../../components/Editor';
-// import { CharacterInterface } from 'Module';
-
-// // const CHARACTER = gql``;
-
-// export default function AdddCharacter(): JSX.Element {
-//     const [data, setData] = useState<CharacterInterface>({
-//         name: '',
-//         tag: [],
-//         number: undefined,
-//     });
-
-//     const test = () => {
-//         console.log(data);
-//     };
-
-//     return (
-//         <>
-//             <Editor data={data} setData={setData} type="character" />
-//             <button onClick={test}>test!</button>
-//         </>
-//     );
-// }

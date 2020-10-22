@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     TextField,
     InputAdornment,
@@ -73,13 +73,15 @@ const CharacterEdit: React.FC<EditorProps> = ({
 }): JSX.Element => {
     const [last, setLast] = useState<number>(0);
     const [singleUploadMutation] = useMutation(IMAGEUPLOAD);
-    // const [getGroup, { data: group }] = useLazyQuery(GROUP_LIST, {
-    //     fetchPolicy: 'no-cache',
-    // });
+    const [getGroup, { data: group }] = useLazyQuery(GROUP_LIST, {
+        fetchPolicy: 'no-cache',
+    });
 
-    // if (type === 'character') {
-    //     getGroup();
-    // }
+    useEffect(() => {
+        if (getGroup && !group) {
+            getGroup();
+        }
+    }, [getGroup, group]);
 
     const handleChangeImage: React.ChangeEventHandler<HTMLInputElement> = async ({
         target: {
@@ -144,15 +146,6 @@ const CharacterEdit: React.FC<EditorProps> = ({
             </ItemGrid>
             {type === 'character' && (
                 <>
-                    <ItemGrid div={3}>
-                        <ItemTextField
-                            label="이름"
-                            value={data.name}
-                            onChange={handleChange}
-                            name="name"
-                            variant="outlined"
-                        />
-                    </ItemGrid>
                     <ItemGrid div={3}>
                         <ItemTextField
                             label="번호"
@@ -234,13 +227,13 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             onChange={handleChange}
                             variant="outlined"
                         >
-                            <MenuItem value={0}>
+                            <MenuItem value={'NONE'}>
                                 <em>없음</em>
                             </MenuItem>
-                            <MenuItem value={1}>B</MenuItem>
-                            <MenuItem value={2}>A</MenuItem>
-                            <MenuItem value={3}>S</MenuItem>
-                            <MenuItem value={4}>SS</MenuItem>
+                            <MenuItem value={'B'}>B</MenuItem>
+                            <MenuItem value={'A'}>A</MenuItem>
+                            <MenuItem value={'S'}>S</MenuItem>
+                            <MenuItem value={'SS'}>SS</MenuItem>
                         </ItemTextField>
                     </ItemGrid>
                     <ItemGrid div={2}>
@@ -251,14 +244,15 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             name="lastGrade"
                             onChange={handleChange}
                             variant="outlined"
+                            helperText="승급이 있을 경우만 선택"
                         >
-                            <MenuItem value={0}>
+                            <MenuItem value={'NONE'}>
                                 <em>없음</em>
                             </MenuItem>
-                            <MenuItem value={1}>B</MenuItem>
-                            <MenuItem value={2}>A</MenuItem>
-                            <MenuItem value={3}>S</MenuItem>
-                            <MenuItem value={4}>SS</MenuItem>
+                            <MenuItem value={'B'}>B</MenuItem>
+                            <MenuItem value={'A'}>A</MenuItem>
+                            <MenuItem value={'S'}>S</MenuItem>
+                            <MenuItem value={'SS'}>SS</MenuItem>
                         </ItemTextField>
                     </ItemGrid>
                     <ItemGrid div={1}>
@@ -269,16 +263,16 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             label="타입"
                             select
                             value={(data as CharacterInterface).type}
-                            name="grade"
+                            name="type"
                             onChange={handleChange}
                             variant="outlined"
                         >
-                            <MenuItem value={0}>
+                            <MenuItem value={'NONE'}>
                                 <em>없음</em>
                             </MenuItem>
-                            <MenuItem value={1}>경장형</MenuItem>
-                            <MenuItem value={2}>기동형</MenuItem>
-                            <MenuItem value={3}>중장형</MenuItem>
+                            <MenuItem value={'LIGHT'}>경장형</MenuItem>
+                            <MenuItem value={'FLYING'}>기동형</MenuItem>
+                            <MenuItem value={'HEAVY'}>중장형</MenuItem>
                         </ItemTextField>
                     </ItemGrid>
                     <ItemGrid div={2}>
@@ -286,43 +280,48 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             label="역할"
                             select
                             value={(data as CharacterInterface).role}
-                            name="lastGrade"
+                            name="role"
                             onChange={handleChange}
                             variant="outlined"
                         >
-                            <MenuItem value={0}>
+                            <MenuItem value={'NONE'}>
                                 <em>없음</em>
                             </MenuItem>
-                            <MenuItem value={1}>공격기</MenuItem>
-                            <MenuItem value={2}>지원기</MenuItem>
-                            <MenuItem value={3}>보호기</MenuItem>
+                            <MenuItem value={'ASSAULT'}>공격기</MenuItem>
+                            <MenuItem value={'SUPPORT'}>지원기</MenuItem>
+                            <MenuItem value={'DEFEND'}>보호기</MenuItem>
                         </ItemTextField>
                     </ItemGrid>
                     <ItemGrid div={1}>
                         <HR />
                     </ItemGrid>
-                    <ItemGrid div={1}>
-                        <ItemTextField
-                            label="그룹"
-                            select
-                            value={(data as CharacterInterface).groupId}
-                            name="grade"
-                            onChange={handleChange}
-                            variant="outlined"
-                        >
-                            <MenuItem value={0}>
-                                <em>없음</em>
-                            </MenuItem>
-                            {/* {group &&
-                                group.getGroup.data.map(
-                                    (data: GroupInterface) => (
-                                        <MenuItem value={data.id} key={data.id}>
-                                            {data.name}
-                                        </MenuItem>
-                                    ),
-                                )} */}
-                        </ItemTextField>
-                    </ItemGrid>
+                    {group && (
+                        <ItemGrid div={1}>
+                            <ItemTextField
+                                label="그룹"
+                                select
+                                value={(data as CharacterInterface).groupId}
+                                name="groupId"
+                                onChange={handleChange}
+                                variant="outlined"
+                            >
+                                <MenuItem value={''}>
+                                    <em>없음</em>
+                                </MenuItem>
+                                {group &&
+                                    group.getGroup.data.map(
+                                        (data: GroupInterface) => (
+                                            <MenuItem
+                                                value={data.id}
+                                                key={data.id}
+                                            >
+                                                {data.name}
+                                            </MenuItem>
+                                        ),
+                                    )}
+                            </ItemTextField>
+                        </ItemGrid>
+                    )}
                 </>
             )}
             <ItemGrid div={1}>
