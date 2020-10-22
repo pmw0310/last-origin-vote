@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Paper, Typography, IconButton, Chip } from '@material-ui/core';
+import { Paper, Typography, IconButton, Chip, Avatar } from '@material-ui/core';
+import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import styled from 'styled-components';
 import { CharacterInterface, GroupInterface } from 'Module';
 import { Edit, Delete } from '@material-ui/icons';
@@ -71,6 +72,22 @@ const ListItem: React.FC<CharacterItemProps> = ({
                         ))}
                     </div>
                 </Info>
+                {type === 'group' &&
+                    ((data as GroupInterface).character as Array<
+                        CharacterInterface
+                    >)?.length > 0 && (
+                        <AvatarGroup max={5}>
+                            {((data as GroupInterface).character as Array<
+                                CharacterInterface
+                            >).map((char) => (
+                                <Avatar
+                                    key={char.id}
+                                    alt={char.name}
+                                    src={char.profileImage}
+                                />
+                            ))}
+                        </AvatarGroup>
+                    )}
                 {auth && (
                     <Auth>
                         <Link href={`/${type}/[id]`} as={`/${type}/${data.id}`}>

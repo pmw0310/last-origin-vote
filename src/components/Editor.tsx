@@ -289,7 +289,7 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             </MenuItem>
                             <MenuItem value={'ASSAULT'}>공격기</MenuItem>
                             <MenuItem value={'SUPPORT'}>지원기</MenuItem>
-                            <MenuItem value={'DEFEND'}>보호기</MenuItem>
+                            <MenuItem value={'DEFENDER'}>보호기</MenuItem>
                         </ItemTextField>
                     </ItemGrid>
                     <ItemGrid div={1}>

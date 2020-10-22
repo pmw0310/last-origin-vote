@@ -36,6 +36,11 @@ const GROUP_LIST = gql`
                     name
                     image
                     tag
+                    character {
+                        id
+                        name
+                        profileImage
+                    }
                 }
             }
             pageInfo {

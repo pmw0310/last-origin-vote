@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Resolver,
     Query,
@@ -69,8 +70,14 @@ export class Group extends GroupInterface {
         description: '소속된 케릭터 정보',
         nullable: true,
     })
-    async character?(): Promise<Character[] | undefined> {
-        const char = await CharacterModels.find({ groupId: this._id });
+    async character?(): Promise<Character[]> {
+        let id = this._id;
+        if (!id) {
+            id = (this as any)._doc._id;
+        }
+        const char = await CharacterModels.find({
+            groupId: (Types.ObjectId(id) as unknown) as string,
+        }).exec();
         return char as Character[];
     }
 }

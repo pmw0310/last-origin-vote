@@ -143,7 +143,7 @@ export class Character extends CharacterInterface {
         if (!this.groupId) {
             return;
         }
-        const group = await GroupModels.findById(this.groupId);
+        const group = await GroupModels.findById(this.groupId).exec();
         return group as Group;
     }
 }
