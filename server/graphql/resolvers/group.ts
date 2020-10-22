@@ -76,7 +76,7 @@ export class Group extends GroupInterface {
             id = (this as any)._doc._id;
         }
         const char = await CharacterModels.find({
-            groupId: (Types.ObjectId(id) as unknown) as string,
+            groupId: id,
         }).exec();
         return char as Character[];
     }
