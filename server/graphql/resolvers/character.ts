@@ -134,7 +134,6 @@ export class Character extends CharacterInterface {
         nullable: true,
     })
     async group?(): Promise<Group | undefined> {
-        console.log(this);
         if (!this.groupId) {
             return;
         }
