@@ -22,10 +22,12 @@ const IMAGEUPLOAD = gql`
 
 const GROUP_LIST = gql`
     query getGroup {
-        getGroup(page: 1, limit: 99999) {
+        get(limit: 99999, focus: GROUP) {
             data {
-                id
-                name
+                ... on Group {
+                    id
+                    name
+                }
             }
         }
     }
@@ -309,7 +311,7 @@ const CharacterEdit: React.FC<EditorProps> = ({
                                     <em>없음</em>
                                 </MenuItem>
                                 {group &&
-                                    group.getGroup.data.map(
+                                    group.get.data.map(
                                         (data: GroupInterface) => (
                                             <MenuItem
                                                 value={data.id}

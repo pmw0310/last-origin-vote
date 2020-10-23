@@ -28,17 +28,20 @@ const AddFabTop = styled.div`
 `;
 
 const CHARACTER_LIST = gql`
-    query getCharacter($page: Int!) {
-        getCharacter(page: $page, limit: 15) {
+    query getCharacter($lastId: ID!) {
+        get(lastId: $lastId, limit: 15, focus: CHARACTERL) {
             edges {
                 node {
-                    id
-                    name
-                    profileImage
-                    tag
+                    ... on Character {
+                        id
+                        name
+                        profileImage
+                        tag
+                    }
                 }
             }
             pageInfo {
+                endCursor
                 hasNextPage
             }
         }
@@ -58,13 +61,13 @@ const REMOVE_CHARACTER = gql`
 `;
 
 const CharacterList = (): JSX.Element => {
-    const [page, setPage] = useState<number>(1);
+    const [lastId, setLastId] = useState<string>('');
     const [open, setOpen] = useState<boolean>(false);
     const [removeId, setremoveId] = useState<string>('');
 
     const { data: list, loading, fetchMore } = useQuery(CHARACTER_LIST, {
         variables: {
-            page,
+            lastId,
         },
         fetchPolicy: 'no-cache',
     });
@@ -92,15 +95,13 @@ const CharacterList = (): JSX.Element => {
     };
 
     const onLoadMore = () => {
-        const _page = page + 1;
+        setLastId(list.get.pageInfo.endCursor);
 
         fetchMore({
             variables: {
-                page: _page,
+                lastId: list.get.pageInfo.endCursor,
             },
         });
-
-        setPage(_page);
     };
 
     return loading ? (
@@ -108,22 +109,20 @@ const CharacterList = (): JSX.Element => {
     ) : (
         <>
             <InfiniteScroll
-                dataLength={list.getCharacter.edges.length}
+                dataLength={list.get.edges.length}
                 next={onLoadMore}
-                hasMore={list.getCharacter.pageInfo.hasNextPage}
+                hasMore={list.get.pageInfo.hasNextPage}
                 loader={<h4>Loading...</h4>}
             >
-                {list.getCharacter.edges.map(
-                    (data: { node: CharacterInterface }) => (
-                        <Item
-                            data={data.node}
-                            key={data.node.id}
-                            auth={!authLoding && (auth.authChecker as boolean)}
-                            removeDialogOpen={handleDialogOpen}
-                            type="char"
-                        />
-                    ),
-                )}
+                {list.get.edges.map((data: { node: CharacterInterface }) => (
+                    <Item
+                        data={data.node}
+                        key={data.node.id}
+                        auth={!authLoding && (auth.authChecker as boolean)}
+                        removeDialogOpen={handleDialogOpen}
+                        type="char"
+                    />
+                ))}
             </InfiniteScroll>
 
             {!authLoding && auth.authChecker && (

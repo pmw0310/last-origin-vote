@@ -6,22 +6,24 @@ import { gql, useLazyQuery, useMutation } from '@apollo/client';
 
 const GET_CHARACTER = gql`
     query getCharacter($id: String!) {
-        getCharacter(page: 1, ids: [$id]) {
+        get(ids: [$id], focus: CHARACTERL) {
             data {
-                name
-                tag
-                profileImage
-                description
-                number
-                groupId
-                grade
-                lastGrade
-                type
-                role
-                class
-                arm
-                stature
-                weight
+                ... on Character {
+                    name
+                    tag
+                    profileImage
+                    description
+                    number
+                    groupId
+                    grade
+                    lastGrade
+                    type
+                    role
+                    class
+                    arm
+                    stature
+                    weight
+                }
             }
         }
     }
@@ -73,7 +75,7 @@ const UpdateCharacter = (): JSX.Element => {
         if (!char) {
             return;
         }
-        const data: CharacterInterface = char.getCharacter.data[0];
+        const data: CharacterInterface = char.get.data[0];
         setData({ ...data, groupId: data.groupId ? data.groupId : '' });
     }, [char, error]);
 

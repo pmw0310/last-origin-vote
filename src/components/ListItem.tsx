@@ -106,12 +106,19 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                 href={`/${type}/[id]`}
                                 as={`/${type}/${data.id}`}
                             >
-                                <IconButton>
+                                <IconButton
+                                    onClick={(event) => event.stopPropagation()}
+                                    onFocus={(event) => event.stopPropagation()}
+                                >
                                     <Edit />
                                 </IconButton>
                             </Link>
                             <IconButton
-                                onClick={removeDialogOpen(data.id as string)}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    removeDialogOpen(data.id as string);
+                                }}
+                                onFocus={(event) => event.stopPropagation()}
                             >
                                 <Delete />
                             </IconButton>

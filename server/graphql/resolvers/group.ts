@@ -1,25 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Resolver,
-    Query,
     Mutation,
     Field,
     ObjectType,
     InputType,
     InterfaceType,
-    Int,
     ID,
     Authorized,
     Arg,
-    Args,
-    ArgsType,
 } from 'type-graphql';
-import GroupModels, { GroupTypeModel } from '../../models/group';
+import GroupModels from '../../models/group';
 import CharacterModels from '../../models/character';
 import { Character } from './character';
-import RelayStylePagination, { Edges } from '../relayStylePagination';
-import { Min } from 'class-validator';
-import { Types, FilterQuery } from 'mongoose';
 
 @InterfaceType()
 @InputType('GroupInput')
@@ -81,69 +74,8 @@ export class Group extends GroupInterface {
     }
 }
 
-@ObjectType()
-class GroupEdges extends Edges(Group) {}
-
-@ObjectType()
-class GroupRelayStylePagination extends RelayStylePagination(
-    Group,
-    GroupEdges,
-) {}
-
-@ArgsType()
-class GroupListArgs {
-    @Field(() => Int, { defaultValue: 1, nullable: true })
-    @Min(1)
-    page?: number = 1;
-    @Field(() => Int, { defaultValue: 10, nullable: true })
-    @Min(1)
-    limit?: number = 10;
-    @Field(() => [String], { name: 'ids', nullable: true, defaultValue: [] })
-    ids?: string[];
-}
-
 @Resolver()
 export default class GroupResolver {
-    @Query(() => GroupRelayStylePagination)
-    async getGroup(
-        @Args() { page, limit, ids }: GroupListArgs,
-    ): Promise<GroupRelayStylePagination> {
-        const query: FilterQuery<GroupTypeModel> = {};
-
-        if (ids && ids.length > 0) {
-            query._id = {
-                $in: ids?.map((id) => Types.ObjectId(id)),
-            };
-        }
-
-        const {
-            docs,
-            hasNextPage,
-            hasPrevPage,
-            nextPage,
-            prevPage,
-            totalPages,
-        } = await GroupModels.paginate(query, { page, limit });
-
-        const group = new GroupRelayStylePagination();
-
-        group.edges = docs.map<GroupEdges>((d) => ({
-            node: d as Group,
-            cursor: d.id,
-        }));
-
-        group.pageInfo = {
-            hasNextPage,
-            hasPrevPage,
-            nextPage,
-            prevPage,
-            totalPages,
-            endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
-        };
-
-        return group;
-    }
-
     @Authorized('group')
     @Mutation(() => Boolean)
     async addGroup(@Arg('data') data: GroupInterface): Promise<boolean> {

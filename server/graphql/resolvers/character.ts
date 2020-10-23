@@ -1,6 +1,5 @@
 import {
     Resolver,
-    Query,
     Mutation,
     Field,
     ObjectType,
@@ -11,20 +10,15 @@ import {
     Authorized,
     registerEnumType,
     Arg,
-    Args,
-    ArgsType,
 } from 'type-graphql';
 import CharacterModels, {
     CharacterGrade,
     CharacterType,
     CharacterRole,
-    CharacterTypeModel,
 } from '../../models/character';
 import GroupModels from '../../models/group';
 import { Group } from './group';
-import RelayStylePagination, { Edges } from '../relayStylePagination';
-import { Min } from 'class-validator';
-import { Types, FilterQuery } from 'mongoose';
+import { Types } from 'mongoose';
 
 registerEnumType(CharacterGrade, {
     name: 'CharacterGrade',
@@ -140,6 +134,7 @@ export class Character extends CharacterInterface {
         nullable: true,
     })
     async group?(): Promise<Group | undefined> {
+        console.log(this);
         if (!this.groupId) {
             return;
         }
@@ -148,68 +143,8 @@ export class Character extends CharacterInterface {
     }
 }
 
-@ObjectType()
-class CharacterEdges extends Edges(Character) {}
-
-@ObjectType()
-class CharacterRelayStylePagination extends RelayStylePagination(
-    Character,
-    CharacterEdges,
-) {}
-
-@ArgsType()
-class CharacterListArgs {
-    @Field(() => Int, { defaultValue: 1 })
-    @Min(1)
-    page: number = 1;
-    @Field(() => Int, { defaultValue: 10 })
-    @Min(1)
-    limit: number = 10;
-    @Field(() => [String], { name: 'ids', nullable: true })
-    ids: string[] = [];
-}
-
 @Resolver()
 export default class CharacterResolver {
-    @Query(() => CharacterRelayStylePagination)
-    async getCharacter(
-        @Args() { ids, page, limit }: CharacterListArgs,
-    ): Promise<CharacterRelayStylePagination> {
-        const query: FilterQuery<CharacterTypeModel> = {};
-        if (ids.length > 0) {
-            query._id = {
-                $in: ids?.map((id) => Types.ObjectId(id)),
-            };
-        }
-
-        const {
-            docs,
-            hasNextPage,
-            hasPrevPage,
-            nextPage,
-            prevPage,
-            totalPages,
-        } = await CharacterModels.paginate(query, { page, limit });
-
-        const char = new CharacterRelayStylePagination();
-
-        char.edges = docs.map<CharacterEdges>((d) => ({
-            node: d as Character,
-            cursor: d.id,
-        }));
-
-        char.pageInfo = {
-            hasNextPage,
-            hasPrevPage,
-            nextPage,
-            prevPage,
-            totalPages,
-            endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
-        };
-
-        return char;
-    }
-
     @Authorized('character')
     @Mutation(() => Boolean)
     async addCharacter(

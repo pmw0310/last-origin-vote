@@ -6,12 +6,14 @@ import { gql, useLazyQuery, useMutation } from '@apollo/client';
 
 const GET_GROUP = gql`
     query getGroup($id: String!) {
-        getGroup(page: 1, ids: [$id]) {
+        get(ids: [$id], focus: GROUP) {
             data {
-                name
-                tag
-                image
-                description
+                ... on Group {
+                    name
+                    tag
+                    image
+                    description
+                }
             }
         }
     }

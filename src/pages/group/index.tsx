@@ -28,22 +28,25 @@ const AddFabTop = styled.div`
 `;
 
 const GROUP_LIST = gql`
-    query getGroup($page: Int!) {
-        getGroup(page: $page, limit: 15) {
+    query getGroup($lastId: ID!) {
+        get(lastId: $lastId, limit: 15, focus: GROUP) {
             edges {
                 node {
-                    id
-                    name
-                    image
-                    tag
-                    character {
+                    ... on Group {
                         id
                         name
-                        profileImage
+                        image
+                        tag
+                        character {
+                            id
+                            name
+                            profileImage
+                        }
                     }
                 }
             }
             pageInfo {
+                endCursor
                 hasNextPage
             }
         }
@@ -63,13 +66,13 @@ const REMOVE_GROUP = gql`
 `;
 
 const GroupList = (): JSX.Element => {
-    const [page, setPage] = useState<number>(1);
+    const [lastId, setLastId] = useState<string>('');
     const [open, setOpen] = useState<boolean>(false);
     const [removeId, setremoveId] = useState<string>('');
 
     const { data: list, loading, fetchMore } = useQuery(GROUP_LIST, {
         variables: {
-            page,
+            lastId,
         },
         fetchPolicy: 'no-cache',
     });
@@ -97,15 +100,13 @@ const GroupList = (): JSX.Element => {
     };
 
     const onLoadMore = () => {
-        const _page = page + 1;
+        setLastId(list.get.pageInfo.endCursor);
 
         fetchMore({
             variables: {
-                page: _page,
+                lastId: list.get.pageInfo.endCursor,
             },
         });
-
-        setPage(_page);
     };
 
     return loading ? (
@@ -113,12 +114,12 @@ const GroupList = (): JSX.Element => {
     ) : (
         <>
             <InfiniteScroll
-                dataLength={list.getGroup.edges.length}
+                dataLength={list.get.edges.length}
                 next={onLoadMore}
-                hasMore={list.getGroup.pageInfo.hasNextPage}
+                hasMore={list.get.pageInfo.hasNextPage}
                 loader={<h4>Loading...</h4>}
             >
-                {list.getGroup.edges.map((data: { node: GroupInterface }) => (
+                {list.get.edges.map((data: { node: GroupInterface }) => (
                     <Item
                         data={data.node}
                         key={data.node.id}
