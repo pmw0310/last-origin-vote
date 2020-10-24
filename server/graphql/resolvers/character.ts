@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Resolver,
     Mutation,
@@ -134,10 +135,14 @@ export class Character extends CharacterInterface {
         nullable: true,
     })
     async group?(): Promise<Group | undefined> {
-        if (!this.groupId) {
+        let groupId = this.groupId;
+        if (!groupId) {
+            groupId = (this as any)._doc.groupId;
+        }
+        if (!groupId) {
             return;
         }
-        const group = await GroupModels.findById(this.groupId).exec();
+        const group = await GroupModels.findById(groupId).exec();
         return group as Group;
     }
 }

@@ -40,6 +40,14 @@ const CHARACTER_LIST = gql`
                         grade
                         type
                         role
+                        class
+                        arm
+                        stature
+                        weight
+                        group {
+                            name
+                            image
+                        }
                     }
                 }
             }

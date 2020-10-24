@@ -13,6 +13,7 @@ import {
     MenuItem,
     ListItemIcon,
     ListItemText,
+    Grid,
 } from '@material-ui/core';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import styled from 'styled-components';
@@ -60,6 +61,16 @@ const AuthButton = styled(IconButton)`
 const GradeIcon = styled.img`
     position: absolute;
     z-index: 100;
+    top: 6px;
+    left: 6px;
+`;
+const CharacterInfo = styled(Grid)`
+    display: flex;
+    align-items: center;
+`;
+const CharacterInfoChip = styled(Chip)`
+    margin-right: 12px;
+    width: 64px;
 `;
 
 const ListItem: React.FC<CharacterItemProps> = ({
@@ -135,7 +146,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
         return text;
     };
 
-    const toGradeImage = (grade: string): string => {
+    const toGradeImagePaht = (grade: string): string => {
         const { role } = data as CharacterInterface;
 
         const isGrade = !isNone(grade);
@@ -157,10 +168,34 @@ const ListItem: React.FC<CharacterItemProps> = ({
         }
     };
 
+    const toStatureText = (): string => {
+        const stature = (data as CharacterInterface).stature as number;
+        if (stature <= 0) {
+            return '?kg';
+        } else if (stature < 500) {
+            return `${stature}kg`;
+        } else {
+            return `${stature / 1000}t`;
+        }
+    };
+
+    const toWeightText = (): string => {
+        const weight = (data as CharacterInterface).weight as number;
+        if (weight <= 0) {
+            return '?cm';
+        } else if (weight < 200) {
+            return `${weight}cm`;
+        } else {
+            return `${weight / 100}m`;
+        }
+    };
+
     const roleText = toRoleText();
-    const gradeImage = toGradeImage(
+    const gradeImage = toGradeImagePaht(
         (data as CharacterInterface).grade as string,
     );
+    const statureText = toStatureText();
+    const weightText = toWeightText();
 
     return (
         <Root>
@@ -259,23 +294,112 @@ const ListItem: React.FC<CharacterItemProps> = ({
                     )}
                 </ItemAccordionSummary>
                 <AccordionDetails>
-                    {type === 'group' &&
-                        expanded &&
-                        ((data as GroupInterface).character as Array<
-                            CharacterInterface
-                        >)?.length > 0 && (
-                            <AvatarGroup max={5}>
-                                {((data as GroupInterface).character as Array<
-                                    CharacterInterface
-                                >).map((char) => (
-                                    <Avatar
-                                        key={char.id}
-                                        alt={char.name}
-                                        src={char.profileImage}
+                    <Grid container spacing={1}>
+                        {type === 'char' && (
+                            <>
+                                {expanded &&
+                                    (data as CharacterInterface).group && (
+                                        <CharacterInfo item xl={12}>
+                                            <Chip
+                                                variant="outlined"
+                                                color="primary"
+                                                label="소속 부대"
+                                            />
+                                            <LazyLoadImage
+                                                alt="https://via.placeholder.com/32x32.png?text=Error"
+                                                src={
+                                                    (data as CharacterInterface)
+                                                        .group?.image ||
+                                                    'https://via.placeholder.com/32x32.png?text=None'
+                                                }
+                                                effect="blur"
+                                                width="32"
+                                                height="32"
+                                            />
+                                            <Typography variant="subtitle2">
+                                                {
+                                                    (data as CharacterInterface)
+                                                        .group?.name
+                                                }
+                                            </Typography>
+                                        </CharacterInfo>
+                                    )}
+                                <CharacterInfo item lg={3} sm={6}>
+                                    <CharacterInfoChip
+                                        variant="outlined"
+                                        color="primary"
+                                        label="신장"
+                                        size="small"
                                     />
-                                ))}
-                            </AvatarGroup>
+                                    <Typography variant="subtitle2">
+                                        {statureText}
+                                    </Typography>
+                                </CharacterInfo>
+                                <CharacterInfo item lg={3} sm={6}>
+                                    <CharacterInfoChip
+                                        variant="outlined"
+                                        color="primary"
+                                        label="체중"
+                                        size="small"
+                                    />
+                                    <Typography variant="subtitle2">
+                                        {weightText}
+                                    </Typography>
+                                </CharacterInfo>
+                                {(data as CharacterInterface).class && (
+                                    <CharacterInfo item lg={3} sm={6}>
+                                        <CharacterInfoChip
+                                            variant="outlined"
+                                            color="primary"
+                                            label="클래스"
+                                            size="small"
+                                        />
+                                        <Typography variant="subtitle2">
+                                            {(data as CharacterInterface).class}
+                                        </Typography>
+                                    </CharacterInfo>
+                                )}
+                                {(data as CharacterInterface).arm && (
+                                    <CharacterInfo item lg={3} sm={6}>
+                                        <CharacterInfoChip
+                                            variant="outlined"
+                                            color="primary"
+                                            label="무장"
+                                            size="small"
+                                        />
+                                        <Typography variant="subtitle2">
+                                            {(data as CharacterInterface).arm}
+                                        </Typography>
+                                    </CharacterInfo>
+                                )}
+                            </>
                         )}
+                        {type === 'group' &&
+                            expanded &&
+                            ((data as GroupInterface).character as Array<
+                                CharacterInterface
+                            >)?.length > 0 && (
+                                <CharacterInfo item xl={12}>
+                                    <Chip
+                                        variant="outlined"
+                                        color="primary"
+                                        label="소속 인원"
+                                    />
+                                    <AvatarGroup max={5}>
+                                        {((data as GroupInterface)
+                                            .character as Array<
+                                            CharacterInterface
+                                        >).map((char) => (
+                                            <Avatar
+                                                key={char.id}
+                                                alt={char.name}
+                                                src={char.profileImage}
+                                            />
+                                        ))}
+                                    </AvatarGroup>
+                                </CharacterInfo>
+                            )}
+                    </Grid>
                 </AccordionDetails>
             </Accordion>
         </Root>

@@ -367,6 +367,7 @@ const CharacterEdit: React.FC<EditorProps> = ({
             <ItemGrid div={1}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <img
+                        alt="https://via.placeholder.com/125x125.png?text=Error"
                         src={
                             (data as CharacterInterface).profileImage ||
                             (data as GroupInterface).image ||

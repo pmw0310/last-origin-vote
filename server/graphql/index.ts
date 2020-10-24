@@ -4,6 +4,7 @@ import UserResolvers from './resolvers/user';
 import CharacterResolvers from './resolvers/character';
 import ImageUploadResolver from './resolvers/imageUpload';
 import GroupResolver from './resolvers/group';
+import LikeResolver from './resolvers/like';
 import GetResolver from './resolvers/get';
 import authChecker from '../lib/authChecker';
 
@@ -23,6 +24,7 @@ export const schema = buildSchemaSync({
         ImageUploadResolver,
         GroupResolver,
         GetResolver,
+        LikeResolver,
     ],
     dateScalarMode: 'timestamp',
     authChecker: customAuthChecker,
