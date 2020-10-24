@@ -55,7 +55,7 @@ const UpdateGroup = (): JSX.Element => {
         if (!group) {
             return;
         }
-        setData({ ...group.getGroup.data[0] });
+        setData({ ...group.get.data[0] });
     }, [group, error]);
 
     const save = async () => {

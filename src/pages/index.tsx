@@ -28,8 +28,8 @@ const AddFabTop = styled.div`
 `;
 
 const CHARACTER_LIST = gql`
-    query getCharacter($lastId: ID!) {
-        get(lastId: $lastId, limit: 15, focus: CHARACTERL) {
+    query getCharacter($endCursor: ID!) {
+        get(endCursor: $endCursor, limit: 15, focus: CHARACTERL) {
             edges {
                 node {
                     ... on Character {
@@ -37,6 +37,9 @@ const CHARACTER_LIST = gql`
                         name
                         profileImage
                         tag
+                        grade
+                        type
+                        role
                     }
                 }
             }
@@ -61,13 +64,13 @@ const REMOVE_CHARACTER = gql`
 `;
 
 const CharacterList = (): JSX.Element => {
-    const [lastId, setLastId] = useState<string>('');
+    const [endCursor, setEndCursor] = useState<string>('');
     const [open, setOpen] = useState<boolean>(false);
     const [removeId, setremoveId] = useState<string>('');
 
     const { data: list, loading, fetchMore } = useQuery(CHARACTER_LIST, {
         variables: {
-            lastId,
+            endCursor,
         },
         fetchPolicy: 'no-cache',
     });
@@ -78,12 +81,13 @@ const CharacterList = (): JSX.Element => {
 
     const [removeCharacter] = useMutation(REMOVE_CHARACTER);
 
-    const handleDialogOpen = (id: string) => () => {
+    const handleDialogOpen = (id: string) => {
         setremoveId(id);
         setOpen(true);
     };
 
     const handleDialogClose = () => {
+        setremoveId('');
         setOpen(false);
     };
 
@@ -95,11 +99,11 @@ const CharacterList = (): JSX.Element => {
     };
 
     const onLoadMore = () => {
-        setLastId(list.get.pageInfo.endCursor);
+        setEndCursor(list.get.pageInfo.endCursor);
 
         fetchMore({
             variables: {
-                lastId: list.get.pageInfo.endCursor,
+                endCursor: list.get.pageInfo.endCursor,
             },
         });
     };

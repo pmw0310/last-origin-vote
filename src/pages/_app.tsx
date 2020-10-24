@@ -4,6 +4,7 @@ import { ApolloProvider } from '@apollo/client';
 import AppBar from '../components/AppBar';
 import AppContainer from '../components/AppContainer';
 import { useApollo } from '../lib/apollo';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface Props {
     Component: any;

@@ -6,12 +6,12 @@ import {
     Typography,
     Grid,
     MenuItem,
+    CircularProgress,
 } from '@material-ui/core';
 import styled from 'styled-components';
 import { CharacterInterface, GroupInterface } from 'Module';
 import ChipInput from 'material-ui-chip-input';
 import { gql, useMutation, useLazyQuery } from '@apollo/client';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { EditorProps } from './EditorForm';
 
 const IMAGEUPLOAD = gql`
@@ -74,6 +74,7 @@ const CharacterEdit: React.FC<EditorProps> = ({
     type,
 }): JSX.Element => {
     const [last, setLast] = useState<number>(0);
+    const [imageUploading, setImageUploading] = useState<boolean>(false);
     const [singleUploadMutation] = useMutation(IMAGEUPLOAD);
     const [getGroup, { data: group }] = useLazyQuery(GROUP_LIST, {
         fetchPolicy: 'no-cache',
@@ -93,7 +94,13 @@ const CharacterEdit: React.FC<EditorProps> = ({
     }) => {
         const file = (files as FileList)[0];
 
+        if (!file) {
+            return;
+        }
+
         if (valid) {
+            setImageUploading(true);
+
             try {
                 const {
                     data: { imageUpload: url },
@@ -113,6 +120,8 @@ const CharacterEdit: React.FC<EditorProps> = ({
                     [type === 'character' ? 'profileImage' : 'image']: null,
                 });
             }
+
+            setImageUploading(false);
         }
     };
 
@@ -357,13 +366,12 @@ const CharacterEdit: React.FC<EditorProps> = ({
             </ItemGrid>
             <ItemGrid div={1}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <LazyLoadImage
+                    <img
                         src={
                             (data as CharacterInterface).profileImage ||
                             (data as GroupInterface).image ||
                             'https://via.placeholder.com/125x125.png?text=No+Image'
                         }
-                        effect="opacity"
                         width="125"
                         height="125"
                     />
@@ -371,8 +379,13 @@ const CharacterEdit: React.FC<EditorProps> = ({
                         variant="contained"
                         component="label"
                         style={{ marginLeft: '30px' }}
+                        disabled={imageUploading}
                     >
-                        <Typography>이미지 업로드</Typography>
+                        {imageUploading ? (
+                            <CircularProgress size={24} />
+                        ) : (
+                            <Typography>이미지 업로드</Typography>
+                        )}
                         <input
                             style={{ display: 'none' }}
                             type="file"

@@ -85,7 +85,7 @@ class GetRelayStylePagination {
 @ArgsType()
 class GetArgs {
     @Field(() => ID, { nullable: true, description: '마지막 ID' })
-    lastId?: string;
+    endCursor?: string;
     @Field(() => Int, { defaultValue: 10, description: '불러올 수량' })
     @Min(1)
     limit: number = 10;
@@ -104,7 +104,7 @@ class GetArgs {
 
 const getCharacter = async (
     limit: number,
-    charLastId?: string,
+    endCursor?: string,
     ids: Array<string> = [],
 ): Promise<GetRelayStylePagination> => {
     let charQuery: FilterQuery<CharacterTypeModel> = {};
@@ -117,10 +117,10 @@ const getCharacter = async (
             },
         };
     }
-    if (charLastId) {
+    if (endCursor) {
         charQuery = {
             ...charQuery,
-            _id: { ...charQuery._id, $gt: Types.ObjectId(charLastId) },
+            _id: { ...charQuery._id, $gt: Types.ObjectId(endCursor) },
         };
     }
 
@@ -154,7 +154,7 @@ const getCharacter = async (
 
 const getGroup = async (
     limit: number,
-    groupLastId?: string,
+    endCursor?: string,
     ids: Array<string> = [],
 ): Promise<GetRelayStylePagination> => {
     let groupQuery: FilterQuery<GroupTypeModel> = {};
@@ -167,12 +167,12 @@ const getGroup = async (
             },
         };
     }
-    if (groupLastId) {
+    if (endCursor) {
         groupQuery = {
             ...groupQuery,
             _id: {
                 ...groupQuery._id,
-                $gt: Types.ObjectId(groupLastId),
+                $gt: Types.ObjectId(endCursor),
             },
         };
     }
@@ -209,12 +209,16 @@ const getGroup = async (
 export default class GetResolver {
     @Query(() => GetRelayStylePagination)
     async get(
-        @Args() { limit, ids, lastId, focus }: GetArgs,
+        @Args() { limit, ids, endCursor, focus }: GetArgs,
     ): Promise<GetRelayStylePagination | undefined> {
         switch (focus) {
             case FocusType.ALL:
-                const char = await getCharacter(limit, lastId, ids);
+                const char = await getCharacter(limit, endCursor, ids);
                 if (char.pageInfo?.hasNextPage) {
+                    char.pageInfo.totalPages = undefined;
+                    char.pageInfo.nextPage = undefined;
+                    char.pageInfo.prevPage = undefined;
+                    char.pageInfo.hasPrevPage = undefined;
                     return char;
                 }
                 const group = await getGroup(
@@ -227,12 +231,15 @@ export default class GetResolver {
                     ...(char.edges as GetEdges[]),
                     ...(group.edges as GetEdges[]),
                 ];
-                get.pageInfo = { ...(group.pageInfo as PageInfo) };
+                get.pageInfo = {
+                    hasNextPage: group.pageInfo?.hasNextPage as boolean,
+                    endCursor: group.pageInfo?.endCursor as string,
+                };
                 return get;
             case FocusType.CHARACTERL:
-                return await getCharacter(limit, lastId, ids);
+                return await getCharacter(limit, endCursor, ids);
             case FocusType.GROUP:
-                return await getGroup(limit, lastId, ids);
+                return await getGroup(limit, endCursor, ids);
         }
 
         new Error(`unknown focus type: ${focus}`);

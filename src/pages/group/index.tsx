@@ -28,8 +28,8 @@ const AddFabTop = styled.div`
 `;
 
 const GROUP_LIST = gql`
-    query getGroup($lastId: ID!) {
-        get(lastId: $lastId, limit: 15, focus: GROUP) {
+    query getGroup($endCursor: ID!) {
+        get(endCursor: $endCursor, limit: 15, focus: GROUP) {
             edges {
                 node {
                     ... on Group {
@@ -66,13 +66,13 @@ const REMOVE_GROUP = gql`
 `;
 
 const GroupList = (): JSX.Element => {
-    const [lastId, setLastId] = useState<string>('');
+    const [endCursor, setEndCursor] = useState<string>('');
     const [open, setOpen] = useState<boolean>(false);
     const [removeId, setremoveId] = useState<string>('');
 
     const { data: list, loading, fetchMore } = useQuery(GROUP_LIST, {
         variables: {
-            lastId,
+            endCursor,
         },
         fetchPolicy: 'no-cache',
     });
@@ -83,12 +83,13 @@ const GroupList = (): JSX.Element => {
 
     const [removeGroup] = useMutation(REMOVE_GROUP);
 
-    const handleDialogOpen = (id: string) => () => {
+    const handleDialogOpen = (id: string) => {
         setremoveId(id);
         setOpen(true);
     };
 
     const handleDialogClose = () => {
+        setremoveId('');
         setOpen(false);
     };
 
@@ -100,11 +101,11 @@ const GroupList = (): JSX.Element => {
     };
 
     const onLoadMore = () => {
-        setLastId(list.get.pageInfo.endCursor);
+        setEndCursor(list.get.pageInfo.endCursor);
 
         fetchMore({
             variables: {
-                lastId: list.get.pageInfo.endCursor,
+                endCursor: list.get.pageInfo.endCursor,
             },
         });
     };

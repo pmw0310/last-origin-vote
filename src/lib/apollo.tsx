@@ -29,7 +29,7 @@ const cache = new InMemoryCache({
                 currentUser() {
                     return currentUserVar();
                 },
-                get: relayStylePagination(['lastId']),
+                get: relayStylePagination(['endCursor']),
             },
         },
     },
