@@ -4,19 +4,48 @@ export interface LinkTypeModel extends Document {
     user: string;
     target: string;
     type: string;
-    link: -1 | 0 | 1;
-    updateAt: Date;
+    like: -1 | 1;
+    updateAt?: Date;
 }
 
+export interface LinkStatsTypeModel {
+    like: number;
+    notLike: number;
+    updateAt?: Date;
+}
+
+export const LinkStatsSchema = new Schema<LinkStatsTypeModel>(
+    {
+        like: {
+            type: Number,
+            default: 0,
+        },
+        notLike: {
+            type: Number,
+            default: 0,
+        },
+        updateAt: {
+            type: Date,
+            default: Date.now,
+        },
+    },
+    { _id: false },
+);
+
 const LinkSchema = new Schema<LinkTypeModel>({
-    user: { type: Types.ObjectId, index: true, required: true },
+    user: { type: String, index: true, required: true },
     target: { type: Types.ObjectId, index: true, required: true },
-    type: { type: String, enum: ['CHARACTER', 'GROUP'], required: true },
-    link: { type: Number, enum: [-1, 0, 1], required: true },
+    type: {
+        type: String,
+        enum: ['CHARACTER', 'GROUP'],
+        index: true,
+        required: true,
+    },
+    like: { type: Number, enum: [-1, 1], required: true },
     updateAt: {
         type: Date,
         default: Date.now,
     },
 });
 
-export default model<LinkTypeModel>('User', LinkSchema);
+export default model<LinkTypeModel>('Link', LinkSchema);

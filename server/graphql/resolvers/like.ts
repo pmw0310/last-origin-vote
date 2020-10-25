@@ -1,22 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Resolver,
     Mutation,
     Field,
     ObjectType,
     Int,
-    InputType,
-    InterfaceType,
     ID,
-    Authorized,
-    Arg,
+    ArgsType,
+    Args,
+    Ctx,
     registerEnumType,
 } from 'type-graphql';
 import { Min, Max } from 'class-validator';
-import GroupModels from '../../models/group';
+import db, { PaginateModel } from 'mongoose';
+import LikeModels from '../../models/like';
+import { UserVerifyResult } from '../../models/user';
 import CharacterModels from '../../models/character';
+import GroupModels from '../../models/group';
 
 enum TargetType {
-    CHARACTERL = 'CHARACTERL',
+    CHARACTER = 'CHARACTER',
     GROUP = 'GROUP',
 }
 
@@ -64,21 +67,136 @@ export class Like {
 
 @ObjectType()
 export class LikeData {
+    @Field(() => Int, { description: '좋아요', nullable: false })
+    like!: number;
+    @Field(() => Int, { description: '싫어요', nullable: false })
+    notLike!: number;
+}
+
+@ArgsType()
+class SetLikeArgs {
     @Field(() => ID, {
         description: '타겟 ID',
-        nullable: true,
+        nullable: false,
     })
-    target?: string;
+    target!: string;
     @Field(() => TargetType, {
         description: '타겟 타입',
-        nullable: true,
+        nullable: false,
     })
-    type?: TargetType;
-    @Field(() => Int, { description: '좋아요', nullable: true })
-    link?: number;
-    @Field(() => Int, { description: '싫어요', nullable: true })
-    notLink?: number;
+    type!: TargetType;
+    @Field(() => Int, {
+        description: '(1:좋아요, -1:싫어요)',
+        nullable: false,
+    })
+    @Min(-1)
+    @Max(1)
+    like!: -1 | 1;
 }
 
 @Resolver()
-export default class GroupResolver {}
+export default class GroupResolver {
+    @Mutation(() => LikeData)
+    async setLike(
+        @Args() { target, type, like }: SetLikeArgs,
+        @Ctx() ctx: { currentUser: UserVerifyResult },
+    ): Promise<LikeData> {
+        const user = ctx.currentUser.user?._id;
+
+        if (!user) {
+            throw Error('not current user');
+        }
+
+        let setLike: number = 0;
+        let setNotLike: number = 0;
+
+        const session = await db.startSession();
+        session.startTransaction();
+
+        const likeRes = await LikeModels.findOne({
+            user,
+            target,
+            type,
+        });
+
+        try {
+            if (likeRes) {
+                if (likeRes.like === like) {
+                    await LikeModels.findByIdAndRemove(likeRes.id)
+                        .session(session)
+                        .exec();
+                    switch (like) {
+                        case 1:
+                            setLike = -1;
+                            break;
+                        case -1:
+                            setNotLike = -1;
+                            break;
+                    }
+                } else {
+                    likeRes.like = like;
+                    likeRes.updateAt = new Date();
+                    await likeRes.save({ session });
+                    switch (like) {
+                        case 1:
+                            setLike = 1;
+                            setNotLike = -1;
+                            break;
+                        case -1:
+                            setLike = -1;
+                            setNotLike = 1;
+                            break;
+                    }
+                }
+            } else {
+                const newLink = new LikeModels({
+                    user,
+                    target,
+                    type: type.toString(),
+                    like: like,
+                });
+                await newLink.save({ session });
+                switch (like) {
+                    case 1:
+                        setLike = 1;
+                        break;
+                    case -1:
+                        setNotLike = 1;
+                        break;
+                }
+            }
+
+            let models: PaginateModel<any>;
+
+            switch (type) {
+                case TargetType.CHARACTER:
+                    models = CharacterModels;
+                    break;
+                case TargetType.GROUP:
+                    models = GroupModels;
+                    break;
+            }
+
+            const data = await models.findById(target).exec();
+
+            if (!data) {
+                throw new Error('not find character');
+            }
+
+            data.likeStats.like += setLike;
+            data.likeStats.notLike += setNotLike;
+            data.likeStats.updateAt = new Date();
+            await data.save({ session });
+            await session.commitTransaction();
+            session.endSession();
+            return {
+                like: data.likeStats.like,
+                notLike: data.likeStats.notLike,
+            };
+        } catch (e) {
+            await session.abortTransaction();
+            session.endSession();
+            throw new Error('error set like');
+        }
+    }
+}

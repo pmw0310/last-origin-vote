@@ -1,6 +1,7 @@
 import { Document, Schema, model, Types, PaginateModel } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import enumToArray from '../lib/enumToArray';
+import { LinkStatsTypeModel, LinkStatsSchema } from './like';
 
 export interface CharacterTypeModel extends Document {
     name?: string;
@@ -9,7 +10,7 @@ export interface CharacterTypeModel extends Document {
     updateAt: Date;
     tag: string[];
     number: number;
-    groupId: string;
+    groupId: string | Types.ObjectId;
     grade: CharacterGrade;
     lastGrade?: CharacterGrade;
     type: CharacterType;
@@ -19,6 +20,7 @@ export interface CharacterTypeModel extends Document {
     stature?: number;
     weight?: number;
     description?: string;
+    linkStats: LinkStatsTypeModel;
 }
 
 export enum CharacterGrade {
@@ -85,6 +87,7 @@ const CharacterSchema = new Schema<CharacterTypeModel>({
     stature: Number,
     weight: Number,
     description: String,
+    likeStats: { type: LinkStatsSchema },
 });
 
 CharacterSchema.plugin(mongoosePaginate);

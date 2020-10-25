@@ -11,15 +11,19 @@ import {
     Authorized,
     registerEnumType,
     Arg,
+    Ctx,
 } from 'type-graphql';
+import { Types } from 'mongoose';
 import CharacterModels, {
     CharacterGrade,
     CharacterType,
     CharacterRole,
 } from '../../models/character';
+import { UserVerifyResult } from '../../models/user';
+import LikeModels from '../../models/like';
 import GroupModels from '../../models/group';
 import { Group } from './group';
-import { Types } from 'mongoose';
+import { LikeData } from './like';
 
 registerEnumType(CharacterGrade, {
     name: 'CharacterGrade',
@@ -144,6 +148,42 @@ export class Character extends CharacterInterface {
         }
         const group = await GroupModels.findById(groupId).exec();
         return group as Group;
+    }
+    @Field(() => LikeData, {
+        description: '좋아요 정보',
+        nullable: true,
+    })
+    likeStats?: LikeData;
+    @Field(() => Number, {
+        description:
+            '사용자가 선택한 좋아요 정보 (0: 선택안함, 1: 좋아요, -1: 싫어요)',
+        nullable: true,
+    })
+    async like?(
+        @Ctx() ctx: { currentUser: UserVerifyResult },
+    ): Promise<number> {
+        const user = ctx.currentUser.user?._id;
+
+        if (!user) {
+            return 0;
+        }
+
+        let target = this._id;
+        if (!target) {
+            target = (this as any)._doc._id;
+        }
+
+        try {
+            const data = await LikeModels.findOne({
+                user,
+                target,
+                type: 'CHARACTER',
+            });
+
+            return data ? (data.like as number) : 0;
+        } catch (e) {
+            return 0;
+        }
     }
 }
 

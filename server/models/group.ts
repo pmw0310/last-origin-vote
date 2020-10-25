@@ -1,5 +1,6 @@
 import { Document, Schema, model, PaginateModel } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import { LinkStatsTypeModel, LinkStatsSchema } from './like';
 
 export interface GroupTypeModel extends Document {
     name?: string;
@@ -8,6 +9,7 @@ export interface GroupTypeModel extends Document {
     updateAt: Date;
     tag: string[];
     description?: string;
+    linkStats: LinkStatsTypeModel;
 }
 
 const GroupSchema = new Schema<GroupTypeModel>({
@@ -26,6 +28,7 @@ const GroupSchema = new Schema<GroupTypeModel>({
         default: [],
     },
     description: String,
+    likeStats: { type: LinkStatsSchema },
 });
 
 GroupSchema.plugin(mongoosePaginate);

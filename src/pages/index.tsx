@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Item from '../components/ListItem';
-import { CharacterInterface } from 'Module';
+import { CharacterInterface, LikeStats } from 'Module';
 import {
     Fab,
     Button,
@@ -48,6 +48,11 @@ const CHARACTER_LIST = gql`
                             name
                             image
                         }
+                        likeStats {
+                            like
+                            notLike
+                        }
+                        like
                     }
                 }
             }
@@ -71,6 +76,15 @@ const REMOVE_CHARACTER = gql`
     }
 `;
 
+const SET_LIKE = gql`
+    mutation setLike($target: ID!, $like: Int!) {
+        setLike(target: $target, type: CHARACTER, like: $like) {
+            like
+            notLike
+        }
+    }
+`;
+
 const CharacterList = (): JSX.Element => {
     const [endCursor, setEndCursor] = useState<string>('');
     const [open, setOpen] = useState<boolean>(false);
@@ -88,6 +102,7 @@ const CharacterList = (): JSX.Element => {
     });
 
     const [removeCharacter] = useMutation(REMOVE_CHARACTER);
+    const [setLike] = useMutation<{ setLike: LikeStats }>(SET_LIKE);
 
     const handleDialogOpen = (id: string) => {
         setremoveId(id);
@@ -116,6 +131,17 @@ const CharacterList = (): JSX.Element => {
         });
     };
 
+    const handleOnLike = async (
+        id: string,
+        like: -1 | 1,
+    ): Promise<LikeStats> => {
+        const likeData = await setLike({
+            variables: { target: id, like },
+        });
+
+        return likeData.data?.setLike as LikeStats;
+    };
+
     return loading ? (
         <>Loading...</>
     ) : (
@@ -133,6 +159,7 @@ const CharacterList = (): JSX.Element => {
                         auth={!authLoding && (auth.authChecker as boolean)}
                         removeDialogOpen={handleDialogOpen}
                         type="char"
+                        onLike={handleOnLike}
                     />
                 ))}
             </InfiniteScroll>

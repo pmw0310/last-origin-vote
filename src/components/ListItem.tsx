@@ -17,20 +17,31 @@ import {
 } from '@material-ui/core';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import styled from 'styled-components';
-import { CharacterInterface, GroupInterface } from 'Module';
+import { CharacterInterface, GroupInterface, LikeStats } from 'Module';
 import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     ExpandMore as ExpandMoreIcon,
     MoreVert as MoreVertIcon,
+    ThumbUpAlt as ThumbUpAltIcon,
+    ThumbDownAlt as ThumbDownAltIcon,
+    ThumbUpAltOutlined as ThumbUpAltOutlinedIcon,
+    ThumbDownAltOutlined as ThumbDownAltOutlinedIcon,
 } from '@material-ui/icons';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { currentUserVar } from '../lib/apollo';
+
+type LikeData = {
+    like: -1 | 0 | 1;
+    likeStats: LikeStats;
+};
 
 export interface CharacterItemProps {
     data: CharacterInterface | GroupInterface;
     auth: boolean;
     removeDialogOpen: (id: string) => void;
     type: 'char' | 'group';
+    onLike?: (id: string, like: -1 | 1) => Promise<LikeStats>;
 }
 
 const Root = styled.div`
@@ -72,16 +83,40 @@ const CharacterInfoChip = styled(Chip)`
     margin-right: 12px;
     width: 64px;
 `;
+const LikeButton = styled(IconButton)`
+    width: 62px;
+    height: 62px;
+    .MuiIconButton-label {
+        display: flex;
+        flex-direction: column;
+    }
+    .MuiTypography-root {
+        line-height: 1;
+        padding-top: 3px;
+    }
+`;
+const Like = styled.div`
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+`;
 
 const ListItem: React.FC<CharacterItemProps> = ({
     data,
     auth,
     removeDialogOpen,
     type,
+    onLike,
 }): JSX.Element => {
     const [expanded, setExpanded] = useState<boolean>(false);
+    const [likeData, setLikeData] = useState<LikeData>({
+        like: data.like as -1 | 0 | 1,
+        likeStats: { ...(data.likeStats as LikeStats) },
+    });
+    const [likeLoading, setLikeLoading] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const currentUser = currentUserVar();
 
     const handleChangeAccordion = (
         _event: React.ChangeEvent<any>,
@@ -98,6 +133,27 @@ const ListItem: React.FC<CharacterItemProps> = ({
 
     const handleMenuClose = () => {
         setAnchorEl(null);
+    };
+
+    const handleLike = async (like: -1 | 1) => {
+        if (!currentUser) {
+            return;
+        } else if (likeLoading || !onLike) {
+            return;
+        }
+
+        setLikeLoading(true);
+
+        try {
+            const likeStats = await onLike(data.id as string, like);
+            console.log(likeStats);
+            setLikeData({
+                like: likeData.like === like ? 0 : like,
+                likeStats,
+            });
+        } catch (e) {}
+
+        setLikeLoading(false);
     };
 
     const router = useRouter();
@@ -291,6 +347,42 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                 </MenuItem>
                             </Menu>
                         </Auth>
+                    )}
+                    {type === 'char' && (
+                        <Like>
+                            <LikeButton
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleLike(1);
+                                }}
+                                onFocus={(event) => event.stopPropagation()}
+                            >
+                                {likeData.like === 1 ? (
+                                    <ThumbUpAltIcon />
+                                ) : (
+                                    <ThumbUpAltOutlinedIcon />
+                                )}
+                                <Typography variant="button">
+                                    {likeData.likeStats.like}
+                                </Typography>
+                            </LikeButton>
+                            <LikeButton
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleLike(-1);
+                                }}
+                                onFocus={(event) => event.stopPropagation()}
+                            >
+                                {likeData.like === -1 ? (
+                                    <ThumbDownAltIcon />
+                                ) : (
+                                    <ThumbDownAltOutlinedIcon />
+                                )}
+                                <Typography variant="button">
+                                    {likeData.likeStats.notLike}
+                                </Typography>
+                            </LikeButton>
+                        </Like>
                     )}
                 </ItemAccordionSummary>
                 <AccordionDetails>

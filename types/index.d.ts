@@ -8,6 +8,11 @@ declare module 'Module' {
         authority?: string[];
     }
 
+    export type LikeStats = {
+        like: number;
+        notLike: number;
+    };
+
     export interface CharacterInterface {
         name?: string;
         profileImage?: string;
@@ -27,6 +32,8 @@ declare module 'Module' {
         createdAt?: number | Date;
         updateAt?: number | Date;
         group?: GroupInterface;
+        likeStats?: LikeStats;
+        like?: -1 | 0 | 1;
     }
 
     export interface GroupInterface {
@@ -38,6 +45,8 @@ declare module 'Module' {
         createdAt?: number | Date;
         updateAt?: number | Date;
         character?: CharacterInterface[];
+        likeStats?: LikeStats;
+        like?: -1 | 0 | 1;
     }
 
     // enum CharacterGrade {
