@@ -14,7 +14,7 @@ import {
     ArgsType,
 } from 'type-graphql';
 import { Min } from 'class-validator';
-import { Types, FilterQuery } from 'mongoose';
+import { Types, FilterQuery, PaginateModel } from 'mongoose';
 import { Character } from './character';
 import { Group } from './group';
 import CharacterModels, { CharacterTypeModel } from '../../models/character';
@@ -23,7 +23,7 @@ import { PageInfo } from '../relayStylePagination';
 
 enum FocusType {
     ALL = 'ALL',
-    CHARACTERL = 'CHARACTERL',
+    CHARACTER = 'CHARACTER',
     GROUP = 'GROUP',
 }
 
@@ -90,7 +90,6 @@ class GetArgs {
     @Min(1)
     limit: number = 10;
     @Field(() => [String], {
-        name: 'ids',
         nullable: true,
         description: '검색할 아이디',
     })
@@ -100,28 +99,55 @@ class GetArgs {
         description: '검색할 타입',
     })
     focus?: FocusType = FocusType.ALL;
+    @Field({
+        nullable: true,
+        description: '검색할 문자 (이름, 태그)',
+    })
+    search?: string;
 }
 
-const getCharacter = async (
-    limit: number,
-    endCursor?: string,
-    ids: Array<string> = [],
-): Promise<GetRelayStylePagination> => {
-    let charQuery: FilterQuery<CharacterTypeModel> = {};
+const getData = async ({
+    limit,
+    endCursor,
+    ids,
+    search,
+    focus,
+}: GetArgs): Promise<GetRelayStylePagination> => {
+    let query: FilterQuery<CharacterTypeModel | GroupTypeModel> = {};
     if (ids.length > 0) {
-        charQuery = {
-            ...charQuery,
+        query = {
+            ...query,
             _id: {
-                ...charQuery._id,
+                ...query._id,
                 $in: ids?.map((id) => Types.ObjectId(id)),
             },
         };
     }
     if (endCursor) {
-        charQuery = {
-            ...charQuery,
-            _id: { ...charQuery._id, $gt: Types.ObjectId(endCursor) },
+        query = {
+            ...query,
+            _id: { ...query._id, $gt: Types.ObjectId(endCursor) },
         };
+    }
+    if (search) {
+        const reg = new RegExp(search, 'i');
+        query = {
+            ...query,
+            $or: [{ name: { $regex: reg } }, { tag: { $regex: reg } }],
+        };
+    }
+
+    let models: PaginateModel<any>;
+
+    switch (focus) {
+        case FocusType.CHARACTER:
+            models = CharacterModels;
+            break;
+        case FocusType.GROUP:
+            models = GroupModels;
+            break;
+        default:
+            throw new Error(`unusable focus type: ${focus}`);
     }
 
     const {
@@ -131,16 +157,16 @@ const getCharacter = async (
         nextPage,
         prevPage,
         totalPages,
-    } = await CharacterModels.paginate(charQuery, { limit });
+    } = await models.paginate(query, { limit });
 
-    const char = new GetRelayStylePagination();
+    const data = new GetRelayStylePagination();
 
-    char.edges = docs.map<GetEdges>((d) => ({
-        node: d as Character,
+    data.edges = docs.map<GetEdges>((d) => ({
+        node: d,
         cursor: d.id,
     }));
 
-    char.pageInfo = {
+    data.pageInfo = {
         hasNextPage,
         hasPrevPage,
         nextPage,
@@ -149,71 +175,21 @@ const getCharacter = async (
         endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
     };
 
-    return char;
-};
-
-const getGroup = async (
-    limit: number,
-    endCursor?: string,
-    ids: Array<string> = [],
-): Promise<GetRelayStylePagination> => {
-    let groupQuery: FilterQuery<GroupTypeModel> = {};
-    if (ids.length > 0) {
-        groupQuery = {
-            ...groupQuery,
-            _id: {
-                ...groupQuery._id,
-                $in: ids?.map((id) => Types.ObjectId(id)),
-            },
-        };
-    }
-    if (endCursor) {
-        groupQuery = {
-            ...groupQuery,
-            _id: {
-                ...groupQuery._id,
-                $gt: Types.ObjectId(endCursor),
-            },
-        };
-    }
-
-    const {
-        docs,
-        hasNextPage,
-        hasPrevPage,
-        nextPage,
-        prevPage,
-        totalPages,
-    } = await GroupModels.paginate(groupQuery, { limit });
-
-    const group = new GetRelayStylePagination();
-
-    group.edges = docs.map<GetEdges>((d) => ({
-        node: d as Group,
-        cursor: d.id,
-    }));
-
-    group.pageInfo = {
-        hasNextPage,
-        hasPrevPage,
-        nextPage,
-        prevPage,
-        totalPages,
-        endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
-    };
-
-    return group;
+    return data;
 };
 
 @Resolver()
 export default class GetResolver {
     @Query(() => GetRelayStylePagination)
     async get(
-        @Args() { limit, ids, endCursor, focus }: GetArgs,
+        @Args() getArgs: GetArgs,
     ): Promise<GetRelayStylePagination | undefined> {
-        switch (focus) {
+        switch (getArgs.focus) {
             case FocusType.ALL:
-                const char = await getCharacter(limit, endCursor, ids);
+                const char = await getData({
+                    ...getArgs,
+                    focus: FocusType.CHARACTER,
+                });
                 if (char.pageInfo?.hasNextPage) {
                     char.pageInfo.totalPages = undefined;
                     char.pageInfo.nextPage = undefined;
@@ -221,11 +197,10 @@ export default class GetResolver {
                     char.pageInfo.hasPrevPage = undefined;
                     return char;
                 }
-                const group = await getGroup(
-                    limit - (char.edges as GetEdges[]).length,
-                    undefined,
-                    ids,
-                );
+                const group = await getData({
+                    ...getArgs,
+                    focus: FocusType.GROUP,
+                });
                 const get = new GetRelayStylePagination();
                 get.edges = [
                     ...(char.edges as GetEdges[]),
@@ -236,12 +211,12 @@ export default class GetResolver {
                     endCursor: group.pageInfo?.endCursor as string,
                 };
                 return get;
-            case FocusType.CHARACTERL:
-                return await getCharacter(limit, endCursor, ids);
+            case FocusType.CHARACTER:
+                return await getData(getArgs);
             case FocusType.GROUP:
-                return await getGroup(limit, endCursor, ids);
+                return await getData(getArgs);
         }
 
-        new Error(`unknown focus type: ${focus}`);
+        throw new Error(`unusable focus type: ${getArgs.focus}`);
     }
 }

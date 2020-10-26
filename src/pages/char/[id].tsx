@@ -6,7 +6,7 @@ import { gql, useLazyQuery, useMutation } from '@apollo/client';
 
 const GET_CHARACTER = gql`
     query getCharacter($id: String!) {
-        get(ids: [$id], focus: CHARACTERL) {
+        get(ids: [$id], focus: CHARACTER) {
             data {
                 ... on Character {
                     name

@@ -29,7 +29,7 @@ const AddFabTop = styled.div`
 
 const CHARACTER_LIST = gql`
     query getCharacter($endCursor: ID!) {
-        get(endCursor: $endCursor, limit: 15, focus: CHARACTERL) {
+        get(endCursor: $endCursor, limit: 15, focus: CHARACTER) {
             edges {
                 node {
                     ... on Character {
