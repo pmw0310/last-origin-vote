@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "commonjs",
+        "rootDir":"./crons",
+        "outDir": "./dist_crons",
+        "target": "es2018",
+        "isolatedModules": false,
+        "noEmit": false
+    },
+    "include": ["crons/**/*.ts"]
+}
