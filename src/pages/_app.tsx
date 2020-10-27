@@ -4,6 +4,7 @@ import { ApolloProvider } from '@apollo/client';
 import AppBar from '../components/AppBar';
 import AppContainer from '../components/AppContainer';
 import { useApollo } from '../lib/apollo';
+import Snackbar from '../lib/snackbar';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface Props {
@@ -19,12 +20,12 @@ export default function App({ Component, pageProps }: Props): JSX.Element {
             {pageProps.statusCode === 404 ? (
                 <Component {...pageProps} />
             ) : (
-                <>
+                <Snackbar>
                     <AppBar />
                     <AppContainer>
                         <Component {...pageProps} />
                     </AppContainer>
-                </>
+                </Snackbar>
             )}
         </ApolloProvider>
     );

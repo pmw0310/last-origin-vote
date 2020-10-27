@@ -1,11 +1,14 @@
 {
     "name": "last-origin-vote",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "scripts": {
         "dev": "nodemon",
-        "crons": "ts-node --project tsconfig.crons.json crons/index.ts",
         "build": "next build && tsc --project tsconfig.server.json",
-        "start": "cross-env NODE_ENV=production node dist/index.js"
+        "start": "cross-env NODE_ENV=production node dist/index.js",
+        "crons_init": "copyfiles -f server/lib/*.ts crons/lib && copyfiles -f server/models/*.ts crons/models",
+        "crons": "yarn crons_init && ts-node --project tsconfig.crons.json crons/index.ts",
+        "crons_build": "yarn crons_init && tsc -p tsconfig.crons.json",
+        "crons_start": "cross-env NODE_ENV=production node dist_crons/index.js"
     },
     "lint-staged": {
         "**/*.{js,ts,tsx}": [
@@ -26,6 +29,7 @@
         "class-validator": "^0.12.2",
         "cloudinary": "^1.23.0",
         "cross-env": "^7.0.2",
+        "dotenv-flow": "^3.2.0",
         "graphql": "15.3.0",
         "graphql-upload": "^11.0.0",
         "jsonwebtoken": "^8.5.1",
@@ -60,6 +64,7 @@
     "devDependencies": {
         "@types/apollo-upload-client": "^14.1.0",
         "@types/bcrypt": "^3.0.0",
+        "@types/dotenv-flow": "^3.1.0",
         "@types/graphql-upload": "^8.0.4",
         "@types/jsonwebtoken": "^8.5.0",
         "@types/koa": "^2.11.4",

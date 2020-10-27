@@ -12,7 +12,7 @@ import passport from 'koa-passport';
 import { Strategy, Profile } from 'passport-naver';
 import { ApolloServer } from 'apollo-server-koa';
 import { graphqlUploadKoa } from 'graphql-upload';
-import mongoose from 'mongoose';
+import mongooseConnect from './lib/mongooseConnect';
 import next from 'next';
 import LruCache from 'lru-cache';
 import url from 'url';
@@ -100,15 +100,10 @@ const authCheck = (roles: Array<string>) => async (
     apolloServer.applyMiddleware({ app: server });
 
     try {
-        await mongoose.connect(process.env.MONGODB_URI as string, {
-            useCreateIndex: true,
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        });
-        console.log('Connected to MongoDB');
+        await mongooseConnect();
     } catch (e) {
         console.error(e);
+        process.exit(1);
     }
 
     router.get('/', renderAndCache);

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import {
     Typography,
@@ -30,6 +30,7 @@ import {
 } from '@material-ui/icons';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { currentUserVar } from '../lib/apollo';
+import { snackbarContext, SnackbarType, snackbarAction } from '../lib/snackbar';
 
 type LikeData = {
     like: -1 | 0 | 1;
@@ -117,6 +118,9 @@ const ListItem: React.FC<CharacterItemProps> = ({
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const currentUser = currentUserVar();
+    const dispatch: React.Dispatch<snackbarAction> = useContext(
+        snackbarContext,
+    ) as React.Dispatch<snackbarAction>;
 
     const handleChangeAccordion = (
         _event: React.ChangeEvent<any>,
@@ -137,6 +141,13 @@ const ListItem: React.FC<CharacterItemProps> = ({
 
     const handleLike = async (like: -1 | 1) => {
         if (!currentUser) {
+            dispatch({
+                type: SnackbarType.OPEN,
+                option: {
+                    measage: '로그인이 필요합니다.',
+                    severity: 'warning',
+                },
+            });
             return;
         } else if (likeLoading || !onLike) {
             return;
@@ -146,12 +157,19 @@ const ListItem: React.FC<CharacterItemProps> = ({
 
         try {
             const likeStats = await onLike(data.id as string, like);
-            console.log(likeStats);
             setLikeData({
                 like: likeData.like === like ? 0 : like,
                 likeStats,
             });
-        } catch (e) {}
+        } catch (e) {
+            dispatch({
+                type: SnackbarType.OPEN,
+                option: {
+                    measage: '작업이 실패하였습니다.',
+                    severity: 'error',
+                },
+            });
+        }
 
         setLikeLoading(false);
     };
@@ -498,4 +516,4 @@ const ListItem: React.FC<CharacterItemProps> = ({
     );
 };
 
-export default ListItem;
+export default React.memo(ListItem);

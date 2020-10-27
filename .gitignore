@@ -15,7 +15,6 @@
 # production
 /build
 /dist
-/dist_crons
 
 # misc
 .DS_Store
@@ -35,5 +34,7 @@ yarn-error.log*
 # vercel
 .vercel
 
-# upload
-/server/upload
+# crons
+/dist_crons
+/crons/lib
+/crons/models

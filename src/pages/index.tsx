@@ -16,6 +16,9 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import styled from 'styled-components';
 
+import { Paper, IconButton, InputBase } from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
+
 const AddFab = styled(Fab)`
     position: relative;
     margin: 0 auto;
@@ -25,6 +28,23 @@ const AddFabTop = styled.div`
     position: fixed;
     bottom: 28px;
     right: 28px;
+`;
+
+const SearchRoot = styled(Paper)`
+    margin: 12px;
+    padding: 2px 4px;
+    display: flex;
+    align-items: center;
+    width: 400;
+`;
+
+const SearchIconButton = styled(IconButton)`
+    padding: 10;
+`;
+
+const SearchInput = styled(InputBase)`
+    flex: 1;
+    margin-left: 8px;
 `;
 
 const CHARACTER_LIST = gql`
@@ -89,20 +109,17 @@ const CharacterList = (): JSX.Element => {
     const [endCursor, setEndCursor] = useState<string>('');
     const [open, setOpen] = useState<boolean>(false);
     const [removeId, setremoveId] = useState<string>('');
-
+    const [removeCharacter] = useMutation(REMOVE_CHARACTER);
+    const [setLike] = useMutation<{ setLike: LikeStats }>(SET_LIKE);
     const { data: list, loading, fetchMore } = useQuery(CHARACTER_LIST, {
         variables: {
             endCursor,
         },
         fetchPolicy: 'no-cache',
     });
-
     const { data: auth, loading: authLoding } = useQuery(AUTH_CHECKER, {
         fetchPolicy: 'no-cache',
     });
-
-    const [removeCharacter] = useMutation(REMOVE_CHARACTER);
-    const [setLike] = useMutation<{ setLike: LikeStats }>(SET_LIKE);
 
     const handleDialogOpen = (id: string) => {
         setremoveId(id);
@@ -146,6 +163,15 @@ const CharacterList = (): JSX.Element => {
         <>Loading...</>
     ) : (
         <>
+            <SearchRoot component="form">
+                <SearchInput
+                    placeholder="검색"
+                    inputProps={{ 'aria-label': 'search' }}
+                />
+                <SearchIconButton type="submit" aria-label="search">
+                    <SearchIcon />
+                </SearchIconButton>
+            </SearchRoot>
             <InfiniteScroll
                 dataLength={list.get.edges.length}
                 next={onLoadMore}
