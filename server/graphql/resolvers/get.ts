@@ -14,7 +14,7 @@ import {
     ArgsType,
 } from 'type-graphql';
 import { Min } from 'class-validator';
-import { Types, FilterQuery, PaginateModel } from 'mongoose';
+import { Types, FilterQuery, PaginateModel, PaginateOptions } from 'mongoose';
 import { Character } from './character';
 import { Group } from './group';
 import CharacterModels, { CharacterTypeModel } from '../../models/character';
@@ -84,8 +84,14 @@ class GetRelayStylePagination {
 
 @ArgsType()
 class GetArgs {
-    @Field(() => ID, { nullable: true, description: '마지막 ID' })
+    @Field(() => ID, {
+        nullable: true,
+        description: '마지막 ID 페이지와 혼용 불가능',
+    })
     endCursor?: string;
+    @Field(() => Int, { nullable: true, description: '페이지' })
+    @Min(1)
+    page?: number;
     @Field(() => Int, { defaultValue: 10, description: '불러올 수량' })
     @Min(1)
     limit: number = 10;
@@ -108,6 +114,7 @@ class GetArgs {
 
 const getData = async ({
     limit,
+    page,
     endCursor,
     ids,
     search,
@@ -123,7 +130,7 @@ const getData = async ({
             },
         };
     }
-    if (endCursor) {
+    if (!page && endCursor) {
         query = {
             ...query,
             _id: { ...query._id, $gt: Types.ObjectId(endCursor) },
@@ -150,6 +157,12 @@ const getData = async ({
             throw new Error(`unusable focus type: ${focus}`);
     }
 
+    const options: PaginateOptions = { limit };
+
+    if (page) {
+        options.page = page;
+    }
+
     const {
         docs,
         hasNextPage,
@@ -157,7 +170,7 @@ const getData = async ({
         nextPage,
         prevPage,
         totalPages,
-    } = await models.paginate(query, { limit });
+    } = await models.paginate(query, options);
 
     const data = new GetRelayStylePagination();
 
