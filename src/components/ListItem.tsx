@@ -30,7 +30,7 @@ import {
 } from '@material-ui/icons';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { currentUserVar } from '../lib/apollo';
-import { snackbarContext, SnackbarType, snackbarAction } from '../lib/snackbar';
+import { snackbarContext, SnackbarType, snackbarAction } from '../lib/Snackbar';
 
 type LikeData = {
     like: -1 | 0 | 1;

@@ -24,11 +24,10 @@ import {
     Add as AddIcon,
     ArrowBack as ArrowBackIcon,
     ArrowForward as ArrowForwardIcon,
+    Search as SearchIcon,
 } from '@material-ui/icons';
 import styled from 'styled-components';
-
-import {} from '@material-ui/core';
-import SearchIcon from '@material-ui/icons/Search';
+import Pagination from '../components/common/Pagination';
 
 const AddFab = styled(Fab)`
     position: relative;
@@ -299,25 +298,13 @@ const CharacterList = (): JSX.Element => {
                     </SearchRoot>
                 </Grid>
             </Grid>
-            <Page>
-                <PageButton
-                    onClick={prevPage}
-                    variant="contained"
-                    size={'small'}
-                    color="primary"
-                    startIcon={<ArrowBackIcon />}
-                    disabled={!listData?.get?.pageInfo?.hasPrevPage}
-                />
-                <Typography variant="h6">{`Page ${page}`}</Typography>
-                <PageButton
-                    onClick={nextPage}
-                    variant="contained"
-                    size={'small'}
-                    color="primary"
-                    startIcon={<ArrowForwardIcon />}
-                    disabled={!listData?.get?.pageInfo?.hasNextPage}
-                />
-            </Page>
+            <Pagination
+                onNext={nextPage}
+                onPrev={prevPage}
+                page={page}
+                hasNextPage={listData?.get?.pageInfo?.hasNextPage}
+                hasPrevPage={listData?.get?.pageInfo?.hasPrevPage}
+            />
             {listData &&
                 listData.get.data.map((data: CharacterInterface) => (
                     <Item
