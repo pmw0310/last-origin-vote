@@ -26,6 +26,7 @@ const AddCharacter = (): JSX.Element => {
         arm: '',
         stature: 0,
         weight: 0,
+        __typename: 'Character',
     });
 
     const [addCharacter] = useMutation(ADD_CHARACTER);

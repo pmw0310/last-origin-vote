@@ -53,6 +53,7 @@ const UpdateCharacter = (): JSX.Element => {
         arm: '',
         stature: 0,
         weight: 0,
+        __typename: 'Character',
     });
     const [getCharacter, { data: char, error }] = useLazyQuery(GET_CHARACTER, {
         fetchPolicy: 'no-cache',

@@ -33,6 +33,7 @@ const UpdateGroup = (): JSX.Element => {
         image: '',
         tag: [],
         description: '',
+        __typename: 'Group',
     });
     const [getGroup, { data: group, error }] = useLazyQuery(GET_GROUP, {
         fetchPolicy: 'no-cache',

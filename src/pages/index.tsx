@@ -2,15 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import Item from '../components/ListItem';
-import { CharacterInterface, LikeStats } from 'Module';
+import { CharacterInterface, GroupInterface, LikeStats } from 'Module';
 import {
     Fab,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     Paper,
     IconButton,
     InputBase,
@@ -19,6 +13,7 @@ import {
     Select,
     MenuItem,
     Typography,
+    CircularProgress,
 } from '@material-ui/core';
 import {
     Add as AddIcon,
@@ -28,6 +23,7 @@ import {
 } from '@material-ui/icons';
 import styled from 'styled-components';
 import Pagination from '../components/common/Pagination';
+import { useDialogState, FeedbackType } from '../components/Feedback';
 
 const AddFab = styled(Fab)`
     position: relative;
@@ -71,24 +67,11 @@ const TypeForm = styled(FormControl)`
     }
 `;
 
-const Page = styled.div`
+const Progress = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-
-    .MuiTypography-root {
-        font-size: 1.05rem !important;
-        padding: 0 24px;
-    }
-`;
-
-const PageButton = styled(Button)`
-    padding: 6px !important;
-    border-radius: 18px !important;
-    min-width: 0 !important;
-    .MuiButton-startIcon {
-        margin: 0 !important;
-    }
+    height: 50vh;
 `;
 
 const GET_LIST = gql`
@@ -160,20 +143,18 @@ const SET_LIKE = gql`
 `;
 
 const CharacterList = (): JSX.Element => {
+    const dispatch = useDialogState();
+
     const [page, setPage] = useState<number>(1);
     const [focus, setFocus] = useState<string>('CHARACTER');
     const [search, setSearch] = useState<string>('');
 
-    const [open, setOpen] = useState<boolean>(false);
     const [removeId, setremoveId] = useState<string>('');
     const [removeCharacter] = useMutation(REMOVE_CHARACTER);
     const [setLike] = useMutation<{ setLike: LikeStats }>(SET_LIKE);
-    const [getList, { data: listData, error, loading }] = useLazyQuery(
-        GET_LIST,
-        {
-            fetchPolicy: 'no-cache',
-        },
-    );
+    const [getList, { data: listData, loading }] = useLazyQuery(GET_LIST, {
+        fetchPolicy: 'no-cache',
+    });
 
     const { data: auth, loading: authLoding } = useQuery(AUTH_CHECKER, {
         fetchPolicy: 'no-cache',
@@ -181,19 +162,22 @@ const CharacterList = (): JSX.Element => {
 
     const handleDialogOpen = (id: string) => {
         setremoveId(id);
-        setOpen(true);
-    };
-
-    const handleDialogClose = () => {
-        setremoveId('');
-        setOpen(false);
+        dispatch({
+            type: FeedbackType.OPEN,
+            option: {
+                title: '삭제 하시겠습니까?',
+                yesButtonText: '예',
+                noButtonText: '아니오',
+                onAgree: () => {
+                    handleOnRemove();
+                },
+            },
+        });
     };
 
     const handleOnRemove = async () => {
-        handleDialogClose();
         await removeCharacter({ variables: { id: removeId } });
-
-        window.location.href = '/';
+        updatePage();
     };
 
     const handleOnLike = async (
@@ -306,16 +290,28 @@ const CharacterList = (): JSX.Element => {
                 hasPrevPage={listData?.get?.pageInfo?.hasPrevPage}
             />
             {listData &&
-                listData.get.data.map((data: CharacterInterface) => (
-                    <Item
-                        data={data}
-                        key={data.id}
-                        auth={false}
-                        removeDialogOpen={handleDialogOpen}
-                        type="char"
-                        onLike={handleOnLike}
-                    />
-                ))}
+                !loading &&
+                !authLoding &&
+                listData.get.data.map(
+                    (data: CharacterInterface | GroupInterface) => (
+                        <Item
+                            data={data}
+                            key={data.id}
+                            auth={
+                                (data.__typename === 'Character' &&
+                                    auth?.characterAuth) ||
+                                (data.__typename === 'Group' && auth?.groupAuth)
+                            }
+                            removeDialogOpen={handleDialogOpen}
+                            onLike={handleOnLike}
+                        />
+                    ),
+                )}
+            {loading && (
+                <Progress>
+                    <CircularProgress />
+                </Progress>
+            )}
         </>
     );
 

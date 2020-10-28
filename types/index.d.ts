@@ -34,6 +34,7 @@ declare module 'Module' {
         group?: GroupInterface;
         likeStats?: LikeStats;
         like?: -1 | 0 | 1;
+        __typename: 'Character' | 'Group';
     }
 
     export interface GroupInterface {
@@ -47,6 +48,7 @@ declare module 'Module' {
         character?: CharacterInterface[];
         likeStats?: LikeStats;
         like?: -1 | 0 | 1;
+        __typename: 'Group' | 'Character';
     }
 
     // enum CharacterGrade {

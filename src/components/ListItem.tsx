@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import {
     Typography,
@@ -30,7 +30,7 @@ import {
 } from '@material-ui/icons';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { currentUserVar } from '../lib/apollo';
-import { snackbarContext, SnackbarType, snackbarAction } from '../lib/Snackbar';
+import { useSnackbarState, FeedbackType } from '../components/Feedback';
 
 type LikeData = {
     like: -1 | 0 | 1;
@@ -41,7 +41,6 @@ export interface CharacterItemProps {
     data: CharacterInterface | GroupInterface;
     auth: boolean;
     removeDialogOpen: (id: string) => void;
-    type: 'char' | 'group';
     onLike?: (id: string, like: -1 | 1) => Promise<LikeStats>;
 }
 
@@ -106,7 +105,6 @@ const ListItem: React.FC<CharacterItemProps> = ({
     data,
     auth,
     removeDialogOpen,
-    type,
     onLike,
 }): JSX.Element => {
     const [expanded, setExpanded] = useState<boolean>(false);
@@ -118,9 +116,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const currentUser = currentUserVar();
-    const dispatch: React.Dispatch<snackbarAction> = useContext(
-        snackbarContext,
-    ) as React.Dispatch<snackbarAction>;
+    const dispatch = useSnackbarState();
 
     const handleChangeAccordion = (
         _event: React.ChangeEvent<any>,
@@ -142,7 +138,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
     const handleLike = async (like: -1 | 1) => {
         if (!currentUser) {
             dispatch({
-                type: SnackbarType.OPEN,
+                type: FeedbackType.OPEN,
                 option: {
                     measage: '로그인이 필요합니다.',
                     severity: 'warning',
@@ -163,7 +159,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
             });
         } catch (e) {
             dispatch({
-                type: SnackbarType.OPEN,
+                type: FeedbackType.OPEN,
                 option: {
                     measage: '작업이 실패하였습니다.',
                     severity: 'error',
@@ -270,6 +266,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
     );
     const statureText = toStatureText();
     const weightText = toWeightText();
+    const type: 'Character' | 'Group' = data.__typename;
 
     return (
         <Root>
@@ -279,7 +276,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                     aria-controls="panel1c-content"
                     id="panel1c-header"
                 >
-                    {type === 'char' && gradeImage && (
+                    {type === 'Character' && gradeImage && (
                         <GradeIcon
                             alt="https://via.placeholder.com/150x150.png?text=Error"
                             src={gradeImage}
@@ -301,7 +298,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                         <Typography variant="h5" gutterBottom>
                             {data.name}
                         </Typography>
-                        {type === 'char' && roleText && (
+                        {type === 'Character' && roleText && (
                             <Typography variant="subtitle2" gutterBottom>
                                 {roleText}
                             </Typography>
@@ -339,8 +336,8 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                         event.stopPropagation();
                                         handleMenuClose();
                                         router.push(
-                                            `/${type}/[id]`,
-                                            `/${type}/${data.id}`,
+                                            `/${type.toLowerCase()}/[id]`,
+                                            `/${type.toLowerCase()}/${data.id}`,
                                         );
                                     }}
                                     onFocus={(event) => event.stopPropagation()}
@@ -366,7 +363,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                             </Menu>
                         </Auth>
                     )}
-                    {type === 'char' && (
+                    {type === 'Character' && (
                         <Like>
                             <LikeButton
                                 onClick={(event) => {
@@ -405,7 +402,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                 </ItemAccordionSummary>
                 <AccordionDetails>
                     <Grid container spacing={1}>
-                        {type === 'char' && (
+                        {type === 'Character' && (
                             <>
                                 {expanded &&
                                     (data as CharacterInterface).group && (
@@ -484,7 +481,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                 )}
                             </>
                         )}
-                        {type === 'group' &&
+                        {type === 'Group' &&
                             expanded &&
                             ((data as GroupInterface).character as Array<
                                 CharacterInterface

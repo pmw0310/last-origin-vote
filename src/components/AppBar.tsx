@@ -46,7 +46,7 @@ const ME = gql`
     }
 `;
 
-export default function MenuAppBar(): JSX.Element {
+const MenuAppBar = (): JSX.Element => {
     const { loading, data } = useQuery<{ me: UserInterface }>(ME);
     const onLoginButtonClick = () => {
         window.location.href = '/api/auth/naver';
@@ -102,4 +102,6 @@ export default function MenuAppBar(): JSX.Element {
             </AppBar>
         </Root>
     );
-}
+};
+
+export default React.memo(MenuAppBar);

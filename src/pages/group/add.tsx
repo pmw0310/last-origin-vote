@@ -16,6 +16,7 @@ const AddGroup = (): JSX.Element => {
         tag: [],
         image: '',
         description: '',
+        __typename: 'Group',
     });
 
     const [addGroup] = useMutation(ADD_GROUP);
