@@ -126,7 +126,11 @@ const CharacterEdit: React.FC<EditorProps> = ({
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setData({ ...data, [event.target.name]: event.target.value });
+        const value =
+            event.target.type === 'number'
+                ? Number(event.target.value)
+                : event.target.value;
+        setData({ ...data, [event.target.name]: value });
     };
 
     const handleTagAdd = (addTag: string, time: number) => {

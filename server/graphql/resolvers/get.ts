@@ -181,11 +181,14 @@ const getData = async ({
     }
     switch (sort) {
         case SortType.NUMBER:
-            options.sort = { number: 'asc' };
+            options.sort = { number: 'asc', name: 'asc' };
+            break;
         case SortType.LIKE:
-            options.sort = { ['likeStats.like']: 'desc' };
+            options.sort = { ['likeStats.like']: 'desc', name: 'asc' };
+            break;
         case SortType.NOT_LIKE:
-            options.sort = { ['likeStats.notLike']: 'desc' };
+            options.sort = { ['likeStats.notLike']: 'desc', name: 'asc' };
+            break;
     }
 
     const {

@@ -3,7 +3,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
+import { ButtonBase } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import Container from '@material-ui/core/Container';
 import styled, { createGlobalStyle } from 'styled-components';
@@ -82,20 +82,22 @@ const MenuAppBar = (): JSX.Element => {
                             <>
                                 <Avatar src={data?.me.profileImage} />
                                 <div>{data?.me.nickname}</div>
-                                <Button
-                                    color="inherit"
-                                    onClick={onLogoutButtonClick}
-                                >
-                                    Logout
-                                </Button>
+                                <ButtonBase>
+                                    <img
+                                        src="naver_logout.png"
+                                        height={40}
+                                        onClick={onLogoutButtonClick}
+                                    />
+                                </ButtonBase>
                             </>
                         ) : (
-                            <Button
-                                color="inherit"
-                                onClick={onLoginButtonClick}
-                            >
-                                Login
-                            </Button>
+                            <ButtonBase>
+                                <img
+                                    src="naver_login.png"
+                                    height={40}
+                                    onClick={onLoginButtonClick}
+                                />
+                            </ButtonBase>
                         )}
                     </Toolbar>
                 </Container>

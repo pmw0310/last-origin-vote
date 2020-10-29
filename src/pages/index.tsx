@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import Item from '../components/ListItem';
 import { CharacterInterface, GroupInterface, LikeStats } from 'Module';
@@ -12,24 +12,18 @@ import {
     FormControl,
     Select,
     MenuItem,
-    Typography,
     CircularProgress,
 } from '@material-ui/core';
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
 import {
-    Add as AddIcon,
-    ArrowBack as ArrowBackIcon,
-    ArrowForward as ArrowForwardIcon,
     Search as SearchIcon,
+    AccountCircle as AccountCircleIcon,
+    Assignment as AssignmentIcon,
 } from '@material-ui/icons';
 import styled from 'styled-components';
 import Pagination from '../components/common/Pagination';
 import { useDialogState, FeedbackType } from '../components/Feedback';
 
-const AddFab = styled(Fab)`
-    position: relative;
-    margin: 0 auto;
-    z-index: 1000;
-`;
 const AddFabTop = styled.div`
     position: fixed;
     bottom: 28px;
@@ -75,8 +69,19 @@ const Progress = styled.div`
 `;
 
 const GET_LIST = gql`
-    query getList($page: Int!, $focus: FocusType!, $search: String) {
-        get(page: $page, limit: 15, focus: $focus, search: $search) {
+    query getList(
+        $page: Int!
+        $focus: FocusType!
+        $search: String
+        $sort: SortType!
+    ) {
+        get(
+            page: $page
+            limit: 15
+            focus: $focus
+            search: $search
+            sort: $sort
+        ) {
             data {
                 ... on Character {
                     id
@@ -147,7 +152,11 @@ const CharacterList = (): JSX.Element => {
 
     const [page, setPage] = useState<number>(1);
     const [focus, setFocus] = useState<string>('CHARACTER');
+    const [sort, setSort] = useState<string>('NUMBER');
     const [search, setSearch] = useState<string>('');
+    const [open, setOpen] = React.useState<boolean>(false);
+
+    const router = useRouter();
 
     const [removeId, setremoveId] = useState<string>('');
     const [removeCharacter] = useMutation(REMOVE_CHARACTER);
@@ -194,13 +203,28 @@ const CharacterList = (): JSX.Element => {
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(event.target.value);
     };
-    const handleFocusChange = (
+    const handleSelectChange = (
         event: React.ChangeEvent<{ name?: string; value: unknown }>,
     ) => {
-        const focus = event.target.value as string;
-        setFocus(() => focus);
+        const value: string = event.target.value as string;
+        const option = {
+            page: 1,
+            focus,
+            sort,
+        };
+
+        switch (event.target.name) {
+            case 'focus':
+                setFocus(() => value);
+                option.focus = value;
+                break;
+            case 'sort':
+                setSort(() => value);
+                option.sort = value;
+                break;
+        }
         setPage(() => 1);
-        updatePage({ page: 1, focus });
+        updatePage(option);
     };
 
     const handleSearchKeyPress = (
@@ -223,6 +247,7 @@ const CharacterList = (): JSX.Element => {
                 page,
                 focus,
                 search,
+                sort,
                 ...option,
             },
         });
@@ -251,14 +276,23 @@ const CharacterList = (): JSX.Element => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
     return (
         <>
             <Grid container spacing={1}>
-                <Grid item xs={2}>
+                <Grid item lg={2} md={6}>
                     <TypeForm variant="outlined">
                         <Select
                             value={focus}
-                            onChange={handleFocusChange}
+                            name="focus"
+                            onChange={handleSelectChange}
                             label="유형"
                         >
                             <MenuItem value={'ALL'}>모두</MenuItem>
@@ -267,7 +301,21 @@ const CharacterList = (): JSX.Element => {
                         </Select>
                     </TypeForm>
                 </Grid>
-                <Grid item xs={10}>
+                <Grid item lg={2} md={6}>
+                    <TypeForm variant="outlined">
+                        <Select
+                            value={sort}
+                            name="sort"
+                            onChange={handleSelectChange}
+                            label="검색"
+                        >
+                            <MenuItem value={'NUMBER'}>번호순</MenuItem>
+                            <MenuItem value={'LIKE'}>좋아요순</MenuItem>
+                            <MenuItem value={'NOT_LIKE'}>싫어요순</MenuItem>
+                        </Select>
+                    </TypeForm>
+                </Grid>
+                <Grid item lg={8} md={12}>
                     <SearchRoot component="form">
                         <SearchInput
                             placeholder="검색"
@@ -307,85 +355,57 @@ const CharacterList = (): JSX.Element => {
                         />
                     ),
                 )}
+            {listData && !loading && !authLoding && (
+                <Pagination
+                    onNext={nextPage}
+                    onPrev={prevPage}
+                    page={page}
+                    hasNextPage={listData?.get?.pageInfo?.hasNextPage}
+                    hasPrevPage={listData?.get?.pageInfo?.hasPrevPage}
+                />
+            )}
             {loading && (
                 <Progress>
                     <CircularProgress />
                 </Progress>
             )}
+
+            {!authLoding && (auth?.characterAuth || auth?.groupAuth) && (
+                <AddFabTop>
+                    <SpeedDial
+                        ariaLabel="AddSpeedDial"
+                        hidden={!auth?.characterAuth && !auth?.groupAuth}
+                        icon={<SpeedDialIcon />}
+                        onClose={handleClose}
+                        onOpen={handleOpen}
+                        open={open}
+                        direction="up"
+                    >
+                        {auth?.characterAuth && (
+                            <SpeedDialAction
+                                icon={<AccountCircleIcon />}
+                                tooltipTitle="케릭터 추가"
+                                onClick={() => {
+                                    handleClose();
+                                    router.push('/character/add');
+                                }}
+                            />
+                        )}
+                        {auth?.groupAuth && (
+                            <SpeedDialAction
+                                icon={<AssignmentIcon />}
+                                tooltipTitle="부대 추가"
+                                onClick={() => {
+                                    handleClose();
+                                    router.push('/group/add');
+                                }}
+                            />
+                        )}
+                    </SpeedDial>
+                </AddFabTop>
+            )}
         </>
     );
-
-    // return loading ? (
-    //     <>Loading...</>
-    // ) : (
-    //     <>
-    // <SearchRoot component="form">
-    //     <SearchInput
-    //         placeholder="검색"
-    //         inputProps={{ 'aria-label': 'search' }}
-    //     />
-    //     <SearchIconButton type="submit" aria-label="search">
-    //         <SearchIcon />
-    //     </SearchIconButton>
-    // </SearchRoot>
-    //         <InfiniteScroll
-    //             dataLength={list.get.edges.length}
-    //             next={onLoadMore}
-    //             hasMore={list.get.pageInfo.hasNextPage}
-    //             loader={<h4>Loading...</h4>}
-    //         >
-    // {list.get.edges.map((data: { node: CharacterInterface }) => (
-    //     <Item
-    //         data={data.node}
-    //         key={data.node.id}
-    //         auth={!authLoding && (auth.authChecker as boolean)}
-    //         removeDialogOpen={handleDialogOpen}
-    //         type="char"
-    //         onLike={handleOnLike}
-    //     />
-    // ))}
-    //         </InfiniteScroll>
-
-    //         {!authLoding && auth.authChecker && (
-    //             <>
-    //                 <Dialog
-    //                     open={open}
-    //                     onClose={handleDialogClose}
-    //                     aria-labelledby="alert-dialog-title"
-    //                     aria-describedby="alert-dialog-description"
-    //                 >
-    //                     <DialogTitle id="alert-dialog-title">
-    //                         케릭터을 삭제 하시겠습니까?
-    //                     </DialogTitle>
-    //                     <DialogContent>
-    //                         <DialogContentText id="alert-dialog-description">
-    //                             케릭터을 삭제 하시겠습니까?
-    //                         </DialogContentText>
-    //                     </DialogContent>
-    //                     <DialogActions>
-    //                         <Button onClick={handleDialogClose} color="primary">
-    //                             아니오
-    //                         </Button>
-    //                         <Button
-    //                             onClick={handleOnRemove}
-    //                             color="primary"
-    //                             autoFocus
-    //                         >
-    //                             예
-    //                         </Button>
-    //                     </DialogActions>
-    //                 </Dialog>
-    //                 <AddFabTop>
-    //                     <Link href="/char/add">
-    //                         <AddFab aria-label="add" color="primary">
-    //                             <AddIcon />
-    //                         </AddFab>
-    //                     </Link>
-    //                 </AddFabTop>
-    //             </>
-    //         )}
-    //     </>
-    // );
 };
 
 export default CharacterList;
