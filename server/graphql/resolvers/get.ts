@@ -27,9 +27,20 @@ enum FocusType {
     GROUP = 'GROUP',
 }
 
+enum SortType {
+    NUMBER = 'NUMBER',
+    LIKE = 'LIKE',
+    NOT_LIKE = 'NOT_LIKE',
+}
+
 registerEnumType(FocusType, {
     name: 'FocusType',
-    description: '케릭터 등급',
+    description: '검색 타입',
+});
+
+registerEnumType(SortType, {
+    name: 'SortType',
+    description: '정렬 타임',
 });
 
 export const GetUnion = createUnionType<
@@ -110,6 +121,11 @@ class GetArgs {
         description: '검색할 문자 (이름, 태그)',
     })
     search?: string;
+    @Field(() => SortType, {
+        defaultValue: SortType.NUMBER,
+        description: '정렬 타입',
+    })
+    sort?: SortType = SortType.NUMBER;
 }
 
 const getData = async ({
@@ -119,6 +135,7 @@ const getData = async ({
     ids,
     search,
     focus,
+    sort,
 }: GetArgs): Promise<GetRelayStylePagination> => {
     let query: FilterQuery<CharacterTypeModel | GroupTypeModel> = {};
     if (ids.length > 0) {
@@ -161,6 +178,14 @@ const getData = async ({
 
     if (page) {
         options.page = page;
+    }
+    switch (sort) {
+        case SortType.NUMBER:
+            options.sort = { number: 'asc' };
+        case SortType.LIKE:
+            options.sort = { ['likeStats.like']: 'desc' };
+        case SortType.NOT_LIKE:
+            options.sort = { ['likeStats.notLike']: 'desc' };
     }
 
     const {
