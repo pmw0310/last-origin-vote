@@ -4,7 +4,6 @@ import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import Item from '../components/ListItem';
 import { CharacterInterface, GroupInterface, LikeStats } from 'Module';
 import {
-    Fab,
     Paper,
     IconButton,
     InputBase,
@@ -296,7 +295,7 @@ const CharacterList = (): JSX.Element => {
                             label="유형"
                         >
                             <MenuItem value={'ALL'}>모두</MenuItem>
-                            <MenuItem value={'CHARACTER'}>케릭터</MenuItem>
+                            <MenuItem value={'CHARACTER'}>캐릭터</MenuItem>
                             <MenuItem value={'GROUP'}>부대</MenuItem>
                         </Select>
                     </TypeForm>
