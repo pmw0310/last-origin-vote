@@ -17,8 +17,11 @@ import { Min } from 'class-validator';
 import { Types, FilterQuery, PaginateModel, PaginateOptions } from 'mongoose';
 import { Character } from './character';
 import { Group } from './group';
-import CharacterModels, { CharacterTypeModel } from '../../models/character';
-import GroupModels, { GroupTypeModel } from '../../models/group';
+import BasicDataModel, {
+    CharacterModel,
+    GroupModel,
+    BasicDataType,
+} from '../../models/basicData';
 import { PageInfo } from '../relayStylePagination';
 
 enum FocusType {
@@ -32,6 +35,11 @@ enum SortType {
     LIKE = 'LIKE',
     NOT_LIKE = 'NOT_LIKE',
 }
+
+registerEnumType(BasicDataType, {
+    name: 'BasicDataType',
+    description: '베이스 타입',
+});
 
 registerEnumType(FocusType, {
     name: 'FocusType',
@@ -50,7 +58,6 @@ export const GetUnion = createUnionType<
     types: () => [Character, Group],
     resolveType: (value) => {
         if (
-            'profileImage' in value ||
             'number' in value ||
             'groupId' in value ||
             'group' in value ||
@@ -65,7 +72,7 @@ export const GetUnion = createUnionType<
         ) {
             return Character;
         }
-        if ('image' in value || 'character' in value) {
+        if ('character' in value) {
             return Group;
         }
         return undefined;
@@ -137,7 +144,7 @@ const getData = async ({
     focus,
     sort,
 }: GetArgs): Promise<GetRelayStylePagination> => {
-    let query: FilterQuery<CharacterTypeModel | GroupTypeModel> = {};
+    let query: FilterQuery<CharacterModel | GroupModel> = {};
     if (ids.length > 0) {
         query = {
             ...query,

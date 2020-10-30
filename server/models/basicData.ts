@@ -3,25 +3,36 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 import enumToArray from '../lib/enumToArray';
 import { LinkStatsTypeModel, LinkStatsSchema } from './like';
 
-export interface CharacterTypeModel extends Document {
-    name?: string;
-    profileImage?: string;
+export enum BasicDataType {
+    CHARACTER = 'CHARACTER',
+    GROUP = 'GROUP',
+}
+
+interface BasicData {
+    name: string;
+    profileImage: string;
     createdAt: Date;
     updateAt: Date;
     tag: string[];
+    description?: string;
+    linkStats: LinkStatsTypeModel;
+    type: BasicDataType;
+}
+
+export interface CharacterModel extends Document, BasicData {
     number: number;
     groupId: string | Types.ObjectId;
     grade: CharacterGrade;
     lastGrade?: CharacterGrade;
-    type: CharacterType;
-    role: CharacterRole;
+    type?: CharacterType;
+    role?: CharacterRole;
     class?: string;
     arm?: string;
-    stature?: number;
-    weight?: number;
-    description?: string;
-    linkStats: LinkStatsTypeModel;
+    stature: number;
+    weight: number;
 }
+
+export interface GroupModel extends Document, BasicData {}
 
 export enum CharacterGrade {
     NONE = 'NONE',
@@ -45,8 +56,8 @@ export enum CharacterRole {
     DEFENDER = 'DEFENDER',
 }
 
-const CharacterSchema = new Schema<CharacterTypeModel>({
-    name: String,
+const BasicDataSchema = new Schema<CharacterModel | GroupModel>({
+    name: { type: String, index: true },
     profileImage: String,
     createdAt: {
         type: Date,
@@ -60,8 +71,8 @@ const CharacterSchema = new Schema<CharacterTypeModel>({
         type: [String],
         default: [],
     },
-    number: Number,
-    groupId: { type: Types.ObjectId, index: true },
+    number: { type: Number, index: true },
+    groupId: { type: Types.ObjectId },
     grade: {
         type: String,
         enum: enumToArray(CharacterGrade),
@@ -84,15 +95,15 @@ const CharacterSchema = new Schema<CharacterTypeModel>({
     },
     class: String,
     arm: String,
-    stature: Number,
-    weight: Number,
+    stature: { type: Number, default: 0, min: 0 },
+    weight: { type: Number, default: 0, min: 0 },
     description: String,
     likeStats: { type: LinkStatsSchema },
 });
 
-CharacterSchema.plugin(mongoosePaginate);
+BasicDataSchema.plugin(mongoosePaginate);
 
-export default model<CharacterTypeModel, PaginateModel<CharacterTypeModel>>(
-    'Character',
-    CharacterSchema,
-);
+export default model<
+    CharacterModel | GroupModel,
+    PaginateModel<CharacterModel | GroupModel>
+>('BasicData', BasicDataSchema);

@@ -14,14 +14,14 @@ import {
     Ctx,
 } from 'type-graphql';
 import { Types } from 'mongoose';
-import CharacterModels, {
+import BasicDataModel, {
     CharacterGrade,
     CharacterType,
     CharacterRole,
-} from '../../models/character';
+    BasicDataType,
+} from '../../models/basicData';
 import { UserVerifyResult } from '../../models/user';
 import LikeModels from '../../models/like';
-import GroupModels from '../../models/group';
 import { Group } from './group';
 import { LikeData } from './like';
 
@@ -114,6 +114,11 @@ export class CharacterInterface {
         nullable: true,
     })
     description?: string;
+    @Field(() => BasicDataType, {
+        description: '베이스 타입',
+        nullable: true,
+    })
+    basicType?: BasicDataType;
 }
 
 @ObjectType({ implements: CharacterInterface })
@@ -146,7 +151,7 @@ export class Character extends CharacterInterface {
         if (!groupId) {
             return;
         }
-        const group = await GroupModels.findById(groupId).exec();
+        const group = await BasicDataModel.findById(groupId).exec();
         return group as Group;
     }
     @Field(() => LikeData, {
