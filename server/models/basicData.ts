@@ -8,15 +8,15 @@ export enum BasicDataType {
     GROUP = 'GROUP',
 }
 
-interface BasicData {
+export interface BasicData {
     name: string;
     profileImage: string;
     createdAt: Date;
     updateAt: Date;
     tag: string[];
     description?: string;
-    linkStats: LinkStatsTypeModel;
-    type: BasicDataType;
+    likeStats: LinkStatsTypeModel;
+    basicType: BasicDataType;
 }
 
 export interface CharacterModel extends Document, BasicData {

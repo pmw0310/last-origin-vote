@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    createUnionType,
     registerEnumType,
-    ClassType,
     ObjectType,
     Field,
     Int,
@@ -14,15 +12,16 @@ import {
     ArgsType,
 } from 'type-graphql';
 import { Min } from 'class-validator';
-import { Types, FilterQuery, PaginateModel, PaginateOptions } from 'mongoose';
-import { Character } from './character';
-import { Group } from './group';
+import { Types, FilterQuery, PaginateOptions } from 'mongoose';
+import { Character } from '../models/character';
+import { Group } from '../models/group';
 import BasicDataModel, {
     CharacterModel,
     GroupModel,
     BasicDataType,
 } from '../../models/basicData';
 import { PageInfo } from '../relayStylePagination';
+import { BasicUnion } from '../models/unionType';
 
 enum FocusType {
     ALL = 'ALL',
@@ -36,11 +35,6 @@ enum SortType {
     NOT_LIKE = 'NOT_LIKE',
 }
 
-registerEnumType(BasicDataType, {
-    name: 'BasicDataType',
-    description: '베이스 타입',
-});
-
 registerEnumType(FocusType, {
     name: 'FocusType',
     description: '검색 타입',
@@ -51,37 +45,9 @@ registerEnumType(SortType, {
     description: '정렬 타임',
 });
 
-export const GetUnion = createUnionType<
-    [ClassType<Character>, ClassType<Group>]
->({
-    name: 'GetResult',
-    types: () => [Character, Group],
-    resolveType: (value) => {
-        if (
-            'number' in value ||
-            'groupId' in value ||
-            'group' in value ||
-            'grade' in value ||
-            'lastGrade' in value ||
-            'type' in value ||
-            'role' in value ||
-            'class' in value ||
-            'arm' in value ||
-            'stature' in value ||
-            'weight' in value
-        ) {
-            return Character;
-        }
-        if ('character' in value) {
-            return Group;
-        }
-        return undefined;
-    },
-});
-
 @ObjectType()
 class GetEdges {
-    @Field(() => GetUnion, { nullable: false })
+    @Field(() => BasicUnion, { nullable: false })
     node!: Character | Group;
     @Field(() => ID, { nullable: false })
     cursor!: string;
@@ -93,7 +59,7 @@ class GetRelayStylePagination {
     edges?: GetEdges[];
     @Field(() => PageInfo)
     pageInfo?: PageInfo;
-    @Field(() => [GetUnion])
+    @Field(() => [BasicUnion])
     data?(): Array<Character | Group> {
         const data = this.edges?.map<Character | Group>((e: any) => e.node);
         return data ? data : [];
@@ -135,136 +101,88 @@ class GetArgs {
     sort?: SortType = SortType.NUMBER;
 }
 
-const getData = async ({
-    limit,
-    page,
-    endCursor,
-    ids,
-    search,
-    focus,
-    sort,
-}: GetArgs): Promise<GetRelayStylePagination> => {
-    let query: FilterQuery<CharacterModel | GroupModel> = {};
-    if (ids.length > 0) {
-        query = {
-            ...query,
-            _id: {
-                ...query._id,
-                $in: ids?.map((id) => Types.ObjectId(id)),
-            },
-        };
-    }
-    if (!page && endCursor) {
-        query = {
-            ...query,
-            _id: { ...query._id, $gt: Types.ObjectId(endCursor) },
-        };
-    }
-    if (search) {
-        const reg = new RegExp(search, 'i');
-        query = {
-            ...query,
-            $or: [{ name: { $regex: reg } }, { tag: { $regex: reg } }],
-        };
-    }
-
-    let models: PaginateModel<any>;
-
-    switch (focus) {
-        case FocusType.CHARACTER:
-            models = CharacterModels;
-            break;
-        case FocusType.GROUP:
-            models = GroupModels;
-            break;
-        default:
-            throw new Error(`unusable focus type: ${focus}`);
-    }
-
-    const options: PaginateOptions = { limit };
-
-    if (page) {
-        options.page = page;
-    }
-    switch (sort) {
-        case SortType.NUMBER:
-            options.sort = { number: 'asc', name: 'asc' };
-            break;
-        case SortType.LIKE:
-            options.sort = { ['likeStats.like']: 'desc', name: 'asc' };
-            break;
-        case SortType.NOT_LIKE:
-            options.sort = { ['likeStats.notLike']: 'desc', name: 'asc' };
-            break;
-    }
-
-    const {
-        docs,
-        hasNextPage,
-        hasPrevPage,
-        nextPage,
-        prevPage,
-        totalPages,
-    } = await models.paginate(query, options);
-
-    const data = new GetRelayStylePagination();
-
-    data.edges = docs.map<GetEdges>((d) => ({
-        node: d,
-        cursor: d.id,
-    }));
-
-    data.pageInfo = {
-        hasNextPage,
-        hasPrevPage,
-        nextPage,
-        prevPage,
-        totalPages,
-        endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
-    };
-
-    return data;
-};
-
 @Resolver()
 export default class GetResolver {
     @Query(() => GetRelayStylePagination)
     async get(
-        @Args() getArgs: GetArgs,
+        @Args() { ids, page, endCursor, search, limit, sort, focus }: GetArgs,
     ): Promise<GetRelayStylePagination | undefined> {
-        switch (getArgs.focus) {
-            case FocusType.ALL:
-                const char = await getData({
-                    ...getArgs,
-                    focus: FocusType.CHARACTER,
-                });
-                if (char.pageInfo?.hasNextPage) {
-                    char.pageInfo.totalPages = undefined;
-                    char.pageInfo.nextPage = undefined;
-                    char.pageInfo.prevPage = undefined;
-                    char.pageInfo.hasPrevPage = undefined;
-                    return char;
-                }
-                const group = await getData({
-                    ...getArgs,
-                    focus: FocusType.GROUP,
-                });
-                const get = new GetRelayStylePagination();
-                get.edges = [
-                    ...(char.edges as GetEdges[]),
-                    ...(group.edges as GetEdges[]),
-                ];
-                get.pageInfo = {
-                    hasNextPage: group.pageInfo?.hasNextPage as boolean,
-                    endCursor: group.pageInfo?.endCursor as string,
-                };
-                return get;
+        let query: FilterQuery<CharacterModel | GroupModel> = {};
+
+        switch (focus) {
             case FocusType.CHARACTER:
-                return await getData(getArgs);
+                query = { ...query, basicType: BasicDataType.CHARACTER };
+                break;
             case FocusType.GROUP:
-                return await getData(getArgs);
+                query = { ...query, basicType: BasicDataType.GROUP };
+                break;
         }
 
-        throw new Error(`unusable focus type: ${getArgs.focus}`);
+        if (ids.length > 0) {
+            query = {
+                ...query,
+                _id: {
+                    ...query._id,
+                    $in: ids?.map((id) => Types.ObjectId(id)),
+                },
+            };
+        }
+        if (!page && endCursor) {
+            query = {
+                ...query,
+                _id: { ...query._id, $gt: Types.ObjectId(endCursor) },
+            };
+        }
+        if (search) {
+            const reg = new RegExp(search, 'i');
+            query = {
+                ...query,
+                $or: [{ name: { $regex: reg } }, { tag: { $regex: reg } }],
+            };
+        }
+
+        const options: PaginateOptions = { limit };
+
+        if (page) {
+            options.page = page;
+        }
+        switch (sort) {
+            case SortType.NUMBER:
+                options.sort = { number: 'asc', name: 'asc' };
+                break;
+            case SortType.LIKE:
+                options.sort = { ['likeStats.like']: 'desc', name: 'asc' };
+                break;
+            case SortType.NOT_LIKE:
+                options.sort = { ['likeStats.notLike']: 'desc', name: 'asc' };
+                break;
+        }
+
+        const {
+            docs,
+            hasNextPage,
+            hasPrevPage,
+            nextPage,
+            prevPage,
+            totalPages,
+        } = await BasicDataModel.paginate(query, options);
+
+        const data = new GetRelayStylePagination();
+
+        data.edges = docs.map<GetEdges>((d) => ({
+            node: d,
+            cursor: d.id,
+        }));
+
+        data.pageInfo = {
+            hasNextPage,
+            hasPrevPage,
+            nextPage,
+            prevPage,
+            totalPages,
+            endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
+        };
+
+        return data;
     }
 }
