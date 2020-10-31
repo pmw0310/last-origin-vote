@@ -1,6 +1,6 @@
 import { createUnionType, ClassType } from 'type-graphql';
-import { Character } from './character';
-import { Group } from './group';
+import { Character, CharacterInterface } from './character';
+import { Group, GroupInterface } from './group';
 import { BasicDataType } from '../../models/basicData';
 
 export const BasicUnion = createUnionType<
@@ -9,24 +9,27 @@ export const BasicUnion = createUnionType<
     name: 'BasicUnion',
     types: () => [Character, Group],
     resolveType: (value) => {
-        if (
-            value.basicType === BasicDataType.CHARACTER ||
-            'number' in value ||
-            'groupId' in value ||
-            'group' in value ||
-            'grade' in value ||
-            'lastGrade' in value ||
-            'type' in value ||
-            'role' in value ||
-            'class' in value ||
-            'arm' in value ||
-            'stature' in value ||
-            'weight' in value
-        ) {
+        if (value.basicType === BasicDataType.CHARACTER) {
             return Character;
         }
-        if (value.basicType === BasicDataType.GROUP || 'character' in value) {
+        if (value.basicType === BasicDataType.GROUP) {
             return Group;
+        }
+        return undefined;
+    },
+});
+
+export const BasicInputUnion = createUnionType<
+    [ClassType<Character>, ClassType<Group>]
+>({
+    name: 'BasicUnion',
+    types: () => [CharacterInterface, GroupInterface],
+    resolveType: (value) => {
+        if (value.basicType === BasicDataType.CHARACTER) {
+            return CharacterInterface;
+        }
+        if (value.basicType === BasicDataType.GROUP) {
+            return GroupInterface;
         }
         return undefined;
     },

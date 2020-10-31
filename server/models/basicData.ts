@@ -98,7 +98,12 @@ const BasicDataSchema = new Schema<CharacterModel | GroupModel>({
     stature: { type: Number, default: 0, min: 0 },
     weight: { type: Number, default: 0, min: 0 },
     description: String,
-    likeStats: { type: LinkStatsSchema },
+    likeStats: { type: LinkStatsSchema, default: {} },
+    basicType: {
+        type: String,
+        enum: enumToArray(BasicDataType),
+        required: true,
+    },
 });
 
 BasicDataSchema.plugin(mongoosePaginate);
