@@ -35,7 +35,15 @@ const AddCharacter = (): JSX.Element => {
     const save = async () => {
         await addCharacter({
             variables: {
-                data: { ...data, __typename: undefined },
+                data: {
+                    ...data,
+                    number:
+                        !data.number && (data.number as number) <= 0
+                            ? undefined
+                            : data.number,
+                    basicType: 'CHARACTER',
+                    __typename: undefined,
+                },
             },
         });
 

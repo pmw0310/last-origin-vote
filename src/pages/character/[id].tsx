@@ -84,7 +84,15 @@ const UpdateCharacter = (): JSX.Element => {
         await setCharacter({
             variables: {
                 id: router.query.id,
-                data: { ...data, __typename: undefined },
+                data: {
+                    ...data,
+                    number:
+                        !data.number && (data.number as number) <= 0
+                            ? undefined
+                            : data.number,
+                    basicType: 'CHARACTER',
+                    __typename: undefined,
+                },
             },
         });
 

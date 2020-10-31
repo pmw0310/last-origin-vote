@@ -96,7 +96,7 @@ const GET_LIST = gql`
                     weight
                     group {
                         name
-                        image
+                        profileImage
                     }
                     likeStats {
                         like
@@ -107,7 +107,7 @@ const GET_LIST = gql`
                 ... on Group {
                     id
                     name
-                    image
+                    profileImage
                     tag
                     character {
                         id

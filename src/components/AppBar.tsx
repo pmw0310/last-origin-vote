@@ -84,7 +84,7 @@ const MenuAppBar = (): JSX.Element => {
                                 <div>{data?.me.nickname}</div>
                                 <ButtonBase>
                                     <img
-                                        src="naver_logout.png"
+                                        src="/naver_logout.png"
                                         height={40}
                                         onClick={onLogoutButtonClick}
                                     />
@@ -93,7 +93,7 @@ const MenuAppBar = (): JSX.Element => {
                         ) : (
                             <ButtonBase>
                                 <img
-                                    src="naver_login.png"
+                                    src="/naver_login.png"
                                     height={40}
                                     onClick={onLoginButtonClick}
                                 />

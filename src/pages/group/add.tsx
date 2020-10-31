@@ -14,7 +14,7 @@ const AddGroup = (): JSX.Element => {
     const [data, setData] = useState<GroupInterface>({
         name: '',
         tag: [],
-        image: '',
+        profileImage: '',
         description: '',
         __typename: 'Group',
     });
@@ -25,7 +25,7 @@ const AddGroup = (): JSX.Element => {
     const save = async () => {
         await addGroup({
             variables: {
-                data: { ...data, __typename: undefined },
+                data: { ...data, basicType: 'GROUP', __typename: undefined },
             },
         });
 

@@ -39,7 +39,7 @@ declare module 'Module' {
 
     export interface GroupInterface {
         name?: string;
-        image?: string;
+        profileImage?: string;
         tag?: string[];
         description?: string;
         id?: string;

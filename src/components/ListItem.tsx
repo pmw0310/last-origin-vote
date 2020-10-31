@@ -286,8 +286,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                     <LazyLoadImage
                         alt="https://via.placeholder.com/150x150.png?text=Error"
                         src={
-                            (data as CharacterInterface).profileImage ||
-                            (data as GroupInterface).image ||
+                            data.profileImage ||
                             'https://via.placeholder.com/150x150.png?text=No+Image'
                         }
                         effect="blur"
@@ -416,7 +415,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                                 alt="https://via.placeholder.com/32x32.png?text=Error"
                                                 src={
                                                     (data as CharacterInterface)
-                                                        .group?.image ||
+                                                        .group?.profileImage ||
                                                     'https://via.placeholder.com/32x32.png?text=None'
                                                 }
                                                 effect="blur"

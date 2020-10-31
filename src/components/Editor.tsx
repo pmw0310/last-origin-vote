@@ -373,8 +373,7 @@ const CharacterEdit: React.FC<EditorProps> = ({
                     <img
                         alt="https://via.placeholder.com/125x125.png?text=Error"
                         src={
-                            (data as CharacterInterface).profileImage ||
-                            (data as GroupInterface).image ||
+                            data.profileImage ||
                             'https://via.placeholder.com/125x125.png?text=No+Image'
                         }
                         width="125"

@@ -11,7 +11,7 @@ const GET_GROUP = gql`
                 ... on Group {
                     name
                     tag
-                    image
+                    profileImage
                     description
                 }
             }
@@ -30,7 +30,7 @@ const UpdateGroup = (): JSX.Element => {
 
     const [data, setData] = useState<GroupInterface>({
         name: '',
-        image: '',
+        profileImage: '',
         tag: [],
         description: '',
         __typename: 'Group',
@@ -63,6 +63,7 @@ const UpdateGroup = (): JSX.Element => {
         await setGroup({
             variables: {
                 id: router.query.id,
+                basicType: 'GROUP',
                 data: { ...data, __typename: undefined },
             },
         });
