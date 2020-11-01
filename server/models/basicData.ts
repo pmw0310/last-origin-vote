@@ -1,35 +1,35 @@
 import { Document, Schema, model, Types, PaginateModel } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import enumToArray from '../lib/enumToArray';
-import { LinkStatsTypeModel, LinkStatsSchema } from './like';
+import { likeStatsTypeModel, likeStatsSchema } from './like';
 
 export enum BasicDataType {
     CHARACTER = 'CHARACTER',
     GROUP = 'GROUP',
 }
 
-export interface BasicData {
+interface BasicData {
     name: string;
     profileImage: string;
     createdAt: Date;
     updateAt: Date;
     tag: string[];
     description?: string;
-    likeStats: LinkStatsTypeModel;
-    basicType: BasicDataType;
+    likeStats: likeStatsTypeModel;
+    type: BasicDataType;
 }
 
 export interface CharacterModel extends Document, BasicData {
-    number: number;
-    groupId: string | Types.ObjectId;
-    grade: CharacterGrade;
-    lastGrade?: CharacterGrade;
-    type?: CharacterType;
-    role?: CharacterRole;
-    class?: string;
-    arm?: string;
-    stature: number;
-    weight: number;
+    charNumber: number;
+    charGroupId: string | Types.ObjectId;
+    charGrade: CharacterGrade;
+    charLastGrade?: CharacterGrade;
+    charType?: CharacterType;
+    charRole?: CharacterRole;
+    charClass?: string;
+    charArm?: string;
+    charStature: number;
+    charWeight: number;
 }
 
 export interface GroupModel extends Document, BasicData {}
@@ -71,39 +71,36 @@ const BasicDataSchema = new Schema<CharacterModel | GroupModel>({
         type: [String],
         default: [],
     },
-    number: { type: Number, index: true },
-    groupId: { type: Types.ObjectId },
-    grade: {
-        type: String,
-        enum: enumToArray(CharacterGrade),
-        default: CharacterGrade.NONE,
-    },
-    lastGrade: {
-        type: String,
-        enum: enumToArray(CharacterGrade),
-        default: CharacterGrade.NONE,
-    },
+    description: String,
+    likeStats: { type: likeStatsSchema, default: {} },
     type: {
         type: String,
-        enum: enumToArray(CharacterType),
-        default: CharacterType.NONE,
+        enum: enumToArray(BasicDataType),
+        index: true,
     },
-    role: {
+
+    charNumber: { type: Number },
+    charGroupId: { type: Types.ObjectId },
+    charGrade: {
+        type: String,
+        enum: enumToArray(CharacterGrade),
+    },
+    charLastGrade: {
+        type: String,
+        enum: enumToArray(CharacterGrade),
+    },
+    charType: {
+        type: String,
+        enum: enumToArray(CharacterType),
+    },
+    charRole: {
         type: String,
         enum: enumToArray(CharacterRole),
-        default: CharacterRole.NONE,
     },
-    class: String,
-    arm: String,
-    stature: { type: Number, default: 0, min: 0 },
-    weight: { type: Number, default: 0, min: 0 },
-    description: String,
-    likeStats: { type: LinkStatsSchema, default: {} },
-    basicType: {
-        type: String,
-        enum: enumToArray(BasicDataType),
-        required: true,
-    },
+    charClass: String,
+    charArm: String,
+    charStature: { type: Number, min: 0 },
+    charWeight: { type: Number, min: 0 },
 });
 
 BasicDataSchema.plugin(mongoosePaginate);

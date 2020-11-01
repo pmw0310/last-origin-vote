@@ -40,7 +40,7 @@ export default class ImageUploadResolver {
                     cloudinary.v2.uploader.upload(
                         path,
                         {
-                            use_filename: true,
+                            use_filename: false,
                             unique_filename: true,
                         },
                         async (error, result) => {

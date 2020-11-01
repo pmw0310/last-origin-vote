@@ -6,6 +6,7 @@ import IconButton from '@material-ui/core/IconButton';
 import { ButtonBase } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import Container from '@material-ui/core/Container';
+import Tooltip from '@material-ui/core/Tooltip';
 import styled, { createGlobalStyle } from 'styled-components';
 import { gql, useQuery } from '@apollo/client';
 import { currentUserVar } from '../lib/apollo';
@@ -31,6 +32,17 @@ const Root = styled.div`
 `;
 const MenuButton = styled(IconButton)`
     margin-right: 2px;
+`;
+const AppBarToolbar = styled(Toolbar)`
+    display: flex;
+    justify-content: space-between;
+`;
+const Auth = styled.div`
+    display: flex;
+    align-items: center;
+`;
+const AppBarAvatar = styled(Avatar)`
+    margin-right: 10px;
 `;
 
 const ME = gql`
@@ -68,38 +80,45 @@ const MenuAppBar = (): JSX.Element => {
             <GlobalStyles />
             <AppBar position="static">
                 <Container fixed>
-                    <Toolbar>
+                    <AppBarToolbar>
                         <MenuButton
                             edge="start"
                             color="inherit"
                             aria-label="menu"
+                            disabled={true}
                         >
                             <MenuIcon />
                         </MenuButton>
-                        {loading ? (
-                            <div />
-                        ) : data?.me ? (
-                            <>
-                                <Avatar src={data?.me.profileImage} />
-                                <div>{data?.me.nickname}</div>
+                        <Auth>
+                            {!loading && data?.me ? (
+                                <>
+                                    <Tooltip
+                                        title={data.me.nickname as string}
+                                        aria-label={data.me.nickname}
+                                    >
+                                        <AppBarAvatar
+                                            src={data?.me.profileImage}
+                                        />
+                                    </Tooltip>
+                                    <ButtonBase>
+                                        <img
+                                            src="/naver_logout.png"
+                                            height={36}
+                                            onClick={onLogoutButtonClick}
+                                        />
+                                    </ButtonBase>
+                                </>
+                            ) : (
                                 <ButtonBase>
                                     <img
-                                        src="/naver_logout.png"
-                                        height={40}
-                                        onClick={onLogoutButtonClick}
+                                        src="/naver_login.png"
+                                        height={36}
+                                        onClick={onLoginButtonClick}
                                     />
                                 </ButtonBase>
-                            </>
-                        ) : (
-                            <ButtonBase>
-                                <img
-                                    src="/naver_login.png"
-                                    height={40}
-                                    onClick={onLoginButtonClick}
-                                />
-                            </ButtonBase>
-                        )}
-                    </Toolbar>
+                            )}
+                        </Auth>
+                    </AppBarToolbar>
                 </Container>
             </AppBar>
         </Root>

@@ -18,6 +18,7 @@ import {
     Search as SearchIcon,
     AccountCircle as AccountCircleIcon,
     Assignment as AssignmentIcon,
+    Close as CloseIcon,
 } from '@material-ui/icons';
 import styled from 'styled-components';
 import Pagination from '../components/common/Pagination';
@@ -87,13 +88,14 @@ const GET_LIST = gql`
                     name
                     profileImage
                     tag
-                    grade
                     type
-                    role
-                    class
-                    arm
-                    stature
-                    weight
+                    charGrade
+                    charType
+                    charRole
+                    charClass
+                    charArm
+                    charStature
+                    charWeight
                     group {
                         name
                         profileImage
@@ -109,6 +111,7 @@ const GET_LIST = gql`
                     name
                     profileImage
                     tag
+                    type
                     character {
                         id
                         name
@@ -139,7 +142,7 @@ const REMOVE_CHARACTER = gql`
 
 const SET_LIKE = gql`
     mutation setLike($target: ID!, $like: Int!) {
-        setLike(target: $target, type: CHARACTER, like: $like) {
+        setLike(target: $target, like: $like) {
             like
             notLike
         }
@@ -151,7 +154,7 @@ const CharacterList = (): JSX.Element => {
 
     const [page, setPage] = useState<number>(1);
     const [focus, setFocus] = useState<string>('CHARACTER');
-    const [sort, setSort] = useState<string>('NUMBER');
+    const [sort, setSort] = useState<string>('NAME');
     const [search, setSearch] = useState<string>('');
     const [open, setOpen] = React.useState<boolean>(false);
 
@@ -200,7 +203,7 @@ const CharacterList = (): JSX.Element => {
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(event.target.value);
+        setSearch(() => event.target.value);
     };
     const handleSelectChange = (
         event: React.ChangeEvent<{ name?: string; value: unknown }>,
@@ -236,6 +239,21 @@ const CharacterList = (): JSX.Element => {
         }
     };
 
+    const handleSearchButton = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        setPage(() => 1);
+        updatePage({ page: 1 });
+    };
+
+    const handleSearchClearButton = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        if (search) {
+            setSearch(() => '');
+            setPage(() => 1);
+            updatePage({ page: 1, search: '' });
+        }
+    };
+
     const updatePage = (option?: {
         page?: number;
         focus?: string;
@@ -258,7 +276,7 @@ const CharacterList = (): JSX.Element => {
         }
 
         setPage((page) => page + 1);
-        updatePage();
+        updatePage({ page: page + 1 });
     };
 
     const prevPage = (): void => {
@@ -267,7 +285,7 @@ const CharacterList = (): JSX.Element => {
         }
 
         setPage((page) => page - 1);
-        updatePage();
+        updatePage({ page: page - 1 });
     };
 
     useEffect(() => {
@@ -308,23 +326,32 @@ const CharacterList = (): JSX.Element => {
                             onChange={handleSelectChange}
                             label="검색"
                         >
-                            <MenuItem value={'NUMBER'}>번호순</MenuItem>
-                            <MenuItem value={'LIKE'}>좋아요순</MenuItem>
-                            <MenuItem value={'NOT_LIKE'}>싫어요순</MenuItem>
+                            <MenuItem value={'NAME'}>이름</MenuItem>
+                            <MenuItem value={'LIKE'}>좋아요</MenuItem>
+                            <MenuItem value={'NOT_LIKE'}>싫어요</MenuItem>
                         </Select>
                     </TypeForm>
                 </Grid>
                 <Grid item lg={8} md={12}>
                     <SearchRoot component="form">
+                        <SearchIconButton
+                            aria-label="search"
+                            onClick={handleSearchButton}
+                        >
+                            <SearchIcon />
+                        </SearchIconButton>
                         <SearchInput
-                            placeholder="검색"
+                            placeholder="검색..."
                             inputProps={{ 'aria-label': 'search' }}
                             value={search}
                             onChange={handleSearchChange}
                             onKeyPress={handleSearchKeyPress}
                         />
-                        <SearchIconButton type="submit" aria-label="search">
-                            <SearchIcon />
+                        <SearchIconButton
+                            aria-label="clear"
+                            onClick={handleSearchClearButton}
+                        >
+                            <CloseIcon />
                         </SearchIconButton>
                     </SearchRoot>
                 </Grid>
@@ -345,24 +372,27 @@ const CharacterList = (): JSX.Element => {
                             data={data}
                             key={data.id}
                             auth={
-                                (data.__typename === 'Character' &&
+                                (data.type === 'CHARACTER' &&
                                     auth?.characterAuth) ||
-                                (data.__typename === 'Group' && auth?.groupAuth)
+                                (data.type === 'GROUP' && auth?.groupAuth)
                             }
                             removeDialogOpen={handleDialogOpen}
                             onLike={handleOnLike}
                         />
                     ),
                 )}
-            {listData && !loading && !authLoding && (
-                <Pagination
-                    onNext={nextPage}
-                    onPrev={prevPage}
-                    page={page}
-                    hasNextPage={listData?.get?.pageInfo?.hasNextPage}
-                    hasPrevPage={listData?.get?.pageInfo?.hasPrevPage}
-                />
-            )}
+            {listData &&
+                listData.get.data.length > 0 &&
+                !loading &&
+                !authLoding && (
+                    <Pagination
+                        onNext={nextPage}
+                        onPrev={prevPage}
+                        page={page}
+                        hasNextPage={listData?.get?.pageInfo?.hasNextPage}
+                        hasPrevPage={listData?.get?.pageInfo?.hasPrevPage}
+                    />
+                )}
             {loading && (
                 <Progress>
                     <CircularProgress />

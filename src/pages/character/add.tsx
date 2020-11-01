@@ -5,8 +5,8 @@ import { CharacterInterface } from 'Module';
 import { gql, useMutation } from '@apollo/client';
 
 const ADD_CHARACTER = gql`
-    mutation setCharacter($data: CharacterInput!) {
-        addCharacter(data: $data)
+    mutation setCharacter($data: InputData!) {
+        add(data: $data)
     }
 `;
 
@@ -16,17 +16,17 @@ const AddCharacter = (): JSX.Element => {
         tag: [],
         profileImage: '',
         description: '',
-        number: 0,
-        groupId: '',
-        grade: 'NONE',
-        lastGrade: 'NONE',
-        type: 'NONE',
-        role: 'NONE',
-        class: '',
-        arm: '',
-        stature: 0,
-        weight: 0,
-        __typename: 'Character',
+        charNumber: 0,
+        charGroupId: '',
+        charGrade: 'NONE',
+        charLastGrade: 'NONE',
+        charType: 'NONE',
+        charRole: 'NONE',
+        charClass: '',
+        charArm: '',
+        charStature: 0,
+        charWeight: 0,
+        type: 'CHARACTER',
     });
 
     const [addCharacter] = useMutation(ADD_CHARACTER);
@@ -37,11 +37,10 @@ const AddCharacter = (): JSX.Element => {
             variables: {
                 data: {
                     ...data,
-                    number:
-                        !data.number && (data.number as number) <= 0
-                            ? undefined
-                            : data.number,
-                    basicType: 'CHARACTER',
+                    charNumber:
+                        !data.charNumber && (data.charNumber as number) <= 0
+                            ? 99999
+                            : data.charNumber,
                     __typename: undefined,
                 },
             },

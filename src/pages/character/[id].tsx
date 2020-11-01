@@ -13,16 +13,17 @@ const GET_CHARACTER = gql`
                     tag
                     profileImage
                     description
-                    number
-                    groupId
-                    grade
-                    lastGrade
+                    charNumber
+                    charGroupId
+                    charGrade
+                    charLastGrade
+                    charType
+                    charRole
+                    charClass
+                    charArm
+                    charStature
+                    charWeight
                     type
-                    role
-                    class
-                    arm
-                    stature
-                    weight
                 }
             }
         }
@@ -30,8 +31,8 @@ const GET_CHARACTER = gql`
 `;
 
 const SET_CHARACTER = gql`
-    mutation setCharacter($id: ID!, $data: CharacterInput!) {
-        updateCharacter(id: $id, data: $data)
+    mutation setCharacter($id: ID!, $data: InputData!) {
+        update(id: $id, data: $data)
     }
 `;
 
@@ -43,17 +44,17 @@ const UpdateCharacter = (): JSX.Element => {
         tag: [],
         profileImage: '',
         description: '',
-        number: 0,
-        groupId: '',
-        grade: 'NONE',
-        lastGrade: 'NONE',
-        type: 'NONE',
-        role: 'NONE',
-        class: '',
-        arm: '',
-        stature: 0,
-        weight: 0,
-        __typename: 'Character',
+        charNumber: 0,
+        charGroupId: '',
+        charGrade: 'NONE',
+        charLastGrade: 'NONE',
+        charType: 'NONE',
+        charRole: 'NONE',
+        charClass: '',
+        charArm: '',
+        charStature: 0,
+        charWeight: 0,
+        type: 'CHARACTER',
     });
     const [getCharacter, { data: char, error }] = useLazyQuery(GET_CHARACTER, {
         fetchPolicy: 'no-cache',
@@ -77,7 +78,10 @@ const UpdateCharacter = (): JSX.Element => {
             return;
         }
         const data: CharacterInterface = char.get.data[0];
-        setData({ ...data, groupId: data.groupId ? data.groupId : '' });
+        setData({
+            ...data,
+            charGroupId: data.charGroupId ? data.charGroupId : '',
+        });
     }, [char, error]);
 
     const save = async () => {
@@ -86,11 +90,10 @@ const UpdateCharacter = (): JSX.Element => {
                 id: router.query.id,
                 data: {
                     ...data,
-                    number:
-                        !data.number && (data.number as number) <= 0
-                            ? undefined
-                            : data.number,
-                    basicType: 'CHARACTER',
+                    charNumber:
+                        !data.charNumber && (data.charNumber as number) <= 0
+                            ? 99999
+                            : data.charNumber,
                     __typename: undefined,
                 },
             },

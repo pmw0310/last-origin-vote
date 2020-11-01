@@ -13,6 +13,7 @@ const GET_GROUP = gql`
                     tag
                     profileImage
                     description
+                    type
                 }
             }
         }
@@ -20,8 +21,8 @@ const GET_GROUP = gql`
 `;
 
 const SET_GROUP = gql`
-    mutation setGroup($id: ID!, $data: GroupInput!) {
-        updateGroup(id: $id, data: $data)
+    mutation setGroup($id: ID!, $data: InputData!) {
+        update(id: $id, data: $data)
     }
 `;
 
@@ -33,7 +34,7 @@ const UpdateGroup = (): JSX.Element => {
         profileImage: '',
         tag: [],
         description: '',
-        __typename: 'Group',
+        type: 'GROUP',
     });
     const [getGroup, { data: group, error }] = useLazyQuery(GET_GROUP, {
         fetchPolicy: 'no-cache',
@@ -63,12 +64,11 @@ const UpdateGroup = (): JSX.Element => {
         await setGroup({
             variables: {
                 id: router.query.id,
-                basicType: 'GROUP',
                 data: { ...data, __typename: undefined },
             },
         });
 
-        router.push('/group');
+        router.push('/');
     };
 
     if (!group) {

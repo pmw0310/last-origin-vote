@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const mongooseConnect = async (): Promise<void> => {
-    await mongoose.connect(process.env.MONGODB_URI as string, {
+    await mongoose.connect(`${process.env.MONGODB_URI as string}/lastorigin`, {
         useCreateIndex: true,
         useNewUrlParser: true,
         useUnifiedTopology: true,

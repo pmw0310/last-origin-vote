@@ -17,16 +17,16 @@ declare module 'Module' {
         name?: string;
         profileImage?: string;
         tag?: string[];
-        number?: number;
-        groupId?: string;
-        grade?: string;
-        lastGrade?: string;
-        type?: string;
-        role?: string;
-        class?: string;
-        arm?: string;
-        stature?: number;
-        weight?: number;
+        charNumber?: number;
+        charGroupId?: string;
+        charGrade?: CharacterGrade;
+        charLastGrade?: CharacterGrade;
+        charType?: CharacterType;
+        charRole?: CharacterRole;
+        charClass?: string;
+        charArm?: string;
+        charStature?: number;
+        charWeight?: number;
         description?: string;
         id?: string;
         createdAt?: number | Date;
@@ -34,7 +34,7 @@ declare module 'Module' {
         group?: GroupInterface;
         likeStats?: LikeStats;
         like?: -1 | 0 | 1;
-        __typename: 'Character' | 'Group';
+        type: 'CHARACTER' | 'GROUP';
     }
 
     export interface GroupInterface {
@@ -48,7 +48,7 @@ declare module 'Module' {
         character?: CharacterInterface[];
         likeStats?: LikeStats;
         like?: -1 | 0 | 1;
-        __typename: 'Group' | 'Character';
+        type: 'CHARACTER' | 'GROUP';
     }
 
     // enum CharacterGrade {

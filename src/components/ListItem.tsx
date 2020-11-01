@@ -177,17 +177,17 @@ const ListItem: React.FC<CharacterItemProps> = ({
     };
 
     const toRoleText = (): string => {
-        const { type, role } = data as CharacterInterface;
+        const { charType, charRole } = data as CharacterInterface;
         let text: string = '';
 
-        const isType = !isNone(type);
-        const isRole = !isNone(role);
+        const isType = !isNone(charType);
+        const isRole = !isNone(charRole);
 
         if (!isType && !isRole) {
             return '';
         }
 
-        switch (type) {
+        switch (charType) {
             case 'LIGHT':
                 text += '경장';
                 break;
@@ -201,7 +201,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
 
         text += isRole ? ' ' : '형';
 
-        switch (role) {
+        switch (charRole) {
             case 'ASSAULT':
                 text += '공격기';
                 break;
@@ -217,16 +217,16 @@ const ListItem: React.FC<CharacterItemProps> = ({
     };
 
     const toGradeImagePaht = (grade: string): string => {
-        const { role } = data as CharacterInterface;
+        const { charRole } = data as CharacterInterface;
 
         const isGrade = !isNone(grade);
-        const isRole = !isNone(role);
+        const isRole = !isNone(charRole);
 
         if (!isGrade || !isRole) {
             return '';
         }
 
-        switch (role) {
+        switch (charRole) {
             case 'ASSAULT':
                 return `/a${grade.toLocaleLowerCase()}.png`;
             case 'SUPPORT':
@@ -239,7 +239,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
     };
 
     const toStatureText = (): string => {
-        const stature = (data as CharacterInterface).stature as number;
+        const stature = (data as CharacterInterface).charStature as number;
         if (stature <= 0) {
             return '?kg';
         } else if (stature < 500) {
@@ -250,7 +250,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
     };
 
     const toWeightText = (): string => {
-        const weight = (data as CharacterInterface).weight as number;
+        const weight = (data as CharacterInterface).charWeight as number;
         if (weight <= 0) {
             return '?cm';
         } else if (weight < 200) {
@@ -262,11 +262,11 @@ const ListItem: React.FC<CharacterItemProps> = ({
 
     const roleText = toRoleText();
     const gradeImage = toGradeImagePaht(
-        (data as CharacterInterface).grade as string,
+        (data as CharacterInterface).charGrade as string,
     );
     const statureText = toStatureText();
     const weightText = toWeightText();
-    const type: 'Character' | 'Group' = data.__typename;
+    const type: 'CHARACTER' | 'GROUP' = data.type;
 
     return (
         <Root>
@@ -276,7 +276,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                     aria-controls="panel1c-content"
                     id="panel1c-header"
                 >
-                    {type === 'Character' && gradeImage && (
+                    {type === 'CHARACTER' && gradeImage && (
                         <GradeIcon
                             alt="https://via.placeholder.com/150x150.png?text=Error"
                             src={gradeImage}
@@ -297,7 +297,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                         <Typography variant="h5" gutterBottom>
                             {data.name}
                         </Typography>
-                        {type === 'Character' && roleText && (
+                        {type === 'CHARACTER' && roleText && (
                             <Typography variant="subtitle2" gutterBottom>
                                 {roleText}
                             </Typography>
@@ -362,46 +362,44 @@ const ListItem: React.FC<CharacterItemProps> = ({
                             </Menu>
                         </Auth>
                     )}
-                    {type === 'Character' && (
-                        <Like>
-                            <LikeButton
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    handleLike(1);
-                                }}
-                                onFocus={(event) => event.stopPropagation()}
-                            >
-                                {likeData.like === 1 ? (
-                                    <ThumbUpAltIcon />
-                                ) : (
-                                    <ThumbUpAltOutlinedIcon />
-                                )}
-                                <Typography variant="button">
-                                    {likeData.likeStats.like}
-                                </Typography>
-                            </LikeButton>
-                            <LikeButton
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    handleLike(-1);
-                                }}
-                                onFocus={(event) => event.stopPropagation()}
-                            >
-                                {likeData.like === -1 ? (
-                                    <ThumbDownAltIcon />
-                                ) : (
-                                    <ThumbDownAltOutlinedIcon />
-                                )}
-                                <Typography variant="button">
-                                    {likeData.likeStats.notLike}
-                                </Typography>
-                            </LikeButton>
-                        </Like>
-                    )}
+                    <Like>
+                        <LikeButton
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                handleLike(1);
+                            }}
+                            onFocus={(event) => event.stopPropagation()}
+                        >
+                            {likeData.like === 1 ? (
+                                <ThumbUpAltIcon />
+                            ) : (
+                                <ThumbUpAltOutlinedIcon />
+                            )}
+                            <Typography variant="button">
+                                {likeData.likeStats.like}
+                            </Typography>
+                        </LikeButton>
+                        <LikeButton
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                handleLike(-1);
+                            }}
+                            onFocus={(event) => event.stopPropagation()}
+                        >
+                            {likeData.like === -1 ? (
+                                <ThumbDownAltIcon />
+                            ) : (
+                                <ThumbDownAltOutlinedIcon />
+                            )}
+                            <Typography variant="button">
+                                {likeData.likeStats.notLike}
+                            </Typography>
+                        </LikeButton>
+                    </Like>
                 </ItemAccordionSummary>
                 <AccordionDetails>
                     <Grid container spacing={1}>
-                        {type === 'Character' && (
+                        {type === 'CHARACTER' && (
                             <>
                                 {expanded &&
                                     (data as CharacterInterface).group && (
@@ -452,7 +450,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                         {weightText}
                                     </Typography>
                                 </CharacterInfo>
-                                {(data as CharacterInterface).class && (
+                                {(data as CharacterInterface).charClass && (
                                     <CharacterInfo item lg={3} sm={6}>
                                         <CharacterInfoChip
                                             variant="outlined"
@@ -461,11 +459,14 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                             size="small"
                                         />
                                         <Typography variant="subtitle2">
-                                            {(data as CharacterInterface).class}
+                                            {
+                                                (data as CharacterInterface)
+                                                    .charClass
+                                            }
                                         </Typography>
                                     </CharacterInfo>
                                 )}
-                                {(data as CharacterInterface).arm && (
+                                {(data as CharacterInterface).charArm && (
                                     <CharacterInfo item lg={3} sm={6}>
                                         <CharacterInfoChip
                                             variant="outlined"
@@ -474,13 +475,16 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                             size="small"
                                         />
                                         <Typography variant="subtitle2">
-                                            {(data as CharacterInterface).arm}
+                                            {
+                                                (data as CharacterInterface)
+                                                    .charArm
+                                            }
                                         </Typography>
                                     </CharacterInfo>
                                 )}
                             </>
                         )}
-                        {type === 'Group' &&
+                        {type === 'GROUP' &&
                             expanded &&
                             ((data as GroupInterface).character as Array<
                                 CharacterInterface

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    InputType,
     Field,
     ObjectType,
     Int,
+    Float,
     ID,
     registerEnumType,
 } from 'type-graphql';
@@ -13,7 +13,7 @@ import BasicDataModel, {
     CharacterRole,
     BasicDataType,
 } from '../../models/basicData';
-import { BasicDataInterface, BasicData } from '../models/basicData';
+import { BasicData } from '../models/basicData';
 import { Group } from './group';
 
 registerEnumType(CharacterGrade, {
@@ -31,129 +31,87 @@ registerEnumType(CharacterRole, {
     description: '케릭터 역할',
 });
 
-@ObjectType({ implements: BasicDataInterface })
-@InputType('CharacterInput')
-export class CharacterInterface extends BasicDataInterface {
-    @Field(() => Int, {
-        description: '번호',
-        nullable: true,
-    })
-    number?: number;
-    @Field(() => ID, {
-        description: '부대 ID',
-        nullable: true,
-    })
-    groupId?: string;
-    @Field(() => CharacterGrade, {
-        description: '등급',
-        nullable: true,
-    })
-    grade?: CharacterGrade;
-    @Field(() => CharacterGrade, {
-        description: '최종 등급',
-        nullable: true,
-    })
-    lastGrade?: CharacterGrade;
-    @Field(() => CharacterType, {
-        description: '타입',
-        nullable: true,
-    })
-    type?: CharacterType;
-    @Field(() => CharacterRole, {
-        description: '역할',
-        nullable: true,
-    })
-    role?: CharacterRole;
-    @Field({
-        description: '클레스',
-        nullable: true,
-    })
-    class?: string;
-    @Field({
-        description: '무장',
-        nullable: true,
-    })
-    arm?: string;
-    @Field(() => Int, {
-        description: '신장',
-        nullable: true,
-    })
-    stature?: number;
-    @Field(() => Int, {
-        description: '체중',
-        nullable: true,
-    })
-    weight?: number;
+export class CharacterInput {
+    charNumber?: number;
+    charGroupId?: string;
+    charGrade?: CharacterGrade;
+    charLastGrade?: CharacterGrade;
+    charType?: CharacterType;
+    charRole?: CharacterRole;
+    charClass?: string;
+    charArm?: string;
+    charStature?: number;
+    charWeight?: number;
 }
 
 @ObjectType({ implements: BasicData })
-export class Character extends BasicData {
+export class Character extends BasicData implements CharacterInput {
     @Field(() => Int, {
         description: '번호',
         nullable: true,
     })
-    number?: number;
+    charNumber?: number;
     @Field(() => ID, {
         description: '부대 ID',
         nullable: true,
     })
-    groupId?: string;
+    charGroupId?: string;
     @Field(() => CharacterGrade, {
         description: '등급',
         nullable: true,
     })
-    grade?: CharacterGrade;
+    charGrade?: CharacterGrade;
     @Field(() => CharacterGrade, {
         description: '최종 등급',
         nullable: true,
     })
-    lastGrade?: CharacterGrade;
+    charLastGrade?: CharacterGrade;
     @Field(() => CharacterType, {
         description: '타입',
         nullable: true,
     })
-    type?: CharacterType;
+    charType?: CharacterType;
     @Field(() => CharacterRole, {
         description: '역할',
         nullable: true,
     })
-    role?: CharacterRole;
+    charRole?: CharacterRole;
     @Field({
         description: '클레스',
         nullable: true,
     })
-    class?: string;
+    charClass?: string;
     @Field({
         description: '무장',
         nullable: true,
     })
-    arm?: string;
-    @Field(() => Int, {
+    charArm?: string;
+    @Field(() => Float, {
         description: '신장',
         nullable: true,
     })
-    stature?: number;
-    @Field(() => Int, {
+    charStature?: number;
+    @Field(() => Float, {
         description: '체중',
         nullable: true,
     })
-    weight?: number;
+    charWeight?: number;
 
     @Field(() => Group, {
         description: '소속된 부대 정보',
         nullable: true,
     })
     async group?(): Promise<Group | undefined> {
-        let groupId = this.groupId;
+        let groupId = this.charGroupId;
         if (!groupId) {
-            groupId = (this as any)._doc.groupId;
+            groupId = (this as any)._doc.charGroupId;
         }
         if (!groupId) {
             return;
         }
         const group = await BasicDataModel.findOne({
             _id: groupId,
-            basicType: BasicDataType.GROUP,
+            type: BasicDataType.GROUP,
         }).exec();
         return group as Group;
     }

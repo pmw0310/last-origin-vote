@@ -9,6 +9,7 @@ import Bodyparser from 'koa-bodyparser';
 // import proxy from 'koa-proxies';
 import helmet from 'koa-helmet';
 import passport from 'koa-passport';
+import { RateLimit } from 'koa2-ratelimit';
 import { Strategy, Profile } from 'passport-naver';
 import { ApolloServer } from 'apollo-server-koa';
 import { graphqlUploadKoa } from 'graphql-upload';
@@ -22,7 +23,6 @@ import api from './api';
 import User, { UserTypeModel } from './models/user';
 import authChecker from './lib/authChecker';
 
-const port = parseInt(process.env.PORT || '4000', 10);
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
@@ -77,9 +77,18 @@ const authCheck = (roles: Array<string>) => async (
 };
 
 (async () => {
+    const uri = process.env.URI;
+    const port = parseInt(process.env.PORT || '4000', 10);
+
     await app.prepare();
 
     const server = new Koa();
+    server.use(
+        RateLimit.middleware({
+            interval: { min: 1 },
+            max: 150,
+        }),
+    );
     const router = new Router<DefaultState, Context>();
     const apolloServer = new ApolloServer({
         schema,
@@ -107,10 +116,10 @@ const authCheck = (roles: Array<string>) => async (
     }
 
     router.get('/', renderAndCache);
-    router.get('/character/add', authCheck(['character']), renderAndCache);
-    router.get('/character/:id', authCheck(['character']), renderAndCache);
-    router.get('/group/add', authCheck(['group']), renderAndCache);
-    router.get('/group/:id', authCheck(['group']), renderAndCache);
+    router.get('/character/add', authCheck(['set']), renderAndCache);
+    router.get('/character/:id', authCheck(['set']), renderAndCache);
+    router.get('/group/add', authCheck(['set']), renderAndCache);
+    router.get('/group/:id', authCheck(['set']), renderAndCache);
     router.use('/api', api.routes());
     router.get('/(.*)', async (ctx: Context) => {
         await handle(ctx.req, ctx.res);
@@ -135,7 +144,7 @@ const authCheck = (roles: Array<string>) => async (
             {
                 clientID: process.env.NAVER_CLIENT_ID as string,
                 clientSecret: process.env.NAVER_CLIENT_SECRET as string,
-                callbackURL: `http://localhost:${port}/api/auth/naver/callback`,
+                callbackURL: `${uri}/api/auth/naver/callback`,
             },
             (
                 _accessToken: string,
@@ -151,9 +160,7 @@ const authCheck = (roles: Array<string>) => async (
     );
 
     server.listen(port, () => {
-        console.log(`> Next on http://localhost:${port}`);
-        console.log(
-            `> GraphQL on http://localhost:${port}${apolloServer.graphqlPath}`,
-        );
+        console.log(`> Next on ${uri}`);
+        console.log(`> GraphQL on ${uri}${apolloServer.graphqlPath}`);
     });
 })();

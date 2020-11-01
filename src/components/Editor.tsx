@@ -112,12 +112,12 @@ const CharacterEdit: React.FC<EditorProps> = ({
 
                 setData({
                     ...data,
-                    [type === 'character' ? 'profileImage' : 'image']: url,
+                    profileImage: url,
                 });
             } catch (e) {
                 setData({
                     ...data,
-                    [type === 'character' ? 'profileImage' : 'image']: null,
+                    profileImage: undefined,
                 });
             }
 
@@ -164,9 +164,9 @@ const CharacterEdit: React.FC<EditorProps> = ({
                     <ItemGrid div={3}>
                         <ItemTextField
                             label="번호"
-                            value={(data as CharacterInterface).number}
+                            value={(data as CharacterInterface).charNumber}
                             onChange={handleChange}
-                            name="number"
+                            name="charNumber"
                             type="number"
                             InputProps={{
                                 startAdornment: (
@@ -181,27 +181,27 @@ const CharacterEdit: React.FC<EditorProps> = ({
                     <ItemGrid div={3}>
                         <ItemTextField
                             label="클래스"
-                            value={(data as CharacterInterface).class}
+                            value={(data as CharacterInterface).charClass}
                             onChange={handleChange}
-                            name="class"
+                            name="charClass"
                             variant="outlined"
                         />
                     </ItemGrid>
                     <ItemGrid div={3}>
                         <ItemTextField
                             label="무장"
-                            value={(data as CharacterInterface).arm}
+                            value={(data as CharacterInterface).charArm}
                             onChange={handleChange}
-                            name="arm"
+                            name="charArm"
                             variant="outlined"
                         />
                     </ItemGrid>
                     <ItemGrid div={3}>
                         <ItemTextField
                             label="신장"
-                            value={(data as CharacterInterface).stature}
+                            value={(data as CharacterInterface).charStature}
                             onChange={handleChange}
-                            name="stature"
+                            name="charStature"
                             type="number"
                             InputProps={{
                                 endAdornment: (
@@ -216,9 +216,9 @@ const CharacterEdit: React.FC<EditorProps> = ({
                     <ItemGrid div={3}>
                         <ItemTextField
                             label="체중"
-                            value={(data as CharacterInterface).weight}
+                            value={(data as CharacterInterface).charWeight}
                             onChange={handleChange}
-                            name="weight"
+                            name="charWeight"
                             type="number"
                             InputProps={{
                                 endAdornment: (
@@ -237,8 +237,8 @@ const CharacterEdit: React.FC<EditorProps> = ({
                         <ItemTextField
                             label="등급"
                             select
-                            value={(data as CharacterInterface).grade}
-                            name="grade"
+                            value={(data as CharacterInterface).charGrade}
+                            name="charGrade"
                             onChange={handleChange}
                             variant="outlined"
                         >
@@ -255,8 +255,8 @@ const CharacterEdit: React.FC<EditorProps> = ({
                         <ItemTextField
                             label="최종 등급"
                             select
-                            value={(data as CharacterInterface).lastGrade}
-                            name="lastGrade"
+                            value={(data as CharacterInterface).charLastGrade}
+                            name="charLastGrade"
                             onChange={handleChange}
                             variant="outlined"
                             helperText="승급이 있을 경우만 선택"
@@ -277,8 +277,8 @@ const CharacterEdit: React.FC<EditorProps> = ({
                         <ItemTextField
                             label="타입"
                             select
-                            value={(data as CharacterInterface).type}
-                            name="type"
+                            value={(data as CharacterInterface).charType}
+                            name="charType"
                             onChange={handleChange}
                             variant="outlined"
                         >
@@ -294,8 +294,8 @@ const CharacterEdit: React.FC<EditorProps> = ({
                         <ItemTextField
                             label="역할"
                             select
-                            value={(data as CharacterInterface).role}
-                            name="role"
+                            value={(data as CharacterInterface).charRole}
+                            name="charRole"
                             onChange={handleChange}
                             variant="outlined"
                         >
@@ -315,8 +315,8 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             <ItemTextField
                                 label="그룹"
                                 select
-                                value={(data as CharacterInterface).groupId}
-                                name="groupId"
+                                value={(data as CharacterInterface).charGroupId}
+                                name="charGroupId"
                                 onChange={handleChange}
                                 variant="outlined"
                             >

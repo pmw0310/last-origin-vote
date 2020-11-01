@@ -11,6 +11,7 @@ import {
 } from 'type-graphql';
 import { Min, Max } from 'class-validator';
 import db from 'mongoose';
+import { ApolloError } from 'apollo-server-koa';
 import LikeModels from '../../models/like';
 import { UserVerifyResult } from '../../models/user';
 import BasicDataModel from '../../models/basicData';
@@ -105,7 +106,7 @@ export default class GroupResolver {
             const data = await BasicDataModel.findById(target).exec();
 
             if (!data) {
-                throw new Error('not find character');
+                throw new ApolloError('not find data');
             }
 
             data.likeStats.like += setLike;
@@ -121,7 +122,8 @@ export default class GroupResolver {
         } catch (e) {
             await session.abortTransaction();
             session.endSession();
-            throw new Error('error set like');
+            console.error(e);
+            throw new ApolloError('error set like');
         }
     }
 }

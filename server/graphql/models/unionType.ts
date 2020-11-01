@@ -9,10 +9,10 @@ export const BasicUnion = createUnionType<
     name: 'BasicUnion',
     types: () => [Character, Group],
     resolveType: (value) => {
-        if (value.basicType === BasicDataType.CHARACTER) {
+        if (value.type === BasicDataType.CHARACTER) {
             return Character;
         }
-        if (value.basicType === BasicDataType.GROUP) {
+        if (value.type === BasicDataType.GROUP) {
             return Group;
         }
         return undefined;

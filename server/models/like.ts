@@ -7,13 +7,13 @@ export interface LinkTypeModel extends Document {
     updateAt?: Date;
 }
 
-export interface LinkStatsTypeModel {
+export interface likeStatsTypeModel {
     like: number;
     notLike: number;
     updateAt?: Date;
 }
 
-export const LinkStatsSchema = new Schema<LinkStatsTypeModel>(
+export const likeStatsSchema = new Schema<likeStatsTypeModel>(
     {
         like: {
             type: Number,

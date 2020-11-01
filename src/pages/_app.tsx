@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
+import Head from 'next/head';
 import { ApolloProvider } from '@apollo/client';
 import AppBar from '../components/AppBar';
 import AppContainer from '../components/AppContainer';
@@ -17,6 +18,10 @@ export default function App({ Component, pageProps }: Props): JSX.Element {
 
     return (
         <ApolloProvider client={apolloClient}>
+            <Head>
+                <title>라스트 오리진 투표</title>
+                <link rel="shortcut icon" href="/favicon.ico" />
+            </Head>
             {pageProps.statusCode === 404 ? (
                 <Component {...pageProps} />
             ) : (

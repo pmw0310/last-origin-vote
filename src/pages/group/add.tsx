@@ -5,8 +5,8 @@ import { GroupInterface } from 'Module';
 import { gql, useMutation } from '@apollo/client';
 
 const ADD_GROUP = gql`
-    mutation setGroup($data: GroupInput!) {
-        addGroup(data: $data)
+    mutation setGroup($data: InputData!) {
+        add(data: $data)
     }
 `;
 
@@ -16,7 +16,7 @@ const AddGroup = (): JSX.Element => {
         tag: [],
         profileImage: '',
         description: '',
-        __typename: 'Group',
+        type: 'GROUP',
     });
 
     const [addGroup] = useMutation(ADD_GROUP);
@@ -25,11 +25,11 @@ const AddGroup = (): JSX.Element => {
     const save = async () => {
         await addGroup({
             variables: {
-                data: { ...data, basicType: 'GROUP', __typename: undefined },
+                data: { ...data, __typename: undefined },
             },
         });
 
-        router.push('/group');
+        router.push('/');
     };
 
     return (

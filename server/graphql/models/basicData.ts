@@ -1,12 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-    registerEnumType,
-    ID,
-    InterfaceType,
-    InputType,
-    Field,
-    Ctx,
-} from 'type-graphql';
+import { registerEnumType, ID, InterfaceType, Field, Ctx } from 'type-graphql';
 import { BasicDataType } from '../../models/basicData';
 import { UserVerifyResult } from '../../models/user';
 import LikeModels from '../../models/like';
@@ -17,39 +10,16 @@ registerEnumType(BasicDataType, {
     description: '베이스 타입',
 });
 
-@InterfaceType({ isAbstract: true })
-@InputType({ isAbstract: true })
-export class BasicDataInterface {
-    @Field({
-        description: '이름',
-        nullable: true,
-    })
+export class BasicDataInput {
     name?: string;
-    @Field({
-        description: '프로필 이미지 url',
-        nullable: true,
-    })
     profileImage?: string;
-    @Field(() => [String], {
-        description: '태그',
-        nullable: 'itemsAndList',
-        defaultValue: [],
-    })
     tag?: string[];
-    @Field({
-        description: '설명',
-        nullable: true,
-    })
     description?: string;
-    @Field(() => BasicDataType, {
-        description: '베이스 타입',
-        nullable: false,
-    })
-    basicType!: BasicDataType;
+    type!: BasicDataType;
 }
 
 @InterfaceType({ isAbstract: true })
-export class BasicData {
+export class BasicData implements BasicDataInput {
     @Field({
         description: '이름',
         nullable: true,
@@ -75,7 +45,7 @@ export class BasicData {
         description: '베이스 타입',
         nullable: false,
     })
-    basicType!: BasicDataType;
+    type!: BasicDataType;
 
     @Field(() => ID, {
         name: 'id',

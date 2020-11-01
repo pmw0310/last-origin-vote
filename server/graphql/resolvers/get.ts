@@ -30,7 +30,7 @@ enum FocusType {
 }
 
 enum SortType {
-    NUMBER = 'NUMBER',
+    NAME = 'NAME',
     LIKE = 'LIKE',
     NOT_LIKE = 'NOT_LIKE',
 }
@@ -95,10 +95,10 @@ class GetArgs {
     })
     search?: string;
     @Field(() => SortType, {
-        defaultValue: SortType.NUMBER,
+        defaultValue: SortType.NAME,
         description: '정렬 타입',
     })
-    sort?: SortType = SortType.NUMBER;
+    sort?: SortType = SortType.NAME;
 }
 
 @Resolver()
@@ -111,10 +111,10 @@ export default class GetResolver {
 
         switch (focus) {
             case FocusType.CHARACTER:
-                query = { ...query, basicType: BasicDataType.CHARACTER };
+                query = { ...query, type: BasicDataType.CHARACTER };
                 break;
             case FocusType.GROUP:
-                query = { ...query, basicType: BasicDataType.GROUP };
+                query = { ...query, type: BasicDataType.GROUP };
                 break;
         }
 
@@ -147,8 +147,8 @@ export default class GetResolver {
             options.page = page;
         }
         switch (sort) {
-            case SortType.NUMBER:
-                options.sort = { number: 'asc', name: 'asc' };
+            case SortType.NAME:
+                options.sort = { name: 'asc' };
                 break;
             case SortType.LIKE:
                 options.sort = { ['likeStats.like']: 'desc', name: 'asc' };
