@@ -403,7 +403,12 @@ const ListItem: React.FC<CharacterItemProps> = ({
                             <>
                                 {expanded &&
                                     (data as CharacterInterface).group && (
-                                        <CharacterInfo item xl={12}>
+                                        <CharacterInfo
+                                            item
+                                            xl={12}
+                                            lg={12}
+                                            sm={12}
+                                        >
                                             <Chip
                                                 variant="outlined"
                                                 color="primary"

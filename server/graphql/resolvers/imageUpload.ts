@@ -51,7 +51,10 @@ export default class ImageUploadResolver {
                             await unlinkSync(path);
 
                             return resolve(
-                                result?.url.replace('://res.', '://res-5.'),
+                                result?.url.replace(
+                                    'http://res.',
+                                    'https://res-5.',
+                                ),
                             );
                         },
                     );
