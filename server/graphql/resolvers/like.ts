@@ -107,6 +107,8 @@ export default class GroupResolver {
 
             if (!data) {
                 throw new ApolloError('not find data');
+            } else if (!data.likeStats) {
+                data.likeStats = { like: 0, notLike: 0 };
             }
 
             data.likeStats.like += setLike;
