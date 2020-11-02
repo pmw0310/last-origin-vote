@@ -41,6 +41,16 @@ dotenv.config();
                     });
                 }
 
+                // const compareData = await StatsModel.find({
+                //     type: StatsType.LINK,
+                // })
+                //     .sort('-createdAt')
+                //     .limit(2)
+                //     .sort('-data.like')
+                //     .exec();
+
+                // console.log(compareData);
+
                 break;
         }
 
