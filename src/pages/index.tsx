@@ -117,6 +117,11 @@ const GET_LIST = gql`
                         name
                         profileImage
                     }
+                    likeStats {
+                        like
+                        notLike
+                    }
+                    like
                 }
             }
             pageInfo {
