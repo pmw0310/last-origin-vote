@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import dotenv from 'dotenv-flow';
 import mongooseConnect, { mongooseDisconnect } from './lib/mongooseConnect';
 import BasicDataModel from './models/basicData';
@@ -18,20 +19,45 @@ dotenv.config();
 
         switch (arg) {
             case 'like':
-                const data = await BasicDataModel.find()
-                    .exists('likeStats', true)
-                    .select(
-                        '_id type likeStats likeStats.like likeStats.notLike',
-                    );
+                const data = await BasicDataModel.aggregate()
+                    .project({
+                        _id: 1,
+                        type: 1,
+                        like: { $ifNull: ['$likeStats.like', 0] },
+                        notLike: { $ifNull: ['$likeStats.notLike', 0] },
+                        likeGrade: {
+                            $ifNull: [
+                                {
+                                    $add: [
+                                        '$likeStats.like',
+                                        {
+                                            $multiply: [
+                                                '$likeStats.notLike',
+                                                -1,
+                                            ],
+                                        },
+                                    ],
+                                },
+                                0,
+                            ],
+                        },
+                    })
+                    .exec();
+
                 const stats = new StatsModel({
                     type: StatsType.LINK,
                     data,
                 });
                 await stats.save();
 
-                const oldData = await StatsModel.find({ type: StatsType.LINK })
-                    .sort('-createdAt')
-                    .skip(30)
+                const date = new Date();
+                date.setDate(date.getDate() - 7);
+                date.setHours(0, 0, 0, 0);
+
+                const oldData = await StatsModel.find({
+                    type: StatsType.LINK,
+                    createdAt: { $lte: date },
+                })
                     .select('_id')
                     .exec();
 
@@ -41,22 +67,13 @@ dotenv.config();
                     });
                 }
 
-                // const compareData = await StatsModel.find({
-                //     type: StatsType.LINK,
-                // })
-                //     .sort('-createdAt')
-                //     .limit(2)
-                //     .sort('-data.like')
-                //     .exec();
-
-                // console.log(compareData);
-
                 break;
         }
 
         await mongooseDisconnect();
         process.exit();
     } catch (e) {
+        console.error(e);
         process.exit(1);
     }
 })();
