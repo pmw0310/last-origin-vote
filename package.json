@@ -30,6 +30,7 @@
         "cloudinary": "^1.23.0",
         "cross-env": "^7.0.2",
         "dotenv-flow": "^3.2.0",
+        "fs-capacitor": "^6.2.0",
         "graphql": "15.3.0",
         "graphql-upload": "^11.0.0",
         "jsonwebtoken": "^8.5.1",
