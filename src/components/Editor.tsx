@@ -7,6 +7,8 @@ import {
     Grid,
     MenuItem,
     CircularProgress,
+    Checkbox,
+    FormControlLabel,
 } from '@material-ui/core';
 import styled from 'styled-components';
 import { CharacterInterface, GroupInterface } from 'Module';
@@ -133,6 +135,12 @@ const CharacterEdit: React.FC<EditorProps> = ({
         setData({ ...data, [event.target.name]: value });
     };
 
+    const handleCheckboxChange = (
+        event: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        setData({ ...data, [event.target.name]: event.target.checked });
+    };
+
     const handleTagAdd = (addTag: string, time: number) => {
         // 유니코드에서 onKeyDown 이벤트가 2번입력되는 현상을 막기위한 코드
         if (last === 0 || time - last > 250) {
@@ -230,6 +238,21 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             }}
                             variant="outlined"
                             helperText="1t = 1000kg"
+                        />
+                    </ItemGrid>
+                    <ItemGrid div={3}>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={
+                                        (data as CharacterInterface).charIsAgs
+                                    }
+                                    onChange={handleCheckboxChange}
+                                    name="charIsAgs"
+                                    color="primary"
+                                />
+                            }
+                            label="AGS 로봇"
                         />
                     </ItemGrid>
                     <ItemGrid div={1}>

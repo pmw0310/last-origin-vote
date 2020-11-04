@@ -42,6 +42,7 @@ export class CharacterInput {
     charArm?: string;
     charStature?: number;
     charWeight?: number;
+    charIsAgs?: boolean;
 }
 
 @ObjectType({ implements: BasicData })
@@ -96,6 +97,11 @@ export class Character extends BasicData implements CharacterInput {
         nullable: true,
     })
     charWeight?: number;
+    @Field(() => Boolean, {
+        description: 'AGS 로봇 여부',
+        nullable: true,
+    })
+    charIsAgs?: boolean;
 
     @Field(() => Group, {
         description: '소속된 부대 정보',

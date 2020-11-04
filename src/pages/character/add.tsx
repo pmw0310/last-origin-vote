@@ -26,6 +26,7 @@ const AddCharacter = (): JSX.Element => {
         charArm: '',
         charStature: 0,
         charWeight: 0,
+        charIsAgs: false,
         type: 'CHARACTER',
     });
 

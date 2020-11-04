@@ -23,6 +23,7 @@ const GET_CHARACTER = gql`
                     charArm
                     charStature
                     charWeight
+                    charIsAgs
                     type
                 }
             }
@@ -54,6 +55,7 @@ const UpdateCharacter = (): JSX.Element => {
         charArm: '',
         charStature: 0,
         charWeight: 0,
+        charIsAgs: false,
         type: 'CHARACTER',
     });
     const [getCharacter, { data: char, error }] = useLazyQuery(GET_CHARACTER, {

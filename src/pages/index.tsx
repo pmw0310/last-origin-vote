@@ -96,6 +96,7 @@ const GET_LIST = gql`
                     charArm
                     charStature
                     charWeight
+                    charIsAgs
                     group {
                         name
                         profileImage

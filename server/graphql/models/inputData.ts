@@ -88,4 +88,9 @@ export class InputData implements BasicDataInput, CharacterInput, GroupInput {
         nullable: true,
     })
     charWeight?: number;
+    @Field(() => Boolean, {
+        description: 'AGS 로봇 여부',
+        nullable: true,
+    })
+    charIsAgs?: boolean;
 }

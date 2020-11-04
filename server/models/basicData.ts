@@ -30,6 +30,7 @@ export interface CharacterModel extends Document, BasicData {
     charArm?: string;
     charStature: number;
     charWeight: number;
+    charIsAgs: boolean;
 }
 
 export interface GroupModel extends Document, BasicData {}
@@ -101,6 +102,7 @@ const BasicDataSchema = new Schema<CharacterModel | GroupModel>({
     charArm: String,
     charStature: { type: Number, min: 0 },
     charWeight: { type: Number, min: 0 },
+    charIsAgs: Boolean,
 });
 
 BasicDataSchema.plugin(mongoosePaginate);

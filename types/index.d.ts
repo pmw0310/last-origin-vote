@@ -27,6 +27,7 @@ declare module 'Module' {
         charArm?: string;
         charStature?: number;
         charWeight?: number;
+        charIsAgs?: boolean;
         description?: string;
         id?: string;
         createdAt?: number | Date;

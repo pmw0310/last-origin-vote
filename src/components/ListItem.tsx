@@ -437,7 +437,12 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                     <CharacterInfoChip
                                         variant="outlined"
                                         color="primary"
-                                        label="신장"
+                                        label={
+                                            (data as CharacterInterface)
+                                                .charIsAgs
+                                                ? '전고'
+                                                : '신장'
+                                        }
                                         size="small"
                                     />
                                     <Typography variant="subtitle2">
@@ -448,7 +453,12 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                     <CharacterInfoChip
                                         variant="outlined"
                                         color="primary"
-                                        label="체중"
+                                        label={
+                                            (data as CharacterInterface)
+                                                .charIsAgs
+                                                ? '중량'
+                                                : '체중'
+                                        }
                                         size="small"
                                     />
                                     <Typography variant="subtitle2">
