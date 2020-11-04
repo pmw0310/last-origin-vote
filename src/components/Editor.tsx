@@ -211,6 +211,7 @@ const CharacterEdit: React.FC<EditorProps> = ({
                                 ),
                             }}
                             variant="outlined"
+                            helperText="1m = 100cm"
                         />
                     </ItemGrid>
                     <ItemGrid div={3}>
@@ -228,6 +229,7 @@ const CharacterEdit: React.FC<EditorProps> = ({
                                 ),
                             }}
                             variant="outlined"
+                            helperText="1t = 1000kg"
                         />
                     </ItemGrid>
                     <ItemGrid div={1}>

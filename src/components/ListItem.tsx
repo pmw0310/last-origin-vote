@@ -241,22 +241,22 @@ const ListItem: React.FC<CharacterItemProps> = ({
     const toStatureText = (): string => {
         const stature = (data as CharacterInterface).charStature as number;
         if (stature <= 0) {
-            return '?kg';
-        } else if (stature < 500) {
-            return `${stature}kg`;
+            return '?cm';
+        } else if (stature < 200) {
+            return `${stature}cm`;
         } else {
-            return `${stature / 1000}t`;
+            return `${stature / 100}m`;
         }
     };
 
     const toWeightText = (): string => {
         const weight = (data as CharacterInterface).charWeight as number;
         if (weight <= 0) {
-            return '?cm';
-        } else if (weight < 200) {
-            return `${weight}cm`;
+            return '?kg';
+        } else if (weight < 500) {
+            return `${weight}kg`;
         } else {
-            return `${weight / 100}m`;
+            return `${weight / 1000}t`;
         }
     };
 
