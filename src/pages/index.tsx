@@ -209,7 +209,7 @@ const CharacterList = (): JSX.Element => {
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(() => event.target.value);
+        setSearch(event.target.value);
     };
     const handleSelectChange = (
         event: React.ChangeEvent<{ name?: string; value: unknown }>,
@@ -223,15 +223,15 @@ const CharacterList = (): JSX.Element => {
 
         switch (event.target.name) {
             case 'focus':
-                setFocus(() => value);
+                setFocus(value);
                 option.focus = value;
                 break;
             case 'sort':
-                setSort(() => value);
+                setSort(value);
                 option.sort = value;
                 break;
         }
-        setPage(() => 1);
+        setPage(1);
         updatePage(option);
     };
 
@@ -240,22 +240,22 @@ const CharacterList = (): JSX.Element => {
     ) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            setPage(() => 1);
+            setPage(1);
             updatePage({ page: 1 });
         }
     };
 
     const handleSearchButton = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        setPage(() => 1);
+        setPage(1);
         updatePage({ page: 1 });
     };
 
     const handleSearchClearButton = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
         if (search) {
-            setSearch(() => '');
-            setPage(() => 1);
+            setSearch('');
+            setPage(1);
             updatePage({ page: 1, search: '' });
         }
     };
