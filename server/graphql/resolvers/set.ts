@@ -4,11 +4,6 @@ import { ApolloError } from 'apollo-server-koa';
 import { Types } from 'mongoose';
 import BasicDataModel from '../../models/basicData';
 import { InputData } from '../models/inputData';
-import {
-    CharacterGrade,
-    CharacterType,
-    CharacterRole,
-} from '../../models/basicData';
 
 @Resolver()
 export default class CharacterResolver {
@@ -20,18 +15,6 @@ export default class CharacterResolver {
                 ...data,
                 charGroupId: data.charGroupId
                     ? Types.ObjectId(data.charGroupId)
-                    : undefined,
-                charGrade: data.charGrade
-                    ? CharacterGrade[data.charGrade]
-                    : undefined,
-                charLastGrade: data.charLastGrade
-                    ? CharacterGrade[data.charLastGrade]
-                    : undefined,
-                charType: data.charType
-                    ? CharacterType[data.charType]
-                    : undefined,
-                charRole: data.charRole
-                    ? CharacterRole[data.charRole]
                     : undefined,
             });
             await doc.save();
