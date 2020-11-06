@@ -22,6 +22,11 @@ import BasicDataModel, {
 } from '../../models/basicData';
 import { PageInfo } from '../relayStylePagination';
 import { BasicUnion } from '../models/unionType';
+import {
+    CharacterGrade,
+    CharacterType,
+    CharacterRole,
+} from '../../models/basicData';
 
 enum FocusType {
     ALL = 'ALL',
@@ -200,8 +205,29 @@ export default class GetResolver {
 
         const data = new GetRelayStylePagination();
 
+        const getName = (_enum: any, value: any): string => {
+            return _enum[_enum[value]];
+        };
+
         data.edges = docs.map<GetEdges>((d) => ({
-            node: d,
+            node: {
+                ...d,
+                charGrade: (d as CharacterModel).charGrade
+                    ? getName(CharacterGrade, (d as CharacterModel).charGrade)
+                    : undefined,
+                charLastGrade: (d as CharacterModel).charLastGrade
+                    ? getName(
+                          CharacterGrade,
+                          (d as CharacterModel).charLastGrade,
+                      )
+                    : undefined,
+                charType: (d as CharacterModel).charType
+                    ? getName(CharacterType, (d as CharacterModel).charType)
+                    : undefined,
+                charRole: (d as CharacterModel).charRole
+                    ? getName(CharacterRole, (d as CharacterModel).charRole)
+                    : undefined,
+            },
             cursor: d.id,
         }));
 

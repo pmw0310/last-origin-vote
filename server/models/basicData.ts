@@ -36,29 +36,30 @@ export interface CharacterModel extends Document, BasicData {
 export interface GroupModel extends Document, BasicData {}
 
 export enum CharacterGrade {
-    NONE = 'NONE',
-    B = 'B',
-    A = 'A',
-    S = 'S',
-    SS = 'SS',
+    B = 1,
+    A = 2,
+    S = 3,
+    SS = 4,
 }
 
 export enum CharacterType {
-    NONE = 'NONE',
-    LIGHT = 'LIGHT',
-    FLYING = 'FLYING',
-    HEAVY = 'HEAVY',
+    LIGHT = 1,
+    FLYING = 2,
+    HEAVY = 3,
 }
 
 export enum CharacterRole {
-    NONE = 'NONE',
-    ASSAULT = 'ASSAULT',
-    SUPPORT = 'SUPPORT',
-    DEFENDER = 'DEFENDER',
+    ASSAULT = 1,
+    SUPPORT = 2,
+    DEFENDER = 3,
 }
 
 const BasicDataSchema = new Schema<CharacterModel | GroupModel>({
-    name: { type: String, index: true },
+    name: {
+        type: String,
+        index: true,
+        unique: true,
+    },
     profileImage: String,
     createdAt: {
         type: Date,
@@ -78,24 +79,25 @@ const BasicDataSchema = new Schema<CharacterModel | GroupModel>({
         type: String,
         enum: enumToArray(BasicDataType),
         index: true,
+        required: true,
     },
 
     charNumber: { type: Number },
     charGroupId: { type: Types.ObjectId },
     charGrade: {
-        type: String,
+        type: Number,
         enum: enumToArray(CharacterGrade),
     },
     charLastGrade: {
-        type: String,
+        type: Number,
         enum: enumToArray(CharacterGrade),
     },
     charType: {
-        type: String,
+        type: Number,
         enum: enumToArray(CharacterType),
     },
     charRole: {
-        type: String,
+        type: Number,
         enum: enumToArray(CharacterRole),
     },
     charClass: String,
