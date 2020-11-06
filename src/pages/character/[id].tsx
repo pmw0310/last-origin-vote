@@ -80,6 +80,11 @@ const UpdateCharacter = (): JSX.Element => {
             return;
         }
         const data: CharacterInterface = char.get.data[0];
+        if (data.charGrade) data.charGrade = 'NONE';
+        if (data.charLastGrade) data.charLastGrade = 'NONE';
+        if (data.charType) data.charType = 'NONE';
+        if (data.charRole) data.charRole = 'NONE';
+
         setData({
             ...data,
             charGroupId: data.charGroupId ? data.charGroupId : '',
@@ -96,6 +101,16 @@ const UpdateCharacter = (): JSX.Element => {
                         !data.charNumber && (data.charNumber as number) <= 0
                             ? 99999
                             : data.charNumber,
+                    charGrade:
+                        data.charGrade === 'NONE' ? undefined : data.charGrade,
+                    charLastGrade:
+                        data.charLastGrade === 'NONE'
+                            ? undefined
+                            : data.charLastGrade,
+                    charType:
+                        data.charType === 'NONE' ? undefined : data.charType,
+                    charRole:
+                        data.charRole === 'NONE' ? undefined : data.charRole,
                     __typename: undefined,
                 },
             },

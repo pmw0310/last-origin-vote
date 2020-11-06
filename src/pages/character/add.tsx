@@ -42,6 +42,16 @@ const AddCharacter = (): JSX.Element => {
                         !data.charNumber && (data.charNumber as number) <= 0
                             ? 99999
                             : data.charNumber,
+                    charGrade:
+                        data.charGrade === 'NONE' ? undefined : data.charGrade,
+                    charLastGrade:
+                        data.charLastGrade === 'NONE'
+                            ? undefined
+                            : data.charLastGrade,
+                    charType:
+                        data.charType === 'NONE' ? undefined : data.charType,
+                    charRole:
+                        data.charRole === 'NONE' ? undefined : data.charRole,
                     __typename: undefined,
                 },
             },

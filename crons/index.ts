@@ -3,6 +3,7 @@ import dotenv from 'dotenv-flow';
 import mongooseConnect, { mongooseDisconnect } from './lib/mongooseConnect';
 import BasicDataModel from './models/basicData';
 import StatsModel, { StatsType } from './models/stats';
+import { BasicDataType } from './models/basicData';
 
 const arg = process.argv[2];
 
@@ -68,6 +69,13 @@ dotenv.config();
                 }
 
                 break;
+            // case 'test':
+            //     await BasicDataModel.updateMany(
+            //         { type: BasicDataType.CHARACTER, charRole: 'DEFENDER' },
+            //         { charRole: 3 },
+            //     ).exec();
+
+            //     break;
         }
 
         await mongooseDisconnect();

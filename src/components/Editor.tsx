@@ -289,7 +289,6 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             <MenuItem value={'NONE'}>
                                 <em>없음</em>
                             </MenuItem>
-                            <MenuItem value={'B'}>B</MenuItem>
                             <MenuItem value={'A'}>A</MenuItem>
                             <MenuItem value={'S'}>S</MenuItem>
                             <MenuItem value={'SS'}>SS</MenuItem>

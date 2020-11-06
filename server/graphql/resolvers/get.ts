@@ -205,27 +205,22 @@ export default class GetResolver {
 
         const data = new GetRelayStylePagination();
 
-        const getName = (_enum: any, value: any): string => {
-            return _enum[_enum[value]];
-        };
-
         data.edges = docs.map<GetEdges>((d) => ({
             node: {
                 ...d,
                 charGrade: (d as CharacterModel).charGrade
-                    ? getName(CharacterGrade, (d as CharacterModel).charGrade)
+                    ? CharacterGrade[(d as CharacterModel).charGrade as number]
                     : undefined,
                 charLastGrade: (d as CharacterModel).charLastGrade
-                    ? getName(
-                          CharacterGrade,
-                          (d as CharacterModel).charLastGrade,
-                      )
+                    ? CharacterGrade[
+                          (d as CharacterModel).charLastGrade as number
+                      ]
                     : undefined,
                 charType: (d as CharacterModel).charType
-                    ? getName(CharacterType, (d as CharacterModel).charType)
+                    ? CharacterType[(d as CharacterModel).charType as number]
                     : undefined,
                 charRole: (d as CharacterModel).charRole
-                    ? getName(CharacterRole, (d as CharacterModel).charRole)
+                    ? CharacterRole[(d as CharacterModel).charRole as number]
                     : undefined,
             },
             cursor: d.id,
@@ -239,6 +234,8 @@ export default class GetResolver {
             totalPages,
             endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
         };
+
+        console.log('test', data.edges[0].node);
 
         return data;
     }
