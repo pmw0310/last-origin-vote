@@ -1,12 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-    Field,
-    ObjectType,
-    Int,
-    Float,
-    ID,
-    registerEnumType,
-} from 'type-graphql';
+import { Field, ObjectType, Int, Float, ID } from 'type-graphql';
 import BasicDataModel, {
     CharacterGrade,
     CharacterType,
@@ -15,21 +8,6 @@ import BasicDataModel, {
 } from '../../models/basicData';
 import { BasicData } from '../models/basicData';
 import { Group } from './group';
-
-registerEnumType(CharacterGrade, {
-    name: 'CharacterGrade',
-    description: '케릭터 등급',
-});
-
-registerEnumType(CharacterType, {
-    name: 'CharacterType',
-    description: '케릭터 타입',
-});
-
-registerEnumType(CharacterRole, {
-    name: 'CharacterRole',
-    description: '케릭터 역할',
-});
 
 export class CharacterInput {
     charNumber?: number;
@@ -57,26 +35,26 @@ export class Character extends BasicData implements CharacterInput {
         nullable: true,
     })
     charGroupId?: string;
-    @Field(() => CharacterGrade, {
+    @Field(() => Int, {
         description: '등급',
         nullable: true,
     })
-    charGrade?: CharacterGrade;
-    @Field(() => CharacterGrade, {
+    charGrade?: number;
+    @Field(() => Int, {
         description: '최종 등급',
         nullable: true,
     })
-    charLastGrade?: CharacterGrade;
-    @Field(() => CharacterType, {
+    charLastGrade?: number;
+    @Field(() => Int, {
         description: '타입',
         nullable: true,
     })
-    charType?: CharacterType;
-    @Field(() => CharacterRole, {
+    charType?: number;
+    @Field(() => Int, {
         description: '역할',
         nullable: true,
     })
-    charRole?: CharacterRole;
+    charRole?: number;
     @Field({
         description: '클레스',
         nullable: true,

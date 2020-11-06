@@ -47,10 +47,10 @@ const UpdateCharacter = (): JSX.Element => {
         description: '',
         charNumber: 0,
         charGroupId: '',
-        charGrade: 'NONE',
-        charLastGrade: 'NONE',
-        charType: 'NONE',
-        charRole: 'NONE',
+        charGrade: 0,
+        charLastGrade: 0,
+        charType: 0,
+        charRole: 0,
         charClass: '',
         charArm: '',
         charStature: 0,
@@ -80,10 +80,10 @@ const UpdateCharacter = (): JSX.Element => {
             return;
         }
         const data: CharacterInterface = char.get.data[0];
-        if (data.charGrade) data.charGrade = 'NONE';
-        if (data.charLastGrade) data.charLastGrade = 'NONE';
-        if (data.charType) data.charType = 'NONE';
-        if (data.charRole) data.charRole = 'NONE';
+        if (!data.charGrade) data.charGrade = 0;
+        if (!data.charLastGrade) data.charLastGrade = 0;
+        if (!data.charType) data.charType = 0;
+        if (!data.charRole) data.charRole = 0;
 
         setData({
             ...data,
@@ -102,15 +102,13 @@ const UpdateCharacter = (): JSX.Element => {
                             ? 99999
                             : data.charNumber,
                     charGrade:
-                        data.charGrade === 'NONE' ? undefined : data.charGrade,
+                        data.charGrade === 0 ? undefined : data.charGrade,
                     charLastGrade:
-                        data.charLastGrade === 'NONE'
+                        data.charLastGrade === 0
                             ? undefined
                             : data.charLastGrade,
-                    charType:
-                        data.charType === 'NONE' ? undefined : data.charType,
-                    charRole:
-                        data.charRole === 'NONE' ? undefined : data.charRole,
+                    charType: data.charType === 0 ? undefined : data.charType,
+                    charRole: data.charRole === 0 ? undefined : data.charRole,
                     __typename: undefined,
                 },
             },

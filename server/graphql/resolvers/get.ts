@@ -22,11 +22,6 @@ import BasicDataModel, {
 } from '../../models/basicData';
 import { PageInfo } from '../relayStylePagination';
 import { BasicUnion } from '../models/unionType';
-import {
-    CharacterGrade,
-    CharacterType,
-    CharacterRole,
-} from '../../models/basicData';
 
 enum FocusType {
     ALL = 'ALL',
@@ -178,19 +173,19 @@ export default class GetResolver {
                 options.sort = { name: orderType };
                 break;
             case SortType.NUMBER:
-                options.sort = { charNumber: orderType, name: 'asc' };
+                options.sort = { charNumber: orderType };
                 break;
             case SortType.STATURE:
-                options.sort = { charStature: orderType, name: 'asc' };
+                options.sort = { charStature: orderType };
                 break;
             case SortType.WEIGHT:
-                options.sort = { charWeight: orderType, name: 'asc' };
+                options.sort = { charWeight: orderType };
                 break;
             case SortType.GRADE:
-                options.sort = { charGradeOrder: orderType, name: 'asc' };
+                options.sort = { charGrade: orderType };
                 break;
             case SortType.LAST_GRADE:
-                options.sort = { charLastGradeOrder: orderType, name: 'asc' };
+                options.sort = { charLastGrade: orderType };
                 break;
         }
 
@@ -204,27 +199,11 @@ export default class GetResolver {
         } = await BasicDataModel.paginate(query, options);
 
         const data = new GetRelayStylePagination();
+        data.edges = [];
 
-        data.edges = docs.map<GetEdges>((d) => ({
-            node: {
-                ...d,
-                charGrade: (d as CharacterModel).charGrade
-                    ? CharacterGrade[(d as CharacterModel).charGrade as number]
-                    : undefined,
-                charLastGrade: (d as CharacterModel).charLastGrade
-                    ? CharacterGrade[
-                          (d as CharacterModel).charLastGrade as number
-                      ]
-                    : undefined,
-                charType: (d as CharacterModel).charType
-                    ? CharacterType[(d as CharacterModel).charType as number]
-                    : undefined,
-                charRole: (d as CharacterModel).charRole
-                    ? CharacterRole[(d as CharacterModel).charRole as number]
-                    : undefined,
-            },
-            cursor: d.id,
-        }));
+        for (const doc of docs) {
+            data.edges.push({ node: doc, cursor: doc.id });
+        }
 
         data.pageInfo = {
             hasNextPage,
@@ -234,8 +213,6 @@ export default class GetResolver {
             totalPages,
             endCursor: docs.length > 0 ? docs[docs.length - 1].id : undefined,
         };
-
-        console.log('test', data.edges[0].node);
 
         return data;
     }

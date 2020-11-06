@@ -267,13 +267,13 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             onChange={handleChange}
                             variant="outlined"
                         >
-                            <MenuItem value={'NONE'}>
+                            <MenuItem value={0}>
                                 <em>없음</em>
                             </MenuItem>
-                            <MenuItem value={'B'}>B</MenuItem>
-                            <MenuItem value={'A'}>A</MenuItem>
-                            <MenuItem value={'S'}>S</MenuItem>
-                            <MenuItem value={'SS'}>SS</MenuItem>
+                            <MenuItem value={1}>B</MenuItem>
+                            <MenuItem value={2}>A</MenuItem>
+                            <MenuItem value={3}>S</MenuItem>
+                            <MenuItem value={4}>SS</MenuItem>
                         </ItemTextField>
                     </ItemGrid>
                     <ItemGrid div={2}>
@@ -286,12 +286,12 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             variant="outlined"
                             helperText="승급이 있을 경우만 선택"
                         >
-                            <MenuItem value={'NONE'}>
+                            <MenuItem value={0}>
                                 <em>없음</em>
                             </MenuItem>
-                            <MenuItem value={'A'}>A</MenuItem>
-                            <MenuItem value={'S'}>S</MenuItem>
-                            <MenuItem value={'SS'}>SS</MenuItem>
+                            <MenuItem value={2}>A</MenuItem>
+                            <MenuItem value={3}>S</MenuItem>
+                            <MenuItem value={4}>SS</MenuItem>
                         </ItemTextField>
                     </ItemGrid>
                     <ItemGrid div={1}>
@@ -306,12 +306,12 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             onChange={handleChange}
                             variant="outlined"
                         >
-                            <MenuItem value={'NONE'}>
+                            <MenuItem value={0}>
                                 <em>없음</em>
                             </MenuItem>
-                            <MenuItem value={'LIGHT'}>경장형</MenuItem>
-                            <MenuItem value={'FLYING'}>기동형</MenuItem>
-                            <MenuItem value={'HEAVY'}>중장형</MenuItem>
+                            <MenuItem value={1}>경장형</MenuItem>
+                            <MenuItem value={2}>기동형</MenuItem>
+                            <MenuItem value={3}>중장형</MenuItem>
                         </ItemTextField>
                     </ItemGrid>
                     <ItemGrid div={2}>
@@ -323,12 +323,12 @@ const CharacterEdit: React.FC<EditorProps> = ({
                             onChange={handleChange}
                             variant="outlined"
                         >
-                            <MenuItem value={'NONE'}>
+                            <MenuItem value={0}>
                                 <em>없음</em>
                             </MenuItem>
-                            <MenuItem value={'ASSAULT'}>공격기</MenuItem>
-                            <MenuItem value={'SUPPORT'}>지원기</MenuItem>
-                            <MenuItem value={'DEFENDER'}>보호기</MenuItem>
+                            <MenuItem value={1}>공격기</MenuItem>
+                            <MenuItem value={2}>지원기</MenuItem>
+                            <MenuItem value={3}>보호기</MenuItem>
                         </ItemTextField>
                     </ItemGrid>
                     <ItemGrid div={1}>

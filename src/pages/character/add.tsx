@@ -18,10 +18,10 @@ const AddCharacter = (): JSX.Element => {
         description: '',
         charNumber: 0,
         charGroupId: '',
-        charGrade: 'NONE',
-        charLastGrade: 'NONE',
-        charType: 'NONE',
-        charRole: 'NONE',
+        charGrade: 0,
+        charLastGrade: 0,
+        charType: 0,
+        charRole: 0,
         charClass: '',
         charArm: '',
         charStature: 0,
@@ -43,15 +43,13 @@ const AddCharacter = (): JSX.Element => {
                             ? 99999
                             : data.charNumber,
                     charGrade:
-                        data.charGrade === 'NONE' ? undefined : data.charGrade,
+                        data.charGrade === 0 ? undefined : data.charGrade,
                     charLastGrade:
-                        data.charLastGrade === 'NONE'
+                        data.charLastGrade === 0
                             ? undefined
                             : data.charLastGrade,
-                    charType:
-                        data.charType === 'NONE' ? undefined : data.charType,
-                    charRole:
-                        data.charRole === 'NONE' ? undefined : data.charRole,
+                    charType: data.charType === 0 ? undefined : data.charType,
+                    charRole: data.charRole === 0 ? undefined : data.charRole,
                     __typename: undefined,
                 },
             },

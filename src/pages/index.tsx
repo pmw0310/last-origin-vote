@@ -218,6 +218,7 @@ const CharacterList = (): JSX.Element => {
         event: React.ChangeEvent<{ name?: string; value: unknown }>,
     ) => {
         const value: string = event.target.value as string;
+
         const option = {
             page: 1,
             focus,
@@ -229,6 +230,11 @@ const CharacterList = (): JSX.Element => {
             case 'focus':
                 setFocus(value);
                 option.focus = value;
+
+                if (value === 'GROUP') {
+                    setSort('NAME');
+                    option.sort = 'NAME';
+                }
                 break;
             case 'sort':
                 setSort(value);
@@ -239,6 +245,7 @@ const CharacterList = (): JSX.Element => {
                 option.order = value;
                 break;
         }
+
         setPage(1);
         updatePage(option);
     };
@@ -328,7 +335,6 @@ const CharacterList = (): JSX.Element => {
                             onChange={handleSelectChange}
                             label="유형"
                         >
-                            <MenuItem value={'ALL'}>모두</MenuItem>
                             <MenuItem value={'CHARACTER'}>캐릭터</MenuItem>
                             <MenuItem value={'GROUP'}>부대</MenuItem>
                         </Select>
@@ -336,19 +342,33 @@ const CharacterList = (): JSX.Element => {
                 </Grid>
                 <Grid item lg={2} md={4}>
                     <TypeForm variant="outlined">
-                        <Select
-                            value={sort}
-                            name="sort"
-                            onChange={handleSelectChange}
-                            label="정렬"
-                        >
-                            <MenuItem value={'NAME'}>이름</MenuItem>
-                            <MenuItem value={'NUMBER'}>번호</MenuItem>
-                            <MenuItem value={'GRADE'}>등급</MenuItem>
-                            <MenuItem value={'LAST_GRADE'}>최종 등급</MenuItem>
-                            <MenuItem value={'STATURE'}>신장</MenuItem>
-                            <MenuItem value={'WEIGHT'}>체중</MenuItem>
-                        </Select>
+                        {focus === 'CHARACTER' && (
+                            <Select
+                                value={sort}
+                                name="sort"
+                                onChange={handleSelectChange}
+                                label="정렬"
+                            >
+                                <MenuItem value={'NAME'}>이름</MenuItem>
+                                <MenuItem value={'NUMBER'}>번호</MenuItem>
+                                <MenuItem value={'GRADE'}>등급</MenuItem>
+                                <MenuItem value={'LAST_GRADE'}>
+                                    최종 등급
+                                </MenuItem>
+                                <MenuItem value={'STATURE'}>신장</MenuItem>
+                                <MenuItem value={'WEIGHT'}>체중</MenuItem>
+                            </Select>
+                        )}
+                        {focus === 'GROUP' && (
+                            <Select
+                                value={sort}
+                                name="sort"
+                                onChange={handleSelectChange}
+                                label="정렬"
+                            >
+                                <MenuItem value={'NAME'}>이름</MenuItem>
+                            </Select>
+                        )}
                     </TypeForm>
                 </Grid>
                 <Grid item lg={2} md={4}>

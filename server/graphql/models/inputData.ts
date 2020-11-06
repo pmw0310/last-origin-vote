@@ -1,9 +1,4 @@
 import { InputType, Field, Int, Float, ID } from 'type-graphql';
-import {
-    CharacterGrade,
-    CharacterType,
-    CharacterRole,
-} from '../../models/basicData';
 import { BasicDataType } from '../../models/basicData';
 import { BasicDataInput } from './basicData';
 import { CharacterInput } from './character';
@@ -48,26 +43,26 @@ export class InputData implements BasicDataInput, CharacterInput, GroupInput {
         nullable: true,
     })
     charGroupId?: string;
-    @Field(() => CharacterGrade, {
+    @Field(() => Int, {
         description: '등급',
         nullable: true,
     })
-    charGrade?: CharacterGrade;
-    @Field(() => CharacterGrade, {
+    charGrade?: number;
+    @Field(() => Int, {
         description: '최종 등급',
         nullable: true,
     })
-    charLastGrade?: CharacterGrade;
-    @Field(() => CharacterType, {
+    charLastGrade?: number;
+    @Field(() => Int, {
         description: '타입',
         nullable: true,
     })
-    charType?: CharacterType;
-    @Field(() => CharacterRole, {
+    charType?: number;
+    @Field(() => Int, {
         description: '역할',
         nullable: true,
     })
-    charRole?: CharacterRole;
+    charRole?: number;
     @Field({
         description: '클레스',
         nullable: true,

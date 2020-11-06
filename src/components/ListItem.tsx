@@ -172,8 +172,8 @@ const ListItem: React.FC<CharacterItemProps> = ({
 
     const router = useRouter();
 
-    const isNone = (txt?: string): boolean => {
-        return !txt || txt === 'NONE';
+    const isNone = (txt?: number): boolean => {
+        return !txt;
     };
 
     const toRoleText = (): string => {
@@ -188,13 +188,13 @@ const ListItem: React.FC<CharacterItemProps> = ({
         }
 
         switch (charType) {
-            case 'LIGHT':
+            case 1:
                 text += '경장';
                 break;
-            case 'FLYING':
+            case 2:
                 text += '기동';
                 break;
-            case 'HEAVY':
+            case 3:
                 text += '중장';
                 break;
         }
@@ -202,13 +202,13 @@ const ListItem: React.FC<CharacterItemProps> = ({
         text += isRole ? ' ' : '형';
 
         switch (charRole) {
-            case 'ASSAULT':
+            case 1:
                 text += '공격기';
                 break;
-            case 'SUPPORT':
+            case 2:
                 text += '지원기';
                 break;
-            case 'DEFENDER':
+            case 3:
                 text += '보호기';
                 break;
         }
@@ -216,7 +216,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
         return text;
     };
 
-    const toGradeImagePaht = (grade: string): string => {
+    const toGradeImagePaht = (grade: number): string => {
         const { charRole } = data as CharacterInterface;
 
         const isGrade = !isNone(grade);
@@ -227,12 +227,12 @@ const ListItem: React.FC<CharacterItemProps> = ({
         }
 
         switch (charRole) {
-            case 'ASSAULT':
-                return `/a${grade.toLocaleLowerCase()}.png`;
-            case 'SUPPORT':
-                return `/s${grade.toLocaleLowerCase()}.png`;
-            case 'DEFENDER':
-                return `/d${grade.toLocaleLowerCase()}.png`;
+            case 1:
+                return `/a${grade}.png`;
+            case 2:
+                return `/s${grade}.png`;
+            case 3:
+                return `/d${grade}.png`;
             default:
                 return '';
         }
@@ -262,7 +262,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
 
     const roleText = toRoleText();
     const gradeImage = toGradeImagePaht(
-        (data as CharacterInterface).charGrade as string,
+        (data as CharacterInterface).charGrade as number,
     );
     const statureText = toStatureText();
     const weightText = toWeightText();

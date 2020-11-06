@@ -19,10 +19,10 @@ declare module 'Module' {
         tag?: string[];
         charNumber?: number;
         charGroupId?: string;
-        charGrade?: CharacterGrade;
-        charLastGrade?: CharacterGrade;
-        charType?: CharacterType;
-        charRole?: CharacterRole;
+        charGrade?: number;
+        charLastGrade?: number;
+        charType?: number;
+        charRole?: number;
         charClass?: string;
         charArm?: string;
         charStature?: number;
