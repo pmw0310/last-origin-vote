@@ -31,8 +31,16 @@ enum FocusType {
 
 enum SortType {
     NAME = 'NAME',
-    LIKE = 'LIKE',
-    NOT_LIKE = 'NOT_LIKE',
+    NUMBER = 'NUMBER',
+    STATURE = 'STATURE',
+    WEIGHT = 'WEIGHT',
+    GRADE = 'GRADE',
+    LAST_GRADE = 'LAST_GRADE',
+}
+
+enum OrderType {
+    ASC = 'ASC',
+    DESC = 'DESC',
 }
 
 registerEnumType(FocusType, {
@@ -43,6 +51,11 @@ registerEnumType(FocusType, {
 registerEnumType(SortType, {
     name: 'SortType',
     description: '정렬 타임',
+});
+
+registerEnumType(OrderType, {
+    name: 'OrderType',
+    description: '정렬 순서 타임',
 });
 
 @ObjectType()
@@ -99,13 +112,19 @@ class GetArgs {
         description: '정렬 타입',
     })
     sort?: SortType = SortType.NAME;
+    @Field(() => OrderType, {
+        defaultValue: OrderType.ASC,
+        description: '정렬 순서 타입',
+    })
+    order?: OrderType.ASC;
 }
 
 @Resolver()
 export default class GetResolver {
     @Query(() => GetRelayStylePagination)
     async get(
-        @Args() { ids, page, endCursor, search, limit, sort, focus }: GetArgs,
+        @Args()
+        { ids, page, endCursor, search, limit, sort, focus, order }: GetArgs,
     ): Promise<GetRelayStylePagination | undefined> {
         let query: FilterQuery<CharacterModel | GroupModel> = {};
 
@@ -146,15 +165,27 @@ export default class GetResolver {
         if (page) {
             options.page = page;
         }
+
+        const orderType: string = (order as string).toLocaleLowerCase();
+
         switch (sort) {
             case SortType.NAME:
-                options.sort = { name: 'asc' };
+                options.sort = { name: orderType };
                 break;
-            case SortType.LIKE:
-                options.sort = { ['likeStats.like']: 'desc', name: 'asc' };
+            case SortType.NUMBER:
+                options.sort = { charNumber: orderType, name: 'asc' };
                 break;
-            case SortType.NOT_LIKE:
-                options.sort = { ['likeStats.notLike']: 'desc', name: 'asc' };
+            case SortType.STATURE:
+                options.sort = { charStature: orderType, name: 'asc' };
+                break;
+            case SortType.WEIGHT:
+                options.sort = { charWeight: orderType, name: 'asc' };
+                break;
+            case SortType.GRADE:
+                options.sort = { charGradeOrder: orderType, name: 'asc' };
+                break;
+            case SortType.LAST_GRADE:
+                options.sort = { charLastGradeOrder: orderType, name: 'asc' };
                 break;
         }
 

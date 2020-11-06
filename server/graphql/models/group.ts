@@ -20,7 +20,9 @@ export class Group extends BasicData implements GroupInput {
         const char = await BasicDataModel.find({
             charGroupId: id,
             type: BasicDataType.CHARACTER,
-        }).exec();
+        })
+            .sort({ charNumber: 1 })
+            .exec();
         return char as Character[];
     }
 }

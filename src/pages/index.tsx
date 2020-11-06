@@ -72,8 +72,9 @@ const GET_LIST = gql`
     query getList(
         $page: Int!
         $focus: FocusType!
-        $search: String
+        $search: String!
         $sort: SortType!
+        $order: OrderType!
     ) {
         get(
             page: $page
@@ -81,6 +82,7 @@ const GET_LIST = gql`
             focus: $focus
             search: $search
             sort: $sort
+            order: $order
         ) {
             data {
                 ... on Character {
@@ -161,6 +163,7 @@ const CharacterList = (): JSX.Element => {
     const [page, setPage] = useState<number>(1);
     const [focus, setFocus] = useState<string>('CHARACTER');
     const [sort, setSort] = useState<string>('NAME');
+    const [order, setOrder] = useState<string>('ASC');
     const [search, setSearch] = useState<string>('');
     const [open, setOpen] = React.useState<boolean>(false);
 
@@ -219,6 +222,7 @@ const CharacterList = (): JSX.Element => {
             page: 1,
             focus,
             sort,
+            order,
         };
 
         switch (event.target.name) {
@@ -229,6 +233,10 @@ const CharacterList = (): JSX.Element => {
             case 'sort':
                 setSort(value);
                 option.sort = value;
+                break;
+            case 'order':
+                setOrder(value);
+                option.order = value;
                 break;
         }
         setPage(1);
@@ -264,6 +272,7 @@ const CharacterList = (): JSX.Element => {
         page?: number;
         focus?: string;
         search?: string;
+        order?: string;
     }): void => {
         getList({
             variables: {
@@ -271,6 +280,7 @@ const CharacterList = (): JSX.Element => {
                 focus,
                 search,
                 sort,
+                order,
                 ...option,
             },
         });
@@ -310,7 +320,7 @@ const CharacterList = (): JSX.Element => {
     return (
         <>
             <Grid container spacing={1}>
-                <Grid item lg={2} md={6}>
+                <Grid item lg={2} md={4}>
                     <TypeForm variant="outlined">
                         <Select
                             value={focus}
@@ -324,21 +334,37 @@ const CharacterList = (): JSX.Element => {
                         </Select>
                     </TypeForm>
                 </Grid>
-                <Grid item lg={2} md={6}>
+                <Grid item lg={2} md={4}>
                     <TypeForm variant="outlined">
                         <Select
                             value={sort}
                             name="sort"
                             onChange={handleSelectChange}
-                            label="검색"
+                            label="정렬"
                         >
                             <MenuItem value={'NAME'}>이름</MenuItem>
-                            <MenuItem value={'LIKE'}>좋아요</MenuItem>
-                            <MenuItem value={'NOT_LIKE'}>싫어요</MenuItem>
+                            <MenuItem value={'NUMBER'}>번호</MenuItem>
+                            <MenuItem value={'GRADE'}>등급</MenuItem>
+                            <MenuItem value={'LAST_GRADE'}>최종 등급</MenuItem>
+                            <MenuItem value={'STATURE'}>신장</MenuItem>
+                            <MenuItem value={'WEIGHT'}>체중</MenuItem>
                         </Select>
                     </TypeForm>
                 </Grid>
-                <Grid item lg={8} md={12}>
+                <Grid item lg={2} md={4}>
+                    <TypeForm variant="outlined">
+                        <Select
+                            value={order}
+                            name="order"
+                            onChange={handleSelectChange}
+                            label="정렬 순서"
+                        >
+                            <MenuItem value={'ASC'}>오름차순</MenuItem>
+                            <MenuItem value={'DESC'}>내림차순</MenuItem>
+                        </Select>
+                    </TypeForm>
+                </Grid>
+                <Grid item lg md>
                     <SearchRoot component="form">
                         <SearchIconButton
                             aria-label="search"

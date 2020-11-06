@@ -18,12 +18,10 @@ export const likeStatsSchema = new Schema<likeStatsTypeModel>(
         like: {
             type: Number,
             default: 0,
-            index: true,
         },
         notLike: {
             type: Number,
             default: 0,
-            index: true,
         },
         updateAt: {
             type: Date,
