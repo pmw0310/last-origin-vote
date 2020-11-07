@@ -34,6 +34,7 @@
         "echarts-for-react": "^2.0.16",
         "graphql": "15.3.0",
         "graphql-upload": "^11.0.0",
+        "immer": "^7.0.14",
         "jsonwebtoken": "^8.5.1",
         "koa": "^2.13.0",
         "koa-bodyparser": "^4.3.0",

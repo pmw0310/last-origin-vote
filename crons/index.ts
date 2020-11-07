@@ -74,9 +74,10 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                 for (const data of stats.data) {
                     const rank = await BasicDataModel.find({
                         type: data.type,
+                        _id: { $ne: data._id },
                         'likeStats.like': { $gt: data.likeGrade },
                     })
-                        .count()
+                        .countDocuments()
                         .exec();
 
                     ranking.data.push({

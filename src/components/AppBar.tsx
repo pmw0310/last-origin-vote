@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Link from 'next/link';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Avatar from '@material-ui/core/Avatar';
@@ -11,6 +12,13 @@ import styled, { createGlobalStyle } from 'styled-components';
 import { gql, useQuery } from '@apollo/client';
 import { currentUserVar } from '../lib/apollo';
 import { UserInterface } from 'Module';
+import Drawer from '@material-ui/core/Drawer';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import EqualizerIcon from '@material-ui/icons/Equalizer';
+import ViewListIcon from '@material-ui/icons/ViewList';
 
 const GlobalStyles = createGlobalStyle`
        html body {
@@ -44,6 +52,9 @@ const Auth = styled.div`
 const AppBarAvatar = styled(Avatar)`
     margin-right: 10px;
 `;
+const AppBarList = styled.div`
+    width: 300px;
+`;
 
 const ME = gql`
     query {
@@ -60,12 +71,55 @@ const ME = gql`
 
 const MenuAppBar = (): JSX.Element => {
     const { loading, data } = useQuery<{ me: UserInterface }>(ME);
+    const [state, setState] = React.useState<boolean>(false);
     const onLoginButtonClick = () => {
         window.location.href = '/api/auth/naver';
     };
     const onLogoutButtonClick = () => {
         window.location.href = '/api/auth/logout';
     };
+
+    const toggleDrawer = (open: boolean) => (
+        event: React.KeyboardEvent | React.MouseEvent,
+    ) => {
+        if (
+            event &&
+            event.type === 'keydown' &&
+            ((event as React.KeyboardEvent).key === 'Tab' ||
+                (event as React.KeyboardEvent).key === 'Shift')
+        ) {
+            return;
+        }
+
+        setState(open);
+    };
+
+    const list = () => (
+        <AppBarList
+            role="presentation"
+            onClick={toggleDrawer(false)}
+            onKeyDown={toggleDrawer(false)}
+        >
+            <List>
+                <Link href="/">
+                    <ListItem button>
+                        <ListItemIcon>
+                            <ViewListIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="리스트" />
+                    </ListItem>
+                </Link>
+                <Link href="/stats">
+                    <ListItem button>
+                        <ListItemIcon>
+                            <EqualizerIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="통계" />
+                    </ListItem>
+                </Link>
+            </List>
+        </AppBarList>
+    );
 
     useEffect(() => {
         if (data?.me) {
@@ -85,10 +139,17 @@ const MenuAppBar = (): JSX.Element => {
                             edge="start"
                             color="inherit"
                             aria-label="menu"
-                            disabled={true}
+                            onClick={toggleDrawer(true)}
                         >
                             <MenuIcon />
                         </MenuButton>
+                        <Drawer
+                            anchor="left"
+                            open={state}
+                            onClose={toggleDrawer(false)}
+                        >
+                            {list()}
+                        </Drawer>
                         <Auth>
                             {!loading && data?.me ? (
                                 <>

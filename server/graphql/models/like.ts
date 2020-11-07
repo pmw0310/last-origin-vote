@@ -1,5 +1,9 @@
 import { Field, ObjectType, Int, ID } from 'type-graphql';
 import { Min, Max } from 'class-validator';
+import { BasicUnion } from './unionType';
+import { Character } from './character';
+import { Group } from './group';
+import { PageInfo } from '../relayStylePagination';
 
 @ObjectType()
 export class Like {
@@ -39,4 +43,20 @@ export class LikeData {
     like!: number;
     @Field(() => Int, { description: '싫어요', nullable: false })
     notLike!: number;
+}
+
+@ObjectType()
+export class LikeRanking {
+    @Field(() => BasicUnion, { description: '데이터', nullable: false })
+    data!: Character | Group;
+    @Field(() => Int, { description: '랭킹 (타입별)', nullable: false })
+    ranking!: number;
+}
+
+@ObjectType()
+export class LikeRankingData {
+    @Field(() => [LikeRanking])
+    likeRanking?: Array<LikeRanking>;
+    @Field(() => PageInfo)
+    pageInfo?: PageInfo;
 }

@@ -30,7 +30,7 @@ const AddFabTop = styled.div`
     right: 28px;
 `;
 
-const SearchRoot = styled(Paper)`
+export const SearchRoot = styled(Paper)`
     margin: 12px;
     padding: 2px 4px;
     display: flex;
@@ -38,16 +38,16 @@ const SearchRoot = styled(Paper)`
     width: 400;
 `;
 
-const SearchIconButton = styled(IconButton)`
+export const SearchIconButton = styled(IconButton)`
     padding: 10;
 `;
 
-const SearchInput = styled(InputBase)`
+export const SearchInput = styled(InputBase)`
     flex: 1;
     margin-left: 8px;
 `;
 
-const TypeForm = styled(FormControl)`
+export const TypeForm = styled(FormControl)`
     background-color: white;
     width: 100%;
     margin: 12px !important;
