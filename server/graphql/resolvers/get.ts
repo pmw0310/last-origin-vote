@@ -29,15 +29,6 @@ enum FocusType {
     GROUP = 'GROUP',
 }
 
-enum SortType {
-    NAME = 'NAME',
-    NUMBER = 'NUMBER',
-    STATURE = 'STATURE',
-    WEIGHT = 'WEIGHT',
-    GRADE = 'GRADE',
-    LAST_GRADE = 'LAST_GRADE',
-}
-
 enum OrderType {
     ASC = 'ASC',
     DESC = 'DESC',
@@ -46,11 +37,6 @@ enum OrderType {
 registerEnumType(FocusType, {
     name: 'FocusType',
     description: '검색 타입',
-});
-
-registerEnumType(SortType, {
-    name: 'SortType',
-    description: '정렬 타임',
 });
 
 registerEnumType(OrderType, {
@@ -101,22 +87,22 @@ class GetArgs {
         defaultValue: FocusType.ALL,
         description: '검색할 타입',
     })
-    focus?: FocusType = FocusType.ALL;
+    focus: FocusType = FocusType.ALL;
     @Field({
         nullable: true,
         description: '검색할 문자 (이름, 태그)',
     })
     search?: string;
-    @Field(() => SortType, {
-        defaultValue: SortType.NAME,
+    @Field({
+        defaultValue: 'name',
         description: '정렬 타입',
     })
-    sort?: SortType = SortType.NAME;
+    sort: string = 'name';
     @Field(() => OrderType, {
         defaultValue: OrderType.ASC,
         description: '정렬 순서 타입',
     })
-    order?: OrderType.ASC;
+    order: OrderType = OrderType.ASC;
 }
 
 @Resolver()
@@ -167,27 +153,8 @@ export default class GetResolver {
         }
 
         const orderType: string = (order as string).toLocaleLowerCase();
-
-        switch (sort) {
-            case SortType.NAME:
-                options.sort = { name: orderType };
-                break;
-            case SortType.NUMBER:
-                options.sort = { charNumber: orderType };
-                break;
-            case SortType.STATURE:
-                options.sort = { charStature: orderType };
-                break;
-            case SortType.WEIGHT:
-                options.sort = { charWeight: orderType };
-                break;
-            case SortType.GRADE:
-                options.sort = { charGrade: orderType };
-                break;
-            case SortType.LAST_GRADE:
-                options.sort = { charLastGrade: orderType };
-                break;
-        }
+        options.sort = {};
+        (options.sort as any)[sort] = orderType;
 
         const {
             docs,

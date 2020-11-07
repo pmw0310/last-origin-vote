@@ -13,10 +13,26 @@ if (!arg) {
 
 dotenv.config();
 
+const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
+    const oldData = await StatsModel.find({
+        type,
+        createdAt: { $lte: date },
+    })
+        .select('_id')
+        .exec();
+
+    if (oldData.length > 0) {
+        await StatsModel.deleteMany({
+            _id: oldData.map((id) => id),
+        });
+    }
+};
+
 (async () => {
     try {
         await mongooseConnect();
 
+        console.time('crons');
         switch (arg) {
             case 'like':
                 const data = await BasicDataModel.aggregate()
@@ -50,32 +66,40 @@ dotenv.config();
                 });
                 await stats.save();
 
-                const date = new Date();
-                date.setDate(date.getDate() - 7);
-                date.setHours(0, 0, 0, 0);
+                const ranking = new StatsModel({
+                    type: StatsType.LIKE_RANKING,
+                    data: [],
+                });
 
-                const oldData = await StatsModel.find({
-                    type: StatsType.LINK,
-                    createdAt: { $lte: date },
-                })
-                    .select('_id')
-                    .exec();
+                for (const data of stats.data) {
+                    const rank = await BasicDataModel.find({
+                        type: data.type,
+                        'likeStats.like': { $gt: data.likeGrade },
+                    })
+                        .count()
+                        .exec();
 
-                if (oldData.length > 0) {
-                    await StatsModel.deleteMany({
-                        _id: oldData.map((id) => id),
+                    ranking.data.push({
+                        _id: data._id,
+                        type: data.type,
+                        ranking: rank + 1,
                     });
                 }
+                await ranking.save();
+
+                const linkDate = new Date();
+                linkDate.setDate(linkDate.getDate() - 7);
+                linkDate.setHours(0, 0, 0, 0);
+
+                const rankingDate = new Date();
+                rankingDate.setHours(rankingDate.getHours() - 2, 0, 0, 0);
+
+                await removeOldData(StatsType.LINK, linkDate);
+                await removeOldData(StatsType.LIKE_RANKING, rankingDate);
 
                 break;
-            // case 'test':
-            //     await BasicDataModel.updateMany(
-            //         { type: BasicDataType.CHARACTER, charRole: 'DEFENDER' },
-            //         { charRole: 3 },
-            //     ).exec();
-
-            //     break;
         }
+        console.timeEnd('crons');
 
         await mongooseDisconnect();
         process.exit();

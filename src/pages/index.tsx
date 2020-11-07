@@ -73,7 +73,7 @@ const GET_LIST = gql`
         $page: Int!
         $focus: FocusType!
         $search: String!
-        $sort: SortType!
+        $sort: String!
         $order: OrderType!
     ) {
         get(
@@ -137,8 +137,7 @@ const GET_LIST = gql`
 
 const AUTH_CHECKER = gql`
     query authChecker {
-        characterAuth: authChecker(roles: ["character"])
-        groupAuth: authChecker(roles: ["group"])
+        auth: authChecker(roles: ["set"])
     }
 `;
 
@@ -162,7 +161,7 @@ const CharacterList = (): JSX.Element => {
 
     const [page, setPage] = useState<number>(1);
     const [focus, setFocus] = useState<string>('CHARACTER');
-    const [sort, setSort] = useState<string>('NAME');
+    const [sort, setSort] = useState<string>('name');
     const [order, setOrder] = useState<string>('ASC');
     const [search, setSearch] = useState<string>('');
     const [open, setOpen] = React.useState<boolean>(false);
@@ -349,14 +348,11 @@ const CharacterList = (): JSX.Element => {
                                 onChange={handleSelectChange}
                                 label="정렬"
                             >
-                                <MenuItem value={'NAME'}>이름</MenuItem>
-                                <MenuItem value={'NUMBER'}>번호</MenuItem>
-                                <MenuItem value={'GRADE'}>등급</MenuItem>
-                                <MenuItem value={'LAST_GRADE'}>
-                                    최종 등급
-                                </MenuItem>
-                                <MenuItem value={'STATURE'}>신장</MenuItem>
-                                <MenuItem value={'WEIGHT'}>체중</MenuItem>
+                                <MenuItem value={'name'}>이름</MenuItem>
+                                <MenuItem value={'charNumber'}>번호</MenuItem>
+                                <MenuItem value={'charGrade'}>등급</MenuItem>
+                                <MenuItem value={'charStature'}>신장</MenuItem>
+                                <MenuItem value={'charWeight'}>체중</MenuItem>
                             </Select>
                         )}
                         {focus === 'GROUP' && (
@@ -423,11 +419,7 @@ const CharacterList = (): JSX.Element => {
                         <Item
                             data={data}
                             key={data.id}
-                            auth={
-                                (data.type === 'CHARACTER' &&
-                                    auth?.characterAuth) ||
-                                (data.type === 'GROUP' && auth?.groupAuth)
-                            }
+                            auth={auth?.auth}
                             removeDialogOpen={handleDialogOpen}
                             onLike={handleOnLike}
                         />
@@ -451,37 +443,33 @@ const CharacterList = (): JSX.Element => {
                 </Progress>
             )}
 
-            {!authLoding && (auth?.characterAuth || auth?.groupAuth) && (
+            {!authLoding && auth?.auth && (
                 <AddFabTop>
                     <SpeedDial
                         ariaLabel="AddSpeedDial"
-                        hidden={!auth?.characterAuth && !auth?.groupAuth}
+                        hidden={!auth?.auth}
                         icon={<SpeedDialIcon />}
                         onClose={handleClose}
                         onOpen={handleOpen}
                         open={open}
                         direction="up"
                     >
-                        {auth?.characterAuth && (
-                            <SpeedDialAction
-                                icon={<AccountCircleIcon />}
-                                tooltipTitle="케릭터 추가"
-                                onClick={() => {
-                                    handleClose();
-                                    router.push('/character/add');
-                                }}
-                            />
-                        )}
-                        {auth?.groupAuth && (
-                            <SpeedDialAction
-                                icon={<AssignmentIcon />}
-                                tooltipTitle="부대 추가"
-                                onClick={() => {
-                                    handleClose();
-                                    router.push('/group/add');
-                                }}
-                            />
-                        )}
+                        <SpeedDialAction
+                            icon={<AccountCircleIcon />}
+                            tooltipTitle="케릭터 추가"
+                            onClick={() => {
+                                handleClose();
+                                router.push('/character/add');
+                            }}
+                        />
+                        <SpeedDialAction
+                            icon={<AssignmentIcon />}
+                            tooltipTitle="부대 추가"
+                            onClick={() => {
+                                handleClose();
+                                router.push('/group/add');
+                            }}
+                        />
                     </SpeedDial>
                 </AddFabTop>
             )}

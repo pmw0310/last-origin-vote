@@ -4,6 +4,7 @@ import enumToArray from '../lib/enumToArray';
 
 export enum StatsType {
     LINK = 'LINK',
+    LIKE_RANKING = 'LIKE_RANKING',
 }
 
 export interface StatsTypeModel extends Document {

@@ -116,6 +116,7 @@ const authCheck = (roles: Array<string>) => async (
     }
 
     router.get('/', renderAndCache);
+    router.get('/stats', renderAndCache);
     router.get('/character/add', authCheck(['set']), renderAndCache);
     router.get('/character/:id', authCheck(['set']), renderAndCache);
     router.get('/group/add', authCheck(['set']), renderAndCache);
