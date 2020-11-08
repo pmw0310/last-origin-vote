@@ -7,7 +7,7 @@ import Router from 'koa-router';
 import Bodyparser from 'koa-bodyparser';
 // import staticServe from 'koa-static';
 // import proxy from 'koa-proxies';
-import helmet from 'koa-helmet';
+// import helmet from 'koa-helmet';
 import passport from 'koa-passport';
 // import { RateLimit } from 'koa2-ratelimit';
 import { Strategy, Profile } from 'passport-naver';
@@ -134,7 +134,7 @@ const authCheck = (roles: Array<string>) => async (
         })
         .use(cors())
         .use(Bodyparser())
-        .use(helmet())
+        // .use(helmet())
         .use(router.routes())
         .use(router.allowedMethods())
         .use(passport.initialize())
