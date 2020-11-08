@@ -51,6 +51,10 @@ export class LikeRanking {
     data!: Character | Group;
     @Field(() => Int, { description: '랭킹 (타입별)', nullable: false })
     ranking!: number;
+    @Field(() => Int, { description: '좋아요', nullable: false })
+    like!: number;
+    @Field(() => Int, { description: '싫어요', nullable: false })
+    notLike!: number;
 }
 
 @ObjectType()

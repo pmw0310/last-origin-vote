@@ -53,7 +53,7 @@ const AppBarAvatar = styled(Avatar)`
     margin-right: 10px;
 `;
 const AppBarList = styled.div`
-    width: 300px;
+    width: 2650px;
 `;
 
 const ME = gql`

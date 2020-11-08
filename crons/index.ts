@@ -84,6 +84,8 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                         _id: data._id,
                         type: data.type,
                         ranking: rank + 1,
+                        like: data.like,
+                        notLike: data.notLike,
                     });
                 }
                 await ranking.save();

@@ -50,10 +50,10 @@ class LikeRankingArgs {
     })
     focus: BasicDataType = BasicDataType.CHARACTER;
     @Field({
-        nullable: true,
         description: '검색할 문자 (이름, 태그)',
+        defaultValue: '',
     })
-    search?: string;
+    search: string = '';
 }
 
 @Resolver()
@@ -156,27 +156,7 @@ export default class GroupResolver {
     async likeRanking(
         @Args() { page, limit, focus, search }: LikeRankingArgs,
     ): Promise<LikeRankingData> {
-        const countAggregations: any[] = [
-            {
-                $match: { type: StatsType.LIKE_RANKING },
-            },
-            {
-                $group: {
-                    _id: null,
-                    last: { $last: '$$ROOT' },
-                },
-            },
-            {
-                $unwind: '$last.data',
-            },
-            {
-                $match: { 'last.data.type': focus },
-            },
-            {
-                $count: 'count',
-            },
-        ];
-
+        const skip: number = (page - 1) * limit;
         const dataAggregations: any[] = [
             {
                 $match: { type: StatsType.LIKE_RANKING },
@@ -195,6 +175,8 @@ export default class GroupResolver {
                     _id: '$last.data._id',
                     type: '$last.data.type',
                     ranking: '$last.data.ranking',
+                    like: '$last.data.like',
+                    notLike: '$last.data.notLike',
                 },
             },
             {
@@ -215,39 +197,89 @@ export default class GroupResolver {
                 $project: {
                     _id: false,
                     ranking: true,
+                    like: true,
+                    notLike: true,
                     data: { $arrayElemAt: ['$data', 0] },
+                    count: { $add: [1] },
+                },
+            },
+            {
+                $project: {
+                    ranking: true,
+                    like: true,
+                    notLike: true,
+                    data: true,
+                    count: true,
+                    find: {
+                        $concat: [
+                            '$data.name',
+                            ' ',
+                            {
+                                $reduce: {
+                                    input: '$data.tag',
+                                    initialValue: '',
+                                    in: { $concat: ['$$value', ' ', '$$this'] },
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    data: {
+                        $push: {
+                            ranking: '$ranking',
+                            data: '$data',
+                            find: '$find',
+                            like: '$like',
+                            notLike: '$notLike',
+                        },
+                    },
+                    count: { $sum: '$count' },
+                },
+            },
+            {
+                $project: {
+                    _id: false,
+                    data: search
+                        ? {
+                              $filter: {
+                                  input: '$data',
+                                  cond: {
+                                      $regexMatch: {
+                                          input: '$$this.find',
+                                          regex: search,
+                                          options: 'i',
+                                      },
+                                  },
+                              },
+                          }
+                        : true,
+                    count: true,
+                },
+            },
+            {
+                $project: {
+                    data: { $slice: ['$data', skip, limit] },
+                    count: true,
                 },
             },
         ];
-
-        if (search) {
-            dataAggregations.push({
-                $match: {
-                    'data.name': {
-                        $regex: search,
-                        $options: 'i',
-                    },
-                },
-            });
-        }
-
-        const countData = await StatsModels.aggregate(countAggregations).exec();
-        const skip: number = (page - 1) * limit;
-        const data = await StatsModels.aggregate(dataAggregations)
-            .skip(skip)
-            .limit(limit)
-            .exec();
-        const count: number = countData[0].count;
+        const data = await StatsModels.aggregate(dataAggregations).exec();
+        console.log('data', data[0].data);
+        const count: number = data[0].count;
         const totalPages: number = Math.ceil(count / limit);
 
         return {
-            likeRanking: data,
+            likeRanking: data[0].data,
             pageInfo: {
-                totalPages: search ? 1 : totalPages,
-                hasNextPage: search ? false : page < totalPages,
-                hasPrevPage: search ? false : skip > 0,
-                prevPage: search ? null : page > 1 ? page - 1 : null,
-                nextPage: search ? null : page < totalPages ? page + 1 : null,
+                totalPages: totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: skip > 0,
+                prevPage: page > 1 ? page - 1 : null,
+                nextPage: page < totalPages ? page + 1 : null,
             },
         };
     }
