@@ -4,7 +4,7 @@ module.exports = {
             name: 'last-origin-app',
             script: './dist/index.js',
             cwd: '/home/node/app/',
-            instances: 1,
+            instances: 0,
             exec_mode: 'cluster',
             watch: false,
             autorestart: true,
