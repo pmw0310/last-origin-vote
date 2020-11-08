@@ -21,24 +21,16 @@ const GET_LIKE_RANKING = gql`
                         id
                         name
                         profileImage
-                        type
-                        likeStats {
-                            like
-                            notLike
-                        }
                     }
                     ... on Group {
                         id
                         name
                         profileImage
-                        type
-                        likeStats {
-                            like
-                            notLike
-                        }
                     }
                 }
                 ranking
+                like
+                notLike
             }
             pageInfo {
                 hasPrevPage
@@ -108,9 +100,15 @@ const Stats = (): JSX.Element => {
                 return tooltip;
             },
         },
+        grid: {
+            top: 45,
+            left: 110,
+            right: 30,
+            bottom: 30,
+        },
         legend: {
             data: ['좋아요', '싫어요'],
-            top: 20,
+            top: 15,
         },
         xAxis: {
             type: 'value',
@@ -172,11 +170,9 @@ const Stats = (): JSX.Element => {
             },
         ];
 
-        for (const {
-            data: { likeStats },
-        } of ranking) {
-            seriesData[0].data.push(likeStats ? likeStats.like : 0);
-            seriesData[1].data.push(likeStats ? likeStats.notLike : 0);
+        for (const { like, notLike } of ranking) {
+            seriesData[0].data.push(like);
+            seriesData[1].data.push(notLike);
         }
 
         setOption(

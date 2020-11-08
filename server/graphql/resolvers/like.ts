@@ -200,7 +200,6 @@ export default class GroupResolver {
                     like: true,
                     notLike: true,
                     data: { $arrayElemAt: ['$data', 0] },
-                    count: { $add: [1] },
                 },
             },
             {
@@ -209,7 +208,6 @@ export default class GroupResolver {
                     like: true,
                     notLike: true,
                     data: true,
-                    count: true,
                     find: {
                         $concat: [
                             '$data.name',
@@ -237,7 +235,6 @@ export default class GroupResolver {
                             notLike: '$notLike',
                         },
                     },
-                    count: { $sum: '$count' },
                 },
             },
             {
@@ -257,18 +254,16 @@ export default class GroupResolver {
                               },
                           }
                         : true,
-                    count: true,
                 },
             },
             {
                 $project: {
                     data: { $slice: ['$data', skip, limit] },
-                    count: true,
+                    count: { $size: '$data' },
                 },
             },
         ];
         const data = await StatsModels.aggregate(dataAggregations).exec();
-        console.log('data', data[0].data);
         const count: number = data[0].count;
         const totalPages: number = Math.ceil(count / limit);
 
