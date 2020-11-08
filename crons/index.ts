@@ -31,7 +31,6 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
 (async () => {
     try {
         await mongooseConnect();
-
         console.time('crons');
         switch (arg) {
             case 'like':
@@ -72,18 +71,49 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                 });
 
                 for (const data of stats.data) {
-                    const rank = await BasicDataModel.find({
-                        type: data.type,
-                        _id: { $ne: data._id },
-                        'likeStats.like': { $gt: data.likeGrade },
-                    })
-                        .countDocuments()
-                        .exec();
+                    const rank = await StatsModel.aggregate([
+                        {
+                            $match: { type: StatsType.LINK },
+                        },
+                        {
+                            $sort: { createdAt: 1 },
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                last: { $last: '$$ROOT' },
+                            },
+                        },
+                        {
+                            $unwind: '$last.data',
+                        },
+                        {
+                            $project: {
+                                _id: false,
+                                type: '$last.data.type',
+                                likeGrade: '$last.data.likeGrade',
+                            },
+                        },
+                        {
+                            $match: {
+                                type: data.type,
+                                likeGrade: { $gt: data.likeGrade },
+                            },
+                        },
+                        {
+                            $count: 'rank',
+                        },
+                        {
+                            $project: {
+                                rank: { $add: ['$rank', 1] },
+                            },
+                        },
+                    ]).exec();
 
                     ranking.data.push({
                         _id: data._id,
                         type: data.type,
-                        ranking: rank + 1,
+                        ranking: rank[0] ? rank[0].rank : 1,
                         like: data.like,
                         notLike: data.notLike,
                     });
@@ -101,6 +131,46 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                 await removeOldData(StatsType.LIKE_RANKING, rankingDate);
 
                 break;
+            // case 'test':
+            //     const rank = await StatsModel.aggregate([
+            //         {
+            //             $match: { type: StatsType.LINK },
+            //         },
+            //         {
+            //             $sort: { createdAt: 1 },
+            //         },
+            //         {
+            //             $group: {
+            //                 _id: null,
+            //                 last: { $last: '$$ROOT' },
+            //             },
+            //         },
+            //         {
+            //             $unwind: '$last.data',
+            //         },
+            //         {
+            //             $project: {
+            //                 _id: false,
+            //                 type: '$last.data.type',
+            //                 likeGrade: '$last.data.likeGrade',
+            //             },
+            //         },
+            //         {
+            //             $match: {
+            //                 type: 'CHARACTER',
+            //                 likeGrade: { $gt: 22 },
+            //             },
+            //         },
+            //         {
+            //             $group: {
+            //                 _id: null,
+            //                 count: { $sum: 1 },
+            //             },
+            //         },
+            //     ]).exec();
+
+            //     console.log(rank);
+            //     break;
         }
         console.timeEnd('crons');
 

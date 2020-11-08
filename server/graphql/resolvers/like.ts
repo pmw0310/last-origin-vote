@@ -162,6 +162,9 @@ export default class GroupResolver {
                 $match: { type: StatsType.LIKE_RANKING },
             },
             {
+                $sort: { createdAt: 1 },
+            },
+            {
                 $group: {
                     _id: null,
                     last: { $last: '$$ROOT' },
