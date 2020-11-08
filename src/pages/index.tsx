@@ -231,8 +231,8 @@ const CharacterList = (): JSX.Element => {
                 option.focus = value;
 
                 if (value === 'GROUP') {
-                    setSort('NAME');
-                    option.sort = 'NAME';
+                    setSort('name');
+                    option.sort = 'name';
                 }
                 break;
             case 'sort':
