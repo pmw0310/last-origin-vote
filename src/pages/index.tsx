@@ -362,7 +362,7 @@ const CharacterList = (): JSX.Element => {
                                 onChange={handleSelectChange}
                                 label="정렬"
                             >
-                                <MenuItem value={'NAME'}>이름</MenuItem>
+                                <MenuItem value={'name'}>이름</MenuItem>
                             </Select>
                         )}
                     </TypeForm>
