@@ -9,7 +9,7 @@ import Bodyparser from 'koa-bodyparser';
 // import proxy from 'koa-proxies';
 import helmet from 'koa-helmet';
 import passport from 'koa-passport';
-import { RateLimit } from 'koa2-ratelimit';
+// import { RateLimit } from 'koa2-ratelimit';
 import { Strategy, Profile } from 'passport-naver';
 import { ApolloServer } from 'apollo-server-koa';
 import { graphqlUploadKoa } from 'graphql-upload';
@@ -83,12 +83,12 @@ const authCheck = (roles: Array<string>) => async (
     await app.prepare();
 
     const server = new Koa();
-    server.use(
-        RateLimit.middleware({
-            interval: { min: 1 },
-            max: 150,
-        }),
-    );
+    // server.use(
+    //     RateLimit.middleware({
+    //         interval: { min: 1 },
+    //         max: 150,
+    //     }),
+    // );
     const router = new Router<DefaultState, Context>();
     const apolloServer = new ApolloServer({
         schema,
