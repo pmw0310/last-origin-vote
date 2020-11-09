@@ -148,7 +148,9 @@ const Stats = (): JSX.Element => {
                 height: 40,
                 align: 'center',
                 backgroundColor: {
-                    image: data.data.profileImage,
+                    image: data.data.profileImage
+                        ? data.data.profileImage
+                        : 'https://via.placeholder.com/40x40.png?text=No+Image',
                 },
             };
         }
@@ -189,7 +191,7 @@ const Stats = (): JSX.Element => {
                     rich: {
                         ...yAxisRichData,
                         value: {
-                            width: 100,
+                            width: 108,
                             align: 'center',
                             lineHeight: 20,
                         },

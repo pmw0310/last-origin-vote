@@ -278,17 +278,32 @@ const ListItem: React.FC<CharacterItemProps> = ({
                 >
                     {type === 'CHARACTER' && gradeImage && (
                         <GradeIcon
-                            alt="https://via.placeholder.com/150x150.png?text=Error"
+                            alt="g"
                             src={gradeImage}
+                            onError={(
+                                e: React.SyntheticEvent<
+                                    HTMLImageElement,
+                                    Event
+                                >,
+                            ) => {
+                                e.currentTarget.src =
+                                    'https://via.placeholder.com/35x35.png?text=Error';
+                            }}
                             height="35"
                         />
                     )}
                     <LazyLoadImage
-                        alt="https://via.placeholder.com/150x150.png?text=Error"
+                        alt="image"
                         src={
                             data.profileImage ||
                             'https://via.placeholder.com/150x150.png?text=No+Image'
                         }
+                        onError={(
+                            e: React.SyntheticEvent<HTMLImageElement, Event>,
+                        ) => {
+                            e.currentTarget.src =
+                                'https://via.placeholder.com/150x150.png?text=Error';
+                        }}
                         effect="blur"
                         width="150"
                         height="150"
