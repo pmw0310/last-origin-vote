@@ -228,11 +228,11 @@ const ListItem: React.FC<CharacterItemProps> = ({
 
         switch (charRole) {
             case 1:
-                return `/a${grade}.png`;
+                return `/public/a${grade}.png`;
             case 2:
-                return `/s${grade}.png`;
+                return `/public/s${grade}.png`;
             case 3:
-                return `/d${grade}.png`;
+                return `/public/d${grade}.png`;
             default:
                 return '';
         }

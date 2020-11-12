@@ -147,11 +147,21 @@ const authCheck = (roles: Array<string>) => async (
                         'https://via.placeholder.com',
                         'https://res-5.cloudinary.com',
                         'data:',
+                        'https://phinf.pstatic.net',
+                        'https://ssl.pstatic.net',
                     ],
                     scriptSrc: ["'unsafe-eval'", uri],
                     mediaSrc: ["'none'"],
                     objectSrc: ["'none'"],
                 },
+            }),
+        )
+        .use(
+            staticServe({
+                rootDir: path.normalize(`${__dirname}/../static/public`),
+                rootPath: '/public',
+                index: '',
+                maxage: 2592000000,
             }),
         )
         .use(

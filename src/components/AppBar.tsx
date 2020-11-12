@@ -162,20 +162,32 @@ const MenuAppBar = (): JSX.Element => {
                                         />
                                     </Tooltip>
                                     <ButtonBase>
-                                        <img
-                                            src="/naver_logout.png"
-                                            height={36}
-                                            onClick={onLogoutButtonClick}
-                                        />
+                                        <picture>
+                                            <source
+                                                srcSet="/public/naver_logout.webp"
+                                                type="image/webp"
+                                            />
+                                            <img
+                                                src="/public/naver_logout.png"
+                                                height={36}
+                                                onClick={onLogoutButtonClick}
+                                            />
+                                        </picture>
                                     </ButtonBase>
                                 </>
                             ) : (
                                 <ButtonBase>
-                                    <img
-                                        src="/naver_login.png"
-                                        height={36}
-                                        onClick={onLoginButtonClick}
-                                    />
+                                    <picture>
+                                        <source
+                                            srcSet="/public/naver_login.webp"
+                                            type="image/webp"
+                                        />
+                                        <img
+                                            src="/public/naver_login.png"
+                                            height={36}
+                                            onClick={onLoginButtonClick}
+                                        />
+                                    </picture>
                                 </ButtonBase>
                             )}
                         </Auth>
