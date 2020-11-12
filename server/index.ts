@@ -146,6 +146,7 @@ const authCheck = (roles: Array<string>) => async (
                         uri,
                         'https://via.placeholder.com',
                         'https://res-5.cloudinary.com',
+                        'data:',
                     ],
                     scriptSrc: ["'unsafe-eval'", uri],
                     mediaSrc: ["'none'"],
