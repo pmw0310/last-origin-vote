@@ -1568,20 +1568,12 @@
   dependencies:
     "@types/koa" "*"
 
-"@types/koa-send@*":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@types/koa-send/-/koa-send-4.1.2.tgz#978f8267ad116d12ac6a18fecd8f34c5657e09ad"
-  integrity sha512-rfqKIv9bFds39Jxvsp8o3YJLnEQVPVriYA14AuO2OY65IHh/4UX4U/iMs5L0wATpcRmm1bbe0BNk23TRwx3VQQ==
+"@types/koa-static-server@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@types/koa-static-server/-/koa-static-server-1.3.0.tgz#1f01e6e8926783e3781c9419163548443a020284"
+  integrity sha512-iSAB4/LE5TJvvdtIWjBvdHKAymLeVtW4TlOn1yG1CWRo6MbvZUYTIgnG9F3zyStQzk2J9sa8YnPpLWyLfrWXCw==
   dependencies:
     "@types/koa" "*"
-
-"@types/koa-static@^4.0.1":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@types/koa-static/-/koa-static-4.0.1.tgz#b740d80a549b0a0a7a3b38918daecde88a7a50ec"
-  integrity sha512-SSpct5fEcAeRkBHa3RiwCIRfDHcD1cZRhwRF///ZfvRt8KhoqRrhK6wpDlYPk/vWHVFE9hPGqh68bhzsHkir4w==
-  dependencies:
-    "@types/koa" "*"
-    "@types/koa-send" "*"
 
 "@types/koa2-ratelimit@^0.9.0":
   version "0.9.0"
@@ -1813,7 +1805,7 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
-"@types/redis@*":
+"@types/redis@*", "@types/redis@^2.8.28":
   version "2.8.28"
   resolved "https://registry.yarnpkg.com/@types/redis/-/redis-2.8.28.tgz#5862b2b64aa7f7cbc76dafd7e6f06992b52c55e3"
   integrity sha512-8l2gr2OQ969ypa7hFOeKqtFoY70XkHxISV0pAwmQ2nm6CSPb1brmTmqJCGGrekCo+pAZyWlNXr+Kvo6L/1wijA==
@@ -3657,7 +3649,7 @@ debug@4, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1:
   dependencies:
     ms "^2.1.1"
 
-debug@^3.1.0, debug@^3.2.6:
+debug@^3.2.6:
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.6.tgz#e83d17de16d8a7efb7717edbe5fb10135eee629b"
   integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
@@ -5805,13 +5797,13 @@ koa-send@^5.0.0:
     http-errors "^1.7.3"
     resolve-path "^1.4.0"
 
-koa-static@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/koa-static/-/koa-static-5.0.0.tgz#5e92fc96b537ad5219f425319c95b64772776943"
-  integrity sha512-UqyYyH5YEXaJrf9S8E23GoJFQZXkBVJ9zYYMPGz919MSX1KuvAcycIuS0ci150HCoPf4XQVhQ84Qf8xRPWxFaQ==
+koa-static-server@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/koa-static-server/-/koa-static-server-1.5.2.tgz#f134979a33530befbe71148441c1cd67f5c271df"
+  integrity sha512-qIlok7DB85k9ST0cBBdzrYD9j3JwfGJx9D3znDRzdYUwlxix5+czgPlyXy5zW077WRrRzQy0ykx1U6cbaEOPtA==
   dependencies:
-    debug "^3.1.0"
     koa-send "^5.0.0"
+    upath "^1.0.2"
 
 koa2-ratelimit@^0.9.0:
   version "0.9.0"
@@ -7634,7 +7626,7 @@ redis-parser@^3.0.0:
   dependencies:
     redis-errors "^1.0.0"
 
-redis@*:
+redis@*, redis@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/redis/-/redis-3.0.2.tgz#bd47067b8a4a3e6a2e556e57f71cc82c7360150a"
   integrity sha512-PNhLCrjU6vKVuMOyFu7oSP296mwBkcE6lrAjruBYG5LgdSqtRBoVQIylrMyVZD/lkF24RSNNatzvYag6HRBHjQ==
@@ -8973,7 +8965,7 @@ unset-value@^1.0.0:
     has-value "^0.3.1"
     isobject "^3.0.0"
 
-upath@^1.1.1:
+upath@^1.0.2, upath@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/upath/-/upath-1.2.0.tgz#8f66dbcd55a883acdae4408af8b035a5044c1894"
   integrity sha512-aZwGpamFO61g3OlfT7OQCHqhGnW43ieH9WZeP7QxN/G/jS4jfqUkZxoryvJgVPEcrl5NL/ggHsSmLMHuH64Lhg==

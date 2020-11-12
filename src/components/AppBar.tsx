@@ -114,7 +114,7 @@ const MenuAppBar = (): JSX.Element => {
                         <ListItemIcon>
                             <EqualizerIcon />
                         </ListItemIcon>
-                        <ListItemText primary="통계" />
+                        <ListItemText primary="순위" />
                     </ListItem>
                 </Link>
             </List>

@@ -5,9 +5,9 @@ import cors from '@koa/cors';
 // import morgan from 'koa-morgan';
 import Router from 'koa-router';
 import Bodyparser from 'koa-bodyparser';
-// import staticServe from 'koa-static';
+import staticServe from 'koa-static-server';
 // import proxy from 'koa-proxies';
-// import helmet from 'koa-helmet';
+import helmet from 'koa-helmet';
 import passport from 'koa-passport';
 // import { RateLimit } from 'koa2-ratelimit';
 import { Strategy, Profile } from 'passport-naver';
@@ -22,6 +22,8 @@ import { schema } from './graphql';
 import api from './api';
 import User, { UserTypeModel } from './models/user';
 import authChecker from './lib/authChecker';
+import { getAsync, setAsync } from './lib/redis';
+import path from 'path';
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -77,10 +79,10 @@ const authCheck = (roles: Array<string>) => async (
 };
 
 (async () => {
-    const uri = process.env.URI;
-    const port = parseInt(process.env.PORT || '4000', 10);
-
     await app.prepare();
+
+    const uri = (process.env.URI as string) || 'http://localhost:4000';
+    const port = parseInt(process.env.PORT || '4000', 10);
 
     const server = new Koa();
     // server.use(
@@ -134,7 +136,31 @@ const authCheck = (roles: Array<string>) => async (
         })
         .use(cors())
         .use(Bodyparser())
-        // .use(helmet())
+        .use(helmet())
+        .use(
+            helmet.contentSecurityPolicy({
+                directives: {
+                    baseUri: [uri],
+                    connectSrc: [uri],
+                    imgSrc: [
+                        uri,
+                        'https://via.placeholder.com',
+                        'https://res-5.cloudinary.com',
+                    ],
+                    scriptSrc: ["'unsafe-eval'", uri],
+                    mediaSrc: ["'none'"],
+                    objectSrc: ["'none'"],
+                },
+            }),
+        )
+        .use(
+            staticServe({
+                rootDir: path.normalize(`${__dirname}/../test`),
+                rootPath: '/test4',
+                index: '',
+                maxage: 2592000000,
+            }),
+        )
         .use(router.routes())
         .use(router.allowedMethods())
         .use(passport.initialize())
@@ -159,6 +185,10 @@ const authCheck = (roles: Array<string>) => async (
             },
         ),
     );
+
+    await setAsync('test', 'aa1');
+    const test = await getAsync('test');
+    console.log(test);
 
     server.listen(port, () => {
         console.log(`> Next on ${uri}`);
