@@ -123,23 +123,6 @@ const Stats = (): JSX.Element => {
 
     useEffect(() => {
         getLikeRanking({ variables: { page: 1, focus: 'CHARACTER' } });
-
-        const image = new Image();
-        const webpdata =
-            'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
-        image.onerror = () => {
-            console.log('no-webp');
-        };
-        image.onload = () => {
-            const result = image.width > 0 && image.height > 0;
-            if (result) {
-                console.log('webp');
-            } else {
-                console.log('no-webp');
-            }
-        };
-        image.src = webpdata;
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

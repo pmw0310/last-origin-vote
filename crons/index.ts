@@ -3,6 +3,10 @@ import dotenv from 'dotenv-flow';
 import mongooseConnect, { mongooseDisconnect } from './lib/mongooseConnect';
 import BasicDataModel from './models/basicData';
 import StatsModel, { StatsType } from './models/stats';
+import path from 'path';
+import url from 'url';
+import fs from 'fs';
+import { get } from 'https';
 
 const arg = process.argv[2];
 
@@ -131,46 +135,60 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                 await removeOldData(StatsType.LIKE_RANKING, rankingDate);
 
                 break;
-            // case 'test':
-            //     const rank = await StatsModel.aggregate([
-            //         {
-            //             $match: { type: StatsType.LINK },
-            //         },
-            //         {
-            //             $sort: { createdAt: 1 },
-            //         },
-            //         {
-            //             $group: {
-            //                 _id: null,
-            //                 last: { $last: '$$ROOT' },
-            //             },
-            //         },
-            //         {
-            //             $unwind: '$last.data',
-            //         },
-            //         {
-            //             $project: {
-            //                 _id: false,
-            //                 type: '$last.data.type',
-            //                 likeGrade: '$last.data.likeGrade',
-            //             },
-            //         },
-            //         {
-            //             $match: {
-            //                 type: 'CHARACTER',
-            //                 likeGrade: { $gt: 22 },
-            //             },
-            //         },
-            //         {
-            //             $group: {
-            //                 _id: null,
-            //                 count: { $sum: 1 },
-            //             },
-            //         },
-            //     ]).exec();
+            case 'test':
+                const test = await BasicDataModel.findOne().exec();
+                // console.log(test);
 
-            //     console.log(rank);
-            //     break;
+                if (!test?.profileImage) {
+                    break;
+                }
+
+                const parsed = url.parse(test?.profileImage as string);
+
+                const file = fs.createWriteStream(
+                    path.normalize(
+                        `${__dirname}/../assets/profile/${path.basename(
+                            parsed.pathname as string,
+                        )}`,
+                    ),
+                );
+
+                await new Promise<void>((resolve, reject) => {
+                    get(test?.profileImage as string, {}, (response): void => {
+                        response.pipe(file);
+                        file.on('finish', () => {
+                            resolve();
+                        }).on('error', () => {
+                            reject();
+                        });
+                    });
+                });
+
+                // await new Promise<void>((resolve) => {
+                //     request(test?.profileImage as string, (response) => {
+                //         const data = new Stream();
+
+                //         data.on('end', () => {
+                //             console.log('end');
+                //             resolve();
+                //         });
+
+                //         response.on('data', function (chunk) {
+                //             data.push(chunk);
+                //         });
+
+                //         response.on('end', function () {
+                //             fs.writeFileSync(
+                //                 path.normalize(
+                //                     `${__dirname}/../assets/public/test.png`,
+                //                 ),
+                //                 data.read(),
+                //             );
+                //         });
+                //     });
+                // });
+
+                break;
         }
         console.timeEnd('crons');
 

@@ -31,6 +31,7 @@ import {
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { currentUserVar } from '../lib/apollo';
 import { useSnackbarState, FeedbackType } from '../components/Feedback';
+import { webpVar } from '../lib/Webp';
 
 type LikeData = {
     like: -1 | 0 | 1;
@@ -216,7 +217,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
         return text;
     };
 
-    const toGradeImagePaht = (grade: number): string => {
+    const toGradeImagePaht = (grade: number, webp: boolean = false): string => {
         const { charRole } = data as CharacterInterface;
 
         const isGrade = !isNone(grade);
@@ -228,11 +229,11 @@ const ListItem: React.FC<CharacterItemProps> = ({
 
         switch (charRole) {
             case 1:
-                return `/public/a${grade}.png`;
+                return `/public/a${grade}.${webp ? 'webp' : 'png'}`;
             case 2:
-                return `/public/s${grade}.png`;
+                return `/public/s${grade}.${webp ? 'webp' : 'png'}`;
             case 3:
-                return `/public/d${grade}.png`;
+                return `/public/d${grade}.${webp ? 'webp' : 'png'}`;
             default:
                 return '';
         }
@@ -263,6 +264,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
     const roleText = toRoleText();
     const gradeImage = toGradeImagePaht(
         (data as CharacterInterface).charGrade as number,
+        webpVar(),
     );
     const statureText = toStatureText();
     const weightText = toWeightText();
@@ -278,7 +280,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                 >
                     {type === 'CHARACTER' && gradeImage && (
                         <GradeIcon
-                            alt="g"
+                            alt="grade"
                             src={gradeImage}
                             onError={(
                                 e: React.SyntheticEvent<

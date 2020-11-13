@@ -158,7 +158,7 @@ const authCheck = (roles: Array<string>) => async (
         )
         .use(
             staticServe({
-                rootDir: path.normalize(`${__dirname}/../static/public`),
+                rootDir: path.normalize(`${__dirname}/../assets/public`),
                 rootPath: '/public',
                 index: '',
                 maxage: 2592000000,
@@ -166,8 +166,8 @@ const authCheck = (roles: Array<string>) => async (
         )
         .use(
             staticServe({
-                rootDir: path.normalize(`${__dirname}/../test`),
-                rootPath: '/test4',
+                rootDir: path.normalize(`${__dirname}/../assets/profile`),
+                rootPath: '/profile',
                 index: '',
                 maxage: 2592000000,
             }),

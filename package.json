@@ -58,7 +58,6 @@
         "react": "16.8.0",
         "react-dom": "16.8.0",
         "react-helmet": "^6.1.0",
-        "react-image-webp": "^0.7.0",
         "react-infinite-scroll-component": "^5.1.0",
         "react-lazy-load-image-component": "^1.5.0",
         "react-virtualized": "^9.22.2",
