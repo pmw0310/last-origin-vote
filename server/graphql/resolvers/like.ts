@@ -190,7 +190,7 @@ export default class GroupResolver {
             },
             {
                 $lookup: {
-                    from: 'basicdatas',
+                    from: 'basicdata',
                     localField: '_id',
                     foreignField: '_id',
                     as: 'data',

@@ -7,6 +7,8 @@ import path from 'path';
 import url from 'url';
 import fs from 'fs';
 import { get } from 'https';
+import imagemin from 'imagemin';
+import imageminWebp from 'imagemin-webp';
 
 const arg = process.argv[2];
 
@@ -156,38 +158,42 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                 await new Promise<void>((resolve, reject) => {
                     get(test?.profileImage as string, {}, (response): void => {
                         response.pipe(file);
-                        file.on('finish', () => {
+                        file.on('finish', async () => {
                             resolve();
                         }).on('error', () => {
                             reject();
                         });
                     });
                 });
+                break;
 
-                // await new Promise<void>((resolve) => {
-                //     request(test?.profileImage as string, (response) => {
-                //         const data = new Stream();
-
-                //         data.on('end', () => {
-                //             console.log('end');
-                //             resolve();
-                //         });
-
-                //         response.on('data', function (chunk) {
-                //             data.push(chunk);
-                //         });
-
-                //         response.on('end', function () {
-                //             fs.writeFileSync(
-                //                 path.normalize(
-                //                     `${__dirname}/../assets/public/test.png`,
-                //                 ),
-                //                 data.read(),
-                //             );
-                //         });
-                //     });
-                // });
-
+            case 'webp':
+                await imagemin(
+                    [
+                        path.normalize(
+                            `${__dirname}/../assets/profile/*.{jpg,png}`,
+                        ),
+                    ],
+                    {
+                        destination: path.normalize(
+                            `${__dirname}/../assets/profile`,
+                        ),
+                        plugins: [imageminWebp({ quality: 90 })],
+                    },
+                );
+                await imagemin(
+                    [
+                        path.normalize(
+                            `${__dirname}/../assets/public/*.{jpg,png}`,
+                        ),
+                    ],
+                    {
+                        destination: path.normalize(
+                            `${__dirname}/../assets/public`,
+                        ),
+                        plugins: [imageminWebp({ quality: 90 })],
+                    },
+                );
                 break;
         }
         console.timeEnd('crons');

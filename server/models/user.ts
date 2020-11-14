@@ -187,4 +187,8 @@ UserSchema.plugin(autoIncrement.plugin, {
     increment: 1,
 });
 
-export default model<UserTypeModel, UserStaticsModel>('User', UserSchema);
+export default model<UserTypeModel, UserStaticsModel>(
+    'User',
+    UserSchema,
+    'user',
+);

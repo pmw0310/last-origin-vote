@@ -8,7 +8,7 @@ const client = redis.createClient({
     password: process.env.REDIS_PASSWORD
         ? (process.env.REDIS_PASSWORD as string)
         : undefined,
-    db: 0,
+    db: parseInt(process.env.REDIS_DB || '0', 10),
 });
 
 export const getAsync = (key: string): Promise<string | null> => {

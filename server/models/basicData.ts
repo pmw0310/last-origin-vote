@@ -112,4 +112,4 @@ BasicDataSchema.plugin(mongoosePaginate);
 export default model<
     CharacterModel | GroupModel,
     PaginateModel<CharacterModel | GroupModel>
->('BasicData', BasicDataSchema);
+>('BasicData', BasicDataSchema, 'basicdata');

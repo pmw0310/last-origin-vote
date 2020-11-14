@@ -41,4 +41,4 @@ const LinkSchema = new Schema<LinkTypeModel>({
     },
 });
 
-export default model<LinkTypeModel>('Link', LinkSchema);
+export default model<LinkTypeModel>('Link', LinkSchema, 'link');

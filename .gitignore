@@ -25,6 +25,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# env files
+.env
+.env.development
+.env.test
+.env.production
+
 # local env files
 .env.local
 .env.development.local
@@ -38,3 +44,6 @@ yarn-error.log*
 /dist_crons
 /crons/lib
 /crons/models
+
+# assets
+/assets/profile
