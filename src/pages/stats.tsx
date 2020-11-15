@@ -11,6 +11,7 @@ import { Paper, Grid, Select, MenuItem } from '@material-ui/core';
 import Pagination from '../components/common/Pagination';
 import { SearchRoot, SearchIconButton, SearchInput, TypeForm } from './index';
 import { Search as SearchIcon, Close as CloseIcon } from '@material-ui/icons';
+import { webpVar } from '../lib/Webp';
 
 const GET_LIKE_RANKING = gql`
     query likeRanking($page: Int!, $focus: BasicDataType!, $search: String) {
@@ -149,7 +150,10 @@ const Stats = (): JSX.Element => {
                 align: 'center',
                 backgroundColor: {
                     image: data.data.profileImage
-                        ? data.data.profileImage
+                        ? (toProfileImage(
+                              data.data.profileImage,
+                              webp,
+                          ) as string)
                         : 'https://via.placeholder.com/40x40.png?text=No+Image',
                 },
             };
@@ -255,6 +259,20 @@ const Stats = (): JSX.Element => {
             updatePage({ page: 1, search: '' });
         }
     };
+
+    const toProfileImage = (
+        profileImage: string | undefined,
+        webp: boolean = false,
+    ): string | undefined => {
+        if (profileImage && webp) {
+            profileImage = profileImage
+                .replace(/.png$/, '.webp')
+                .replace(/.jpg$/, '.webp');
+        }
+        return profileImage;
+    };
+
+    const webp = webpVar();
 
     return (
         <Paper variant="outlined">
