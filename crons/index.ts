@@ -45,23 +45,23 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                         _id: 1,
                         type: 1,
                         like: { $ifNull: ['$likeStats.like', 0] },
-                        notLike: { $ifNull: ['$likeStats.notLike', 0] },
-                        likeGrade: {
-                            $ifNull: [
-                                {
-                                    $add: [
-                                        '$likeStats.like',
-                                        {
-                                            $multiply: [
-                                                '$likeStats.notLike',
-                                                -1,
-                                            ],
-                                        },
-                                    ],
-                                },
-                                0,
-                            ],
-                        },
+                        // notLike: { $ifNull: ['$likeStats.notLike', 0] },
+                        // likeGrade: {
+                        //     $ifNull: [
+                        //         {
+                        //             $add: [
+                        //                 '$likeStats.like',
+                        //                 {
+                        //                     $multiply: [
+                        //                         '$likeStats.notLike',
+                        //                         -1,
+                        //                     ],
+                        //                 },
+                        //             ],
+                        //         },
+                        //         0,
+                        //     ],
+                        // },
                     })
                     .exec();
 
@@ -97,13 +97,13 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                             $project: {
                                 _id: false,
                                 type: '$last.data.type',
-                                likeGrade: '$last.data.likeGrade',
+                                like: '$last.data.like',
                             },
                         },
                         {
                             $match: {
                                 type: data.type,
-                                likeGrade: { $gt: data.likeGrade },
+                                like: { $gt: data.like },
                             },
                         },
                         {
@@ -121,7 +121,7 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                         type: data.type,
                         ranking: rank[0] ? rank[0].rank : 1,
                         like: data.like,
-                        notLike: data.notLike,
+                        // notLike: data.notLike,
                     });
                 }
                 await ranking.save();
@@ -138,59 +138,75 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
 
                 break;
             case 'test':
-                const test = await BasicDataModel.findOne().exec();
-                // console.log(test);
+                const datas = await BasicDataModel.find().lean().exec();
 
-                if (!test?.profileImage) {
-                    break;
-                }
+                for (const data of datas) {
+                    if (!data?.profileImage) {
+                        break;
+                    }
 
-                const parsed = url.parse(test?.profileImage as string);
+                    const parsed = url.parse(data?.profileImage as string);
+                    const fileName = path.basename(parsed.pathname as string);
+                    console.log(fileName);
 
-                const file = fs.createWriteStream(
-                    path.normalize(
-                        `${__dirname}/../assets/profile/${path.basename(
-                            parsed.pathname as string,
-                        )}`,
-                    ),
-                );
+                    const file = fs.createWriteStream(
+                        path.normalize(
+                            `${__dirname}/../assets/profile/${fileName}`,
+                        ),
+                    );
 
-                await new Promise<void>((resolve, reject) => {
-                    get(test?.profileImage as string, {}, (response): void => {
-                        response.pipe(file);
-                        file.on('finish', async () => {
-                            resolve();
-                        }).on('error', () => {
-                            reject();
-                        });
+                    await new Promise<void>((resolve, reject) => {
+                        get(
+                            data?.profileImage as string,
+                            {},
+                            (response): void => {
+                                response.pipe(file);
+                                file.on('finish', async () => {
+                                    resolve();
+                                }).on('error', () => {
+                                    reject();
+                                });
+                            },
+                        );
                     });
-                });
+
+                    await BasicDataModel.updateOne(
+                        { _id: data._id },
+                        {
+                            $set: {
+                                profileImage: `/profile/${fileName}`,
+                            },
+                        },
+                    ).exec();
+                }
                 break;
 
             case 'webp':
                 await imagemin(
                     [
-                        path.normalize(
-                            `${__dirname}/../assets/profile/*.{jpg,png}`,
-                        ),
+                        path
+                            .normalize(
+                                `${__dirname}/../assets/profile/*.{jpg,png}`,
+                            )
+                            .replace(/\\/g, '/'),
                     ],
                     {
-                        destination: path.normalize(
-                            `${__dirname}/../assets/profile`,
-                        ),
+                        destination: path
+                            .normalize(`${__dirname}/../assets/profile`)
+                            .replace(/\\/g, '/'),
                         plugins: [imageminWebp({ quality: 90 })],
                     },
                 );
                 await imagemin(
                     [
-                        path.normalize(
-                            `${__dirname}/../assets/public/*.{jpg,png}`,
-                        ),
+                        path
+                            .normalize(`${__dirname}/../assets/public/*.png`)
+                            .replace(/\\/g, '/'),
                     ],
                     {
-                        destination: path.normalize(
-                            `${__dirname}/../assets/public`,
-                        ),
+                        destination: path
+                            .normalize(`${__dirname}/../assets/public`)
+                            .replace(/\\/g, '/'),
                         plugins: [imageminWebp({ quality: 90 })],
                     },
                 );

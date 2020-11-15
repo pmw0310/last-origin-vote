@@ -30,7 +30,6 @@ const GET_LIKE_RANKING = gql`
                 }
                 ranking
                 like
-                notLike
             }
             pageInfo {
                 hasPrevPage
@@ -101,13 +100,14 @@ const Stats = (): JSX.Element => {
             },
         },
         grid: {
-            top: 45,
-            left: 110,
+            top: 30,
+            left: 130,
             right: 30,
             bottom: 30,
         },
         legend: {
-            data: ['좋아요', '싫어요'],
+            data: ['좋아요'],
+            show: false,
             top: 15,
         },
         xAxis: {
@@ -165,16 +165,15 @@ const Stats = (): JSX.Element => {
                 type: 'bar',
                 data: [],
             },
-            {
-                name: '싫어요',
-                type: 'bar',
-                data: [],
-            },
+            // {
+            //     name: '싫어요',
+            //     type: 'bar',
+            //     data: [],
+            // },
         ];
 
-        for (const { like, notLike } of ranking) {
+        for (const { like } of ranking) {
             seriesData[0].data.push(like);
-            seriesData[1].data.push(notLike);
         }
 
         setOption(
@@ -191,7 +190,7 @@ const Stats = (): JSX.Element => {
                     rich: {
                         ...yAxisRichData,
                         value: {
-                            width: 108,
+                            width: 130,
                             align: 'center',
                             lineHeight: 20,
                         },

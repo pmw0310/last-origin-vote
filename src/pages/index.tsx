@@ -105,7 +105,6 @@ const GET_LIST = gql`
                     }
                     likeStats {
                         like
-                        notLike
                     }
                     like
                 }
@@ -122,7 +121,6 @@ const GET_LIST = gql`
                     }
                     likeStats {
                         like
-                        notLike
                     }
                     like
                 }
@@ -151,7 +149,6 @@ const SET_LIKE = gql`
     mutation setLike($target: ID!, $like: Int!) {
         setLike(target: $target, like: $like) {
             like
-            notLike
         }
     }
 `;

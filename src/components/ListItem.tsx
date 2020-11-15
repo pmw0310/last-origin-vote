@@ -23,10 +23,10 @@ import {
     Delete as DeleteIcon,
     ExpandMore as ExpandMoreIcon,
     MoreVert as MoreVertIcon,
-    ThumbUpAlt as ThumbUpAltIcon,
-    ThumbDownAlt as ThumbDownAltIcon,
-    ThumbUpAltOutlined as ThumbUpAltOutlinedIcon,
-    ThumbDownAltOutlined as ThumbDownAltOutlinedIcon,
+    Favorite,
+    FavoriteBorder as FavoriteBorderIcon,
+    // ThumbDownAlt as ThumbDownAltIcon,
+    // ThumbDownAltOutlined as ThumbDownAltOutlinedIcon,
 } from '@material-ui/icons';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { currentUserVar } from '../lib/apollo';
@@ -100,6 +100,10 @@ const Like = styled.div`
     position: absolute;
     bottom: 6px;
     right: 6px;
+`;
+
+const FavoriteIcon = styled(Favorite)`
+    color: #ee5162;
 `;
 
 const ListItem: React.FC<CharacterItemProps> = ({
@@ -261,10 +265,23 @@ const ListItem: React.FC<CharacterItemProps> = ({
         }
     };
 
+    const toProfileImage = (
+        profileImage: string | undefined,
+        webp: boolean = false,
+    ): string | undefined => {
+        if (profileImage && webp) {
+            profileImage = profileImage
+                .replace(/.png$/, '.webp')
+                .replace(/.jpg$/, '.webp');
+        }
+        return profileImage;
+    };
+
+    const webp = webpVar();
     const roleText = toRoleText();
     const gradeImage = toGradeImagePaht(
         (data as CharacterInterface).charGrade as number,
-        webpVar(),
+        webp,
     );
     const statureText = toStatureText();
     const weightText = toWeightText();
@@ -297,7 +314,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                     <LazyLoadImage
                         alt="image"
                         src={
-                            data.profileImage ||
+                            toProfileImage(data.profileImage, webp) ||
                             'https://via.placeholder.com/150x150.png?text=No+Image'
                         }
                         onError={(
@@ -388,15 +405,15 @@ const ListItem: React.FC<CharacterItemProps> = ({
                             onFocus={(event) => event.stopPropagation()}
                         >
                             {likeData.like === 1 ? (
-                                <ThumbUpAltIcon />
+                                <FavoriteIcon />
                             ) : (
-                                <ThumbUpAltOutlinedIcon />
+                                <FavoriteBorderIcon />
                             )}
                             <Typography variant="button">
                                 {likeData.likeStats.like}
                             </Typography>
                         </LikeButton>
-                        <LikeButton
+                        {/* <LikeButton
                             onClick={(event) => {
                                 event.stopPropagation();
                                 handleLike(-1);
@@ -411,7 +428,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                             <Typography variant="button">
                                 {likeData.likeStats.notLike}
                             </Typography>
-                        </LikeButton>
+                        </LikeButton> */}
                     </Like>
                 </ItemAccordionSummary>
                 <AccordionDetails>
@@ -434,8 +451,12 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                             <LazyLoadImage
                                                 alt="https://via.placeholder.com/32x32.png?text=Error"
                                                 src={
-                                                    (data as CharacterInterface)
-                                                        .group?.profileImage ||
+                                                    toProfileImage(
+                                                        (data as CharacterInterface)
+                                                            .group
+                                                            ?.profileImage,
+                                                        webp,
+                                                    ) ||
                                                     'https://via.placeholder.com/32x32.png?text=None'
                                                 }
                                                 effect="blur"
@@ -535,7 +556,10 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                             <Avatar
                                                 key={char.id}
                                                 alt={char.name}
-                                                src={char.profileImage}
+                                                src={toProfileImage(
+                                                    char.profileImage,
+                                                    webp,
+                                                )}
                                             />
                                         ))}
                                     </AvatarGroup>

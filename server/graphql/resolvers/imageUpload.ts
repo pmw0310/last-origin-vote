@@ -1,9 +1,13 @@
 import { Resolver, Mutation, Arg } from 'type-graphql';
 import { GraphQLUpload } from 'apollo-server-koa';
 import { GraphQLScalarType } from 'graphql';
-import { createWriteStream, unlinkSync } from 'fs';
+import { createWriteStream, existsSync } from 'fs';
 import { Stream } from 'stream';
-import cloudinary from 'cloudinary';
+import { generator } from 'rand-token';
+import path from 'path';
+import imagemin from 'imagemin';
+import imageminWebp from 'imagemin-webp';
+// import cloudinary from 'cloudinary';
 
 export interface Upload {
     filename: string;
@@ -12,11 +16,11 @@ export interface Upload {
     createReadStream: () => Stream;
 }
 
-cloudinary.v2.config({
-    cloud_name: 'lastorigin',
-    api_key: '573186812215326',
-    api_secret: '7un0v5aRFlMLdXlMr_eDS8E2bUM',
-});
+// cloudinary.v2.config({
+//     cloud_name: 'lastorigin',
+//     api_key: '573186812215326',
+//     api_secret: '7un0v5aRFlMLdXlMr_eDS8E2bUM',
+// });
 
 @Resolver()
 export default class ImageUploadResolver {
@@ -25,42 +29,74 @@ export default class ImageUploadResolver {
         @Arg('upload', () => GraphQLUpload as GraphQLScalarType, {
             nullable: true,
         })
-        { createReadStream, mimetype, filename }: Upload,
+        { createReadStream, mimetype }: Upload,
     ): Promise<string> {
         if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
             throw new Error('Not an image');
         }
 
-        const path = `${__dirname}/${filename}`;
+        let ext: string;
+        let dir: string | undefined = undefined;
+        let filename: string;
 
-        return new Promise((resolve) => {
+        if (mimetype === 'image/jpeg') {
+            ext = 'jpg';
+        } else if (mimetype === 'image/png') {
+            ext = 'png';
+        } else {
+            throw new Error('Not an image');
+        }
+
+        while (!dir) {
+            const randToken = generator({
+                chars: '0123456789abcdefghijklmnopqrstuvwxyz',
+            });
+            const name = randToken.generate(20);
+            filename = `${name}.${ext}`;
+            dir = path.normalize(
+                `${__dirname}/../../../assets/profile/${filename}`,
+            );
+
+            if (dir && existsSync(dir)) {
+                dir = undefined;
+            }
+        }
+
+        return new Promise((resolve, reject) => {
             createReadStream()
-                .pipe(createWriteStream(path))
+                .pipe(createWriteStream(dir as string))
                 .on('finish', () => {
-                    cloudinary.v2.uploader.upload(
-                        path,
-                        {
-                            use_filename: false,
-                            unique_filename: true,
-                        },
-                        async (error, result) => {
-                            if (error) {
-                                throw new Error(error.message);
-                            }
+                    // cloudinary.v2.uploader.upload(
+                    //     path,
+                    //     {
+                    //         use_filename: false,
+                    //         unique_filename: true,
+                    //     },
+                    //     async (error, result) => {
+                    //         if (error) {
+                    //             throw new Error(error.message);
+                    //         }
+                    //         await unlinkSync(path);
+                    //         return resolve(
+                    //             result?.url.replace(
+                    //                 'http://res.',
+                    //                 'https://res-5.',
+                    //             ),
+                    //         );
+                    //     },
+                    // );
 
-                            await unlinkSync(path);
+                    imagemin([(dir as string).replace(/\\/g, '/')], {
+                        destination: path
+                            .normalize(`${__dirname}/../../../assets/profile`)
+                            .replace(/\\/g, '/'),
+                        plugins: [imageminWebp({ quality: 90 })],
+                    });
 
-                            return resolve(
-                                result?.url.replace(
-                                    'http://res.',
-                                    'https://res-5.',
-                                ),
-                            );
-                        },
-                    );
+                    resolve(`/profile/${filename}`);
                 })
                 .on('error', () => {
-                    throw new Error('upload error');
+                    reject('upload error');
                 });
         });
     }
