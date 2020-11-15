@@ -11,6 +11,15 @@ const client = redis.createClient({
     db: parseInt(process.env.REDIS_DB || '0', 10),
 });
 
+client.on('connect', () => {
+    console.log('Connected to Redis');
+});
+
+client.on('error', () => {
+    console.error('redis error');
+    process.exit(1);
+});
+
 export const getAsync = (key: string): Promise<string | null> => {
     return new Promise((resolve, reject) => {
         client.get(key, (error, value) => {

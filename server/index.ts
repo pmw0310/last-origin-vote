@@ -24,6 +24,10 @@ import User, { UserTypeModel } from './models/user';
 import authChecker from './lib/authChecker';
 import { getAsync, setAsync } from './lib/redis';
 import path from 'path';
+import { existsSync, mkdirSync } from 'fs';
+
+const profileDir: string = path.normalize(`${__dirname}/../assets/profile`);
+!existsSync(profileDir) && mkdirSync(profileDir);
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -166,7 +170,7 @@ const authCheck = (roles: Array<string>) => async (
         )
         .use(
             staticServe({
-                rootDir: path.normalize(`${__dirname}/../assets/profile`),
+                rootDir: profileDir,
                 rootPath: '/profile',
                 index: '',
                 maxage: 2592000000,
