@@ -102,7 +102,7 @@ const Stats = (): JSX.Element => {
         },
         grid: {
             top: 30,
-            left: 130,
+            left: 105,
             right: 30,
             bottom: 30,
         },
@@ -194,12 +194,12 @@ const Stats = (): JSX.Element => {
                     rich: {
                         ...yAxisRichData,
                         value: {
-                            width: 130,
+                            width: 105,
                             align: 'center',
                             lineHeight: 20,
                         },
                         ranking: {
-                            width: 100,
+                            width: 105,
                             align: 'center',
                             lineHeight: 8,
                             fontWeight: 'bold',

@@ -32,17 +32,19 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { currentUserVar } from '../lib/apollo';
 import { useSnackbarState, FeedbackType } from '../components/Feedback';
 import { webpVar } from '../lib/Webp';
+import withWidth from '@material-ui/core/withWidth';
 
 type LikeData = {
     like: -1 | 0 | 1;
     likeStats: LikeStats;
 };
 
-export interface CharacterItemProps {
+export interface ListItemProps {
     data: CharacterInterface | GroupInterface;
     auth: boolean;
     removeDialogOpen: (id: string) => void;
     onLike?: (id: string, like: -1 | 1) => Promise<LikeStats>;
+    width?: string;
 }
 
 const Root = styled.div`
@@ -106,11 +108,12 @@ const FavoriteIcon = styled(Favorite)`
     color: #ee5162;
 `;
 
-const ListItem: React.FC<CharacterItemProps> = ({
+const ListItem: React.FC<ListItemProps> = ({
     data,
     auth,
     removeDialogOpen,
     onLike,
+    width,
 }): JSX.Element => {
     const [expanded, setExpanded] = useState<boolean>(false);
     const [likeData, setLikeData] = useState<LikeData>({
@@ -328,7 +331,10 @@ const ListItem: React.FC<CharacterItemProps> = ({
                         height="150"
                     />
                     <Info>
-                        <Typography variant="h5" gutterBottom>
+                        <Typography
+                            variant={width === 'xs' ? 'h6' : 'h5'}
+                            gutterBottom
+                        >
                             {data.name}
                         </Typography>
                         {type === 'CHARACTER' && roleText && (
@@ -442,6 +448,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                             xl={12}
                                             lg={12}
                                             sm={12}
+                                            xs={12}
                                         >
                                             <Chip
                                                 variant="outlined"
@@ -462,6 +469,15 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                                 effect="blur"
                                                 width="32"
                                                 height="32"
+                                                onError={(
+                                                    e: React.SyntheticEvent<
+                                                        HTMLImageElement,
+                                                        Event
+                                                    >,
+                                                ) => {
+                                                    e.currentTarget.src =
+                                                        'https://via.placeholder.com/35x35.png?text=Error';
+                                                }}
                                             />
                                             <Typography variant="subtitle2">
                                                 {
@@ -471,7 +487,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                             </Typography>
                                         </CharacterInfo>
                                     )}
-                                <CharacterInfo item lg={3} sm={6}>
+                                <CharacterInfo item lg={3} sm={6} xs={6}>
                                     <CharacterInfoChip
                                         variant="outlined"
                                         color="primary"
@@ -487,7 +503,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                         {statureText}
                                     </Typography>
                                 </CharacterInfo>
-                                <CharacterInfo item lg={3} sm={6}>
+                                <CharacterInfo item lg={3} sm={6} xs={6}>
                                     <CharacterInfoChip
                                         variant="outlined"
                                         color="primary"
@@ -504,7 +520,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                     </Typography>
                                 </CharacterInfo>
                                 {(data as CharacterInterface).charClass && (
-                                    <CharacterInfo item lg={3} sm={6}>
+                                    <CharacterInfo item lg={3} sm={6} xs={6}>
                                         <CharacterInfoChip
                                             variant="outlined"
                                             color="primary"
@@ -520,7 +536,7 @@ const ListItem: React.FC<CharacterItemProps> = ({
                                     </CharacterInfo>
                                 )}
                                 {(data as CharacterInterface).charArm && (
-                                    <CharacterInfo item lg={3} sm={6}>
+                                    <CharacterInfo item lg={3} sm={6} xs={6}>
                                         <CharacterInfoChip
                                             variant="outlined"
                                             color="primary"
@@ -542,13 +558,13 @@ const ListItem: React.FC<CharacterItemProps> = ({
                             ((data as GroupInterface).character as Array<
                                 CharacterInterface
                             >)?.length > 0 && (
-                                <CharacterInfo item xl={12}>
+                                <CharacterInfo item xl={12} xs={12}>
                                     <Chip
                                         variant="outlined"
                                         color="primary"
                                         label="소속 인원"
                                     />
-                                    <AvatarGroup max={5}>
+                                    <AvatarGroup max={width === 'xs' ? 5 : 10}>
                                         {((data as GroupInterface)
                                             .character as Array<
                                             CharacterInterface
@@ -572,4 +588,4 @@ const ListItem: React.FC<CharacterItemProps> = ({
     );
 };
 
-export default React.memo(ListItem);
+export default React.memo(withWidth()(ListItem));
