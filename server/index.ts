@@ -15,14 +15,13 @@ import { ApolloServer } from 'apollo-server-koa';
 import { graphqlUploadKoa } from 'graphql-upload';
 import mongooseConnect from './lib/mongooseConnect';
 import next from 'next';
-import LruCache from 'lru-cache';
 import url from 'url';
 
 import { schema } from './graphql';
 import api from './api';
 import User, { UserTypeModel } from './models/user';
 import authChecker from './lib/authChecker';
-import { getAsync, setAsync } from './lib/redis';
+import client, { getCache, setCache, removeAllCache } from './lib/redis';
 import path from 'path';
 import { existsSync, mkdirSync } from 'fs';
 
@@ -33,17 +32,16 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-const ssrCache = new LruCache({
-    max: 100,
-    maxAge: 1000 * 60 * 10,
-});
-
 async function renderAndCache(ctx: Context, next: Next) {
     const parsedUrl = url.parse(ctx.url, true);
-    const { query, pathname, path: cacheKey } = parsedUrl;
-    if (ssrCache.has(cacheKey)) {
-        console.log('use cache', cacheKey);
-        ctx.body = ssrCache.get(cacheKey);
+    const { query, pathname, path } = parsedUrl;
+    const cacheKey = `html_${path}`;
+
+    const cache = await getCache(cacheKey);
+
+    if (cache) {
+        console.log('use html cache', path);
+        ctx.body = cache;
         await next();
         ctx.respond = false;
         return;
@@ -55,8 +53,9 @@ async function renderAndCache(ctx: Context, next: Next) {
             pathname as string,
             query,
         );
-        if (ctx.res.statusCode === 200) {
-            ssrCache.set(cacheKey, html);
+        if (ctx.res.statusCode === 200 && html) {
+            await setCache(cacheKey, html, 1000 * 60 * 15);
+            client.sadd('html', cacheKey);
         }
         ctx.body = html;
         await next();
@@ -84,6 +83,8 @@ const authCheck = (roles: Array<string>) => async (
 
 (async () => {
     await app.prepare();
+
+    removeAllCache();
 
     const uri = (process.env.URI as string) || 'http://localhost:4000';
     const port = parseInt(process.env.PORT || '4000', 10);
@@ -122,7 +123,7 @@ const authCheck = (roles: Array<string>) => async (
     }
 
     router.get('/', renderAndCache);
-    router.get('/stats', renderAndCache);
+    router.get('/ranking', renderAndCache);
     router.get('/character/add', authCheck(['set']), renderAndCache);
     router.get('/character/:id', authCheck(['set']), renderAndCache);
     router.get('/group/add', authCheck(['set']), renderAndCache);
@@ -148,9 +149,8 @@ const authCheck = (roles: Array<string>) => async (
                     connectSrc: [uri],
                     imgSrc: [
                         uri,
-                        'https://via.placeholder.com',
-                        'https://res-5.cloudinary.com',
                         'data:',
+                        'https://via.placeholder.com',
                         'https://phinf.pstatic.net',
                         'https://ssl.pstatic.net',
                     ],
@@ -200,10 +200,6 @@ const authCheck = (roles: Array<string>) => async (
             },
         ),
     );
-
-    await setAsync('test', 'aa1');
-    const test = await getAsync('test');
-    console.log(test);
 
     server.listen(port, () => {
         console.log(`> Next on ${uri}`);

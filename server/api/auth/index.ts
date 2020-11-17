@@ -1,12 +1,16 @@
 import { DefaultState, Context } from 'koa';
 import Router from 'koa-router';
 import naver from './naver';
+import { delCache } from '../../lib/redis';
 
 const router = new Router<DefaultState, Context>();
 
 router.use('/naver', naver.routes());
 router.get('/logout', async (ctx: Context) => {
-    console.log('logout');
+    const token = ctx.cookies.get('refresh_token');
+    if (token) {
+        delCache(`token_${token}`);
+    }
     ctx.cookies.set('access_token', '', {
         httpOnly: true,
     });

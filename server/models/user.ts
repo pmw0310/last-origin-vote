@@ -1,15 +1,20 @@
 import { Context } from 'koa';
-import { Document, Schema, model, connection, Model } from 'mongoose';
+import { Document, Schema, model, connection, Model, Types } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 import { uid } from 'rand-token';
 import jwt, { VerifyErrors } from 'jsonwebtoken';
 import { encrypt, decrypt } from '../lib/aes256cbc';
+import {
+    getCache,
+    getCacheDate,
+    setCache,
+    existsCache,
+    delCache,
+} from '../lib/redis';
 
 export interface UserTypeModel extends Document {
     _id: string;
     uid: number;
-    token?: string;
-    tokenMaxAge?: Date;
     nickname?: string;
     profileImage?: string;
     createdAt: Date;
@@ -34,12 +39,6 @@ const UserSchema = new Schema<UserTypeModel>({
         unique: true,
         index: true,
     },
-    token: {
-        type: String,
-        unique: true,
-        index: true,
-    },
-    tokenMaxAge: Date,
     nickname: String,
     profileImage: String,
     createdAt: {
@@ -81,12 +80,18 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
 UserSchema.methods.generateRefreshToken = async function (
     ctx: Context,
 ): Promise<string> {
+    let token: string;
+
     while (true) {
         try {
-            this.token = uid(16);
-            this.tokenMaxAge = new Date();
-            this.tokenMaxAge.setDate(this.tokenMaxAge.getDate() + 1);
-            await this.save();
+            token = uid(16);
+            const key = `token_${token}`;
+
+            if (existsCache(key)) {
+                continue;
+            }
+
+            await setCache(key, this._id.toString(), 1000 * 60 * 60 * 24);
             break;
         } catch {
             console.warn('retry generate token');
@@ -94,13 +99,13 @@ UserSchema.methods.generateRefreshToken = async function (
     }
 
     if (ctx) {
-        ctx.cookies.set('refresh_token', this.token, {
+        ctx.cookies.set('refresh_token', token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24,
         });
     }
 
-    return this.token;
+    return token;
 };
 
 UserSchema.statics.verify = async function (
@@ -151,21 +156,33 @@ UserSchema.statics.verify = async function (
 
             return { user };
         } else if (refreshToken) {
-            const user: UserTypeModel = await this.findOne({
-                token: refreshToken as string,
-            });
+            const key = `token_${refreshToken}`;
+            const id = await getCache(key);
 
-            if (!user) {
+            if (!id) {
                 return { error: 'token modulation' };
             }
 
-            const exp = (user.tokenMaxAge as Date).getTime();
-            const now = Date.now();
+            const user: UserTypeModel = await this.findById(
+                Types.ObjectId(id as string),
+            );
 
-            if (exp < now) {
-                return { error: 'token timeout' };
-            } else if (exp - now < 60 * 60) {
-                await user.generateRefreshToken(ctx);
+            if (!user) {
+                return { error: 'not find user' };
+            }
+
+            const time = await getCacheDate(key);
+
+            if (time) {
+                const exp = new Date(time).getTime();
+                const now = Date.now();
+
+                if (exp - now < 1000 * 60 * 60) {
+                    delCache(key);
+                    await user.generateRefreshToken(ctx);
+                }
+            } else {
+                return { error: 'token modulation' };
             }
 
             user.generateAccessToken(ctx);

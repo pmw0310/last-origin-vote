@@ -2,6 +2,7 @@
 import React from 'react';
 import Head from 'next/head';
 import { ApolloProvider } from '@apollo/client';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '../components/AppBar';
 import AppContainer from '../components/AppContainer';
 import { useApollo } from '../lib/apollo';
@@ -28,6 +29,7 @@ export default function App({ Component, pageProps }: Props): JSX.Element {
                 <Component {...pageProps} />
             ) : (
                 <Feedback>
+                    <CssBaseline />
                     <AppBar />
                     <AppContainer>
                         <Component {...pageProps} />

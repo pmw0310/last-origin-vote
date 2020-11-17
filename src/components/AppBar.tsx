@@ -109,7 +109,7 @@ const MenuAppBar = (): JSX.Element => {
                         <ListItemText primary="리스트" />
                     </ListItem>
                 </Link>
-                <Link href="/stats">
+                <Link href="/ranking">
                     <ListItem button>
                         <ListItemIcon>
                             <EqualizerIcon />
