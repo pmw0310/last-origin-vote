@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import EchartsCore from 'echarts-for-react/lib/core';
-import echarts, { EChartOption } from 'echarts/lib/echarts';
 import 'echarts/lib/chart/bar';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
-import { gql, useLazyQuery } from '@apollo/client';
+
 import { CharacterInterface, GroupInterface } from 'Module';
-import produce from 'immer';
-import { Paper, Grid, Select, MenuItem } from '@material-ui/core';
+import { Close as CloseIcon, Search as SearchIcon } from '@material-ui/icons';
+import { Grid, MenuItem, Paper, Select } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { SearchIconButton, SearchInput, SearchRoot, TypeForm } from './index';
+import echarts, { EChartOption } from 'echarts/lib/echarts';
+import { gql, useLazyQuery } from '@apollo/client';
+
+import EchartsCore from 'echarts-for-react/lib/core';
 import Pagination from '../components/common/Pagination';
-import { SearchRoot, SearchIconButton, SearchInput, TypeForm } from './index';
-import { Search as SearchIcon, Close as CloseIcon } from '@material-ui/icons';
+import produce from 'immer';
+import { toProfileImage } from '../lib/info';
 import { webpVar } from '../lib/Webp';
 
 const GET_LIKE_RANKING = gql`
@@ -49,6 +52,10 @@ const Stats = (): JSX.Element => {
     const [page, setPage] = useState<number>(1);
     const [focus, setFocus] = useState<string>('CHARACTER');
     const [search, setSearch] = useState<string>('');
+    const [max, setMax] = useState<number>(-1);
+    const [update, setUpdate] = useState<boolean>(false);
+    const webp = webpVar();
+
     const updatePage = (option?: {
         page?: number;
         focus?: string;
@@ -113,6 +120,7 @@ const Stats = (): JSX.Element => {
         },
         xAxis: {
             type: 'value',
+            max: 10,
         },
         yAxis: {
             type: 'category',
@@ -120,6 +128,7 @@ const Stats = (): JSX.Element => {
             data: [],
         },
         series: [],
+        color: ['#ee5162'],
     });
 
     useEffect(() => {
@@ -128,7 +137,13 @@ const Stats = (): JSX.Element => {
     }, []);
 
     useEffect(() => {
-        if (!likeRanking) return;
+        if (!loading && likeRanking) {
+            setUpdate(true);
+        }
+    }, [likeRanking, loading]);
+
+    useEffect(() => {
+        if (!update) return;
 
         const {
             likeRanking: { likeRanking: ranking },
@@ -149,12 +164,9 @@ const Stats = (): JSX.Element => {
                 height: 40,
                 align: 'center',
                 backgroundColor: {
-                    image: data.data.profileImage
-                        ? (toProfileImage(
-                              data.data.profileImage,
-                              webp,
-                          ) as string)
-                        : 'https://via.placeholder.com/40x40.png?text=No+Image',
+                    image:
+                        toProfileImage(data.data.profileImage, webp) ||
+                        'https://via.placeholder.com/40x40.png?text=No+Image',
                 },
             };
         }
@@ -162,26 +174,30 @@ const Stats = (): JSX.Element => {
         const seriesData: Array<{
             name: string;
             type: string;
-            data: Array<string>;
+            data: Array<number>;
         }> = [
             {
                 name: '좋아요',
                 type: 'bar',
                 data: [],
             },
-            // {
-            //     name: '싫어요',
-            //     type: 'bar',
-            //     data: [],
-            // },
         ];
 
         for (const { like } of ranking) {
             seriesData[0].data.push(like);
         }
 
+        let _max: number;
+        if (max === -1) {
+            _max = Math.max.apply(null, seriesData[0].data);
+            setMax(_max);
+        } else {
+            _max = max;
+        }
+
         setOption(
             produce(option, (draft) => {
+                (draft.xAxis as EChartOption.XAxis).max = _max;
                 (draft.yAxis as EChartOption.YAxis).data = yAxisData;
                 draft.series = seriesData;
                 (draft.yAxis as EChartOption.YAxis).axisLabel = {
@@ -208,8 +224,8 @@ const Stats = (): JSX.Element => {
                 };
             }),
         );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [likeRanking]);
+        setUpdate(false);
+    }, [likeRanking, max, option, update, webp]);
 
     const handleSelectChange = (
         event: React.ChangeEvent<{ name?: string; value: unknown }>,
@@ -259,20 +275,6 @@ const Stats = (): JSX.Element => {
             updatePage({ page: 1, search: '' });
         }
     };
-
-    const toProfileImage = (
-        profileImage: string | undefined,
-        webp: boolean = false,
-    ): string | undefined => {
-        if (profileImage && webp) {
-            profileImage = profileImage
-                .replace(/.png$/, '.webp')
-                .replace(/.jpg$/, '.webp');
-        }
-        return profileImage;
-    };
-
-    const webp = webpVar();
 
     return (
         <Paper variant="outlined">

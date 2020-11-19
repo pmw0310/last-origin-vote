@@ -1,9 +1,10 @@
-import React from 'react';
-import { Button, Typography } from '@material-ui/core';
 import {
     ArrowBack as ArrowBackIcon,
     ArrowForward as ArrowForwardIcon,
 } from '@material-ui/icons';
+import { Button, Typography } from '@material-ui/core';
+
+import React from 'react';
 import styled from 'styled-components';
 
 const Page = styled.div`

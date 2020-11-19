@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react';
 import {
-    TextField,
-    InputAdornment,
     Button,
-    Typography,
-    Grid,
-    MenuItem,
-    CircularProgress,
     Checkbox,
+    CircularProgress,
     FormControlLabel,
+    Grid,
+    InputAdornment,
+    MenuItem,
+    TextField,
+    Typography,
 } from '@material-ui/core';
-import styled from 'styled-components';
 import { CharacterInterface, GroupInterface } from 'Module';
+import React, { useEffect, useState } from 'react';
+import { gql, useLazyQuery, useMutation } from '@apollo/client';
+
 import ChipInput from 'material-ui-chip-input';
-import { gql, useMutation, useLazyQuery } from '@apollo/client';
 import { EditorProps } from './EditorForm';
+import styled from 'styled-components';
 
 const IMAGEUPLOAD = gql`
     mutation imageUpload($file: Upload!) {

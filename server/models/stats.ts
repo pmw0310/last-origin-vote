@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Document, Schema, model } from 'mongoose';
+
 import enumToArray from '../lib/enumToArray';
 
 export enum StatsType {

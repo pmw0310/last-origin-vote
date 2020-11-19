@@ -10,7 +10,7 @@ declare module 'Module' {
 
     export type LikeStats = {
         like: number;
-        notLike: number;
+        state: boolean;
     };
 
     export interface CharacterInterface {
@@ -51,23 +51,4 @@ declare module 'Module' {
         like?: -1 | 0 | 1;
         type: 'CHARACTER' | 'GROUP';
     }
-
-    // enum CharacterGrade {
-    //     B = 1,
-    //     A,
-    //     S,
-    //     SS,
-    // }
-
-    // enum CharacterType {
-    //     LIGHT = 1,
-    //     FLYING,
-    //     HEAVY,
-    // }
-
-    // enum CharacterRole {
-    //     ASSAULT = 1,
-    //     SUPPORT,
-    //     DEFEND,
-    // }
 }

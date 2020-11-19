@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Field, ObjectType } from 'type-graphql';
+
 import BasicDataModel, { BasicDataType } from '../../models/basicData';
-import { Character } from './character';
+import { Field, ObjectType } from 'type-graphql';
+
 import { BasicData } from '../models/basicData';
+import { Character } from './character';
 
 export class GroupInput {}
 

@@ -1,6 +1,7 @@
-import { InputType, Field, Int, Float, ID } from 'type-graphql';
-import { BasicDataType } from '../../models/basicData';
+import { Field, Float, ID, InputType, Int } from 'type-graphql';
+
 import { BasicDataInput } from './basicData';
+import { BasicDataType } from '../../models/basicData';
 import { CharacterInput } from './character';
 import { GroupInput } from './group';
 

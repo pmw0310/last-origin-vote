@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Field, ObjectType, Int, Float, ID } from 'type-graphql';
+
 import BasicDataModel, {
-    CharacterGrade,
-    CharacterType,
-    CharacterRole,
     BasicDataType,
+    CharacterGrade,
+    CharacterRole,
+    CharacterType,
 } from '../../models/basicData';
+import { Field, Float, ID, Int, ObjectType } from 'type-graphql';
+
 import { BasicData } from '../models/basicData';
 import { Group } from './group';
 

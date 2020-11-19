@@ -1,16 +1,17 @@
-import { Context } from 'koa';
-import { Document, Schema, model, connection, Model, Types } from 'mongoose';
-import autoIncrement from 'mongoose-auto-increment';
-import { uid } from 'rand-token';
-import jwt, { VerifyErrors } from 'jsonwebtoken';
-import { encrypt, decrypt } from '../lib/aes256cbc';
+import { Document, Model, Schema, connection, model } from 'mongoose';
+import { decrypt, encrypt } from '../lib/aes256cbc';
 import {
+    delCache,
+    existsCache,
     getCache,
     getCacheDate,
     setCache,
-    existsCache,
-    delCache,
 } from '../lib/redis';
+import jwt, { VerifyErrors } from 'jsonwebtoken';
+
+import { Context } from 'koa';
+import autoIncrement from 'mongoose-auto-increment';
+import { uid } from 'rand-token';
 
 export interface UserTypeModel extends Document {
     _id: string;
@@ -84,10 +85,10 @@ UserSchema.methods.generateRefreshToken = async function (
 
     while (true) {
         try {
-            token = uid(16);
+            token = uid(32);
             const key = `token_${token}`;
 
-            if (existsCache(key)) {
+            if (await existsCache(key)) {
                 continue;
             }
 
@@ -157,15 +158,13 @@ UserSchema.statics.verify = async function (
             return { user };
         } else if (refreshToken) {
             const key = `token_${refreshToken}`;
-            const id = await getCache(key);
+            const id: string = (await getCache(key)) as string;
 
             if (!id) {
                 return { error: 'token modulation' };
             }
 
-            const user: UserTypeModel = await this.findById(
-                Types.ObjectId(id as string),
-            );
+            const user: UserTypeModel = await this.findById(id);
 
             if (!user) {
                 return { error: 'not find user' };

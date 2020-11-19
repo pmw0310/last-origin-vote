@@ -1,24 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    Resolver,
+    Args,
+    ArgsType,
+    Ctx,
+    Field,
+    ID,
+    Int,
     Mutation,
     Query,
-    Field,
-    Int,
-    ID,
-    ArgsType,
-    Args,
-    Ctx,
+    Resolver,
 } from 'type-graphql';
-import { Min, Max } from 'class-validator';
-import db from 'mongoose';
-import { ApolloError } from 'apollo-server-koa';
-import LikeModels from '../../models/like';
-import StatsModels, { StatsType } from '../../models/stats';
-import { UserVerifyResult } from '../../models/user';
-import BasicDataModel from '../../models/basicData';
 import { LikeData, LikeRankingData } from '../models/like';
+import StatsModels, { StatsType } from '../../models/stats';
+
+import { ApolloError } from 'apollo-server-koa';
+import BasicDataModel from '../../models/basicData';
 import { BasicDataType } from '../../models/basicData';
+import LikeModels from '../../models/like';
+import { Min } from 'class-validator';
+import { UserVerifyResult } from '../../models/user';
+import db from 'mongoose';
 
 @ArgsType()
 class SetLikeArgs {
@@ -27,13 +28,6 @@ class SetLikeArgs {
         nullable: false,
     })
     target!: string;
-    @Field(() => Int, {
-        description: '(1:좋아요, -1:싫어요)',
-        nullable: false,
-    })
-    @Min(-1)
-    @Max(1)
-    like!: -1 | 1;
 }
 
 @ArgsType()
@@ -60,7 +54,7 @@ class LikeRankingArgs {
 export default class GroupResolver {
     @Mutation(() => LikeData)
     async setLike(
-        @Args() { target, like }: SetLikeArgs,
+        @Args() { target }: SetLikeArgs,
         @Ctx() ctx: { currentUser: UserVerifyResult },
     ): Promise<LikeData> {
         const user = ctx.currentUser.user?._id;
@@ -70,7 +64,6 @@ export default class GroupResolver {
         }
 
         let setLike: number = 0;
-        let setNotLike: number = 0;
 
         const session = await db.startSession();
         session.startTransaction();
@@ -82,48 +75,25 @@ export default class GroupResolver {
 
         try {
             if (likeRes) {
-                if (likeRes.like === like) {
+                if (likeRes.like === 1) {
                     await LikeModels.findByIdAndRemove(likeRes.id)
                         .session(session)
                         .exec();
-                    switch (like) {
-                        case 1:
-                            setLike = -1;
-                            break;
-                        case -1:
-                            setNotLike = -1;
-                            break;
-                    }
+                    setLike = -1;
                 } else {
-                    likeRes.like = like;
+                    likeRes.like = 1;
                     likeRes.updateAt = new Date();
                     await likeRes.save({ session });
-                    switch (like) {
-                        case 1:
-                            setLike = 1;
-                            setNotLike = -1;
-                            break;
-                        case -1:
-                            setLike = -1;
-                            setNotLike = 1;
-                            break;
-                    }
+                    setLike = 1;
                 }
             } else {
                 const newLink = new LikeModels({
                     user,
                     target,
-                    like: like,
+                    like: 1,
                 });
                 await newLink.save({ session });
-                switch (like) {
-                    case 1:
-                        setLike = 1;
-                        break;
-                    case -1:
-                        setNotLike = 1;
-                        break;
-                }
+                setLike = 1;
             }
 
             const data = await BasicDataModel.findById(target).exec();
@@ -131,18 +101,17 @@ export default class GroupResolver {
             if (!data) {
                 throw new ApolloError('not find data');
             } else if (!data.likeStats) {
-                data.likeStats = { like: 0, notLike: 0 };
+                data.likeStats = { like: 0 };
             }
 
             data.likeStats.like += setLike;
-            data.likeStats.notLike += setNotLike;
             data.likeStats.updateAt = new Date();
             await data.save({ session });
             await session.commitTransaction();
             session.endSession();
             return {
+                state: setLike === 1,
                 like: data.likeStats.like,
-                notLike: data.likeStats.notLike,
             };
         } catch (e) {
             await session.abortTransaction();

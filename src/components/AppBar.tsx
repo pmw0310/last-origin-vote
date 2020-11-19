@@ -1,24 +1,25 @@
 import React, { useEffect } from 'react';
-import Link from 'next/link';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
-import { ButtonBase } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import Container from '@material-ui/core/Container';
-import Tooltip from '@material-ui/core/Tooltip';
-import styled, { createGlobalStyle } from 'styled-components';
 import { gql, useQuery } from '@apollo/client';
-import { currentUserVar } from '../lib/apollo';
-import { UserInterface } from 'Module';
+import styled, { createGlobalStyle } from 'styled-components';
+
+import AppBar from '@material-ui/core/AppBar';
+import Avatar from '@material-ui/core/Avatar';
+import { ButtonBase } from '@material-ui/core';
+import Container from '@material-ui/core/Container';
 import Drawer from '@material-ui/core/Drawer';
+import EqualizerIcon from '@material-ui/icons/Equalizer';
+import IconButton from '@material-ui/core/IconButton';
+import Link from 'next/link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import EqualizerIcon from '@material-ui/icons/Equalizer';
+import MenuIcon from '@material-ui/icons/Menu';
+import Toolbar from '@material-ui/core/Toolbar';
+import Tooltip from '@material-ui/core/Tooltip';
+import { UserInterface } from 'Module';
 import ViewListIcon from '@material-ui/icons/ViewList';
+import { currentUserVar } from '../lib/apollo';
 
 const GlobalStyles = createGlobalStyle`
        html body {

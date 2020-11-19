@@ -1,49 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
-import { useRouter } from 'next/router';
 import {
-    Typography,
-    IconButton,
-    Chip,
-    Avatar,
     Accordion,
     AccordionDetails,
     AccordionSummary,
-    Menu,
-    MenuItem,
+    Avatar,
+    Chip,
+    Grid,
+    IconButton,
     ListItemIcon,
     ListItemText,
-    Grid,
+    Menu,
+    MenuItem,
+    Typography,
 } from '@material-ui/core';
-import AvatarGroup from '@material-ui/lab/AvatarGroup';
-import styled from 'styled-components';
-import { CharacterInterface, GroupInterface, LikeStats } from 'Module';
+import { CharacterInterface, GroupInterface } from 'Module';
 import {
-    Edit as EditIcon,
     Delete as DeleteIcon,
+    Edit as EditIcon,
     ExpandMore as ExpandMoreIcon,
     MoreVert as MoreVertIcon,
-    Favorite,
-    FavoriteBorder as FavoriteBorderIcon,
-    // ThumbDownAlt as ThumbDownAltIcon,
-    // ThumbDownAltOutlined as ThumbDownAltOutlinedIcon,
 } from '@material-ui/icons';
+import React, { useState } from 'react';
+import {
+    toGradeImagePaht,
+    toProfileImage,
+    toRoleText,
+    toStatureText,
+    toWeightText,
+} from '../lib/info';
+
+import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { currentUserVar } from '../lib/apollo';
-import { useSnackbarState, FeedbackType } from '../components/Feedback';
+import LikeButton from '../components/common/LikeButton';
+import styled from 'styled-components';
+import { useRouter } from 'next/router';
 import { webpVar } from '../lib/Webp';
 import withWidth from '@material-ui/core/withWidth';
-
-type LikeData = {
-    like: -1 | 0 | 1;
-    likeStats: LikeStats;
-};
 
 export interface ListItemProps {
     data: CharacterInterface | GroupInterface;
     auth: boolean;
     removeDialogOpen: (id: string) => void;
-    onLike?: (id: string, like: -1 | 1) => Promise<LikeStats>;
     width?: string;
 }
 
@@ -86,45 +83,16 @@ const CharacterInfoChip = styled(Chip)`
     margin-right: 12px;
     width: 64px;
 `;
-const LikeButton = styled(IconButton)`
-    width: 62px;
-    height: 62px;
-    .MuiIconButton-label {
-        display: flex;
-        flex-direction: column;
-    }
-    .MuiTypography-root {
-        line-height: 1;
-        padding-top: 3px;
-    }
-`;
-const Like = styled.div`
-    position: absolute;
-    bottom: 6px;
-    right: 6px;
-`;
-
-const FavoriteIcon = styled(Favorite)`
-    color: #ee5162;
-`;
 
 const ListItem: React.FC<ListItemProps> = ({
     data,
     auth,
     removeDialogOpen,
-    onLike,
     width,
 }): JSX.Element => {
     const [expanded, setExpanded] = useState<boolean>(false);
-    const [likeData, setLikeData] = useState<LikeData>({
-        like: data.like as -1 | 0 | 1,
-        likeStats: { ...(data.likeStats as LikeStats) },
-    });
-    const [likeLoading, setLikeLoading] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const currentUser = currentUserVar();
-    const dispatch = useSnackbarState();
 
     const handleChangeAccordion = (
         _event: React.ChangeEvent<any>,
@@ -143,151 +111,17 @@ const ListItem: React.FC<ListItemProps> = ({
         setAnchorEl(null);
     };
 
-    const handleLike = async (like: -1 | 1) => {
-        if (!currentUser) {
-            dispatch({
-                type: FeedbackType.OPEN,
-                option: {
-                    measage: '로그인이 필요합니다.',
-                    severity: 'warning',
-                },
-            });
-            return;
-        } else if (likeLoading || !onLike) {
-            return;
-        }
-
-        setLikeLoading(true);
-
-        try {
-            const likeStats = await onLike(data.id as string, like);
-            setLikeData({
-                like: likeData.like === like ? 0 : like,
-                likeStats,
-            });
-        } catch (e) {
-            dispatch({
-                type: FeedbackType.OPEN,
-                option: {
-                    measage: '작업이 실패하였습니다.',
-                    severity: 'error',
-                },
-            });
-        }
-
-        setLikeLoading(false);
-    };
-
     const router = useRouter();
 
-    const isNone = (txt?: number): boolean => {
-        return !txt;
-    };
-
-    const toRoleText = (): string => {
-        const { charType, charRole } = data as CharacterInterface;
-        let text: string = '';
-
-        const isType = !isNone(charType);
-        const isRole = !isNone(charRole);
-
-        if (!isType && !isRole) {
-            return '';
-        }
-
-        switch (charType) {
-            case 1:
-                text += '경장';
-                break;
-            case 2:
-                text += '기동';
-                break;
-            case 3:
-                text += '중장';
-                break;
-        }
-
-        text += isRole ? ' ' : '형';
-
-        switch (charRole) {
-            case 1:
-                text += '공격기';
-                break;
-            case 2:
-                text += '지원기';
-                break;
-            case 3:
-                text += '보호기';
-                break;
-        }
-
-        return text;
-    };
-
-    const toGradeImagePaht = (grade: number, webp: boolean = false): string => {
-        const { charRole } = data as CharacterInterface;
-
-        const isGrade = !isNone(grade);
-        const isRole = !isNone(charRole);
-
-        if (!isGrade || !isRole) {
-            return '';
-        }
-
-        switch (charRole) {
-            case 1:
-                return `/public/a${grade}.${webp ? 'webp' : 'png'}`;
-            case 2:
-                return `/public/s${grade}.${webp ? 'webp' : 'png'}`;
-            case 3:
-                return `/public/d${grade}.${webp ? 'webp' : 'png'}`;
-            default:
-                return '';
-        }
-    };
-
-    const toStatureText = (): string => {
-        const stature = (data as CharacterInterface).charStature as number;
-        if (stature <= 0) {
-            return '?cm';
-        } else if (stature < 200) {
-            return `${stature}cm`;
-        } else {
-            return `${stature / 100}m`;
-        }
-    };
-
-    const toWeightText = (): string => {
-        const weight = (data as CharacterInterface).charWeight as number;
-        if (weight <= 0) {
-            return '?kg';
-        } else if (weight < 500) {
-            return `${weight}kg`;
-        } else {
-            return `${weight / 1000}t`;
-        }
-    };
-
-    const toProfileImage = (
-        profileImage: string | undefined,
-        webp: boolean = false,
-    ): string | undefined => {
-        if (profileImage && webp) {
-            profileImage = profileImage
-                .replace(/.png$/, '.webp')
-                .replace(/.jpg$/, '.webp');
-        }
-        return profileImage;
-    };
-
     const webp = webpVar();
-    const roleText = toRoleText();
+    const roleText = toRoleText(data);
     const gradeImage = toGradeImagePaht(
+        data,
         (data as CharacterInterface).charGrade as number,
         webp,
     );
-    const statureText = toStatureText();
-    const weightText = toWeightText();
+    const statureText = toStatureText(data);
+    const weightText = toWeightText(data);
     const type: 'CHARACTER' | 'GROUP' = data.type;
 
     return (
@@ -402,40 +236,7 @@ const ListItem: React.FC<ListItemProps> = ({
                             </Menu>
                         </Auth>
                     )}
-                    <Like>
-                        <LikeButton
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                handleLike(1);
-                            }}
-                            onFocus={(event) => event.stopPropagation()}
-                        >
-                            {likeData.like === 1 ? (
-                                <FavoriteIcon />
-                            ) : (
-                                <FavoriteBorderIcon />
-                            )}
-                            <Typography variant="button">
-                                {likeData.likeStats.like}
-                            </Typography>
-                        </LikeButton>
-                        {/* <LikeButton
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                handleLike(-1);
-                            }}
-                            onFocus={(event) => event.stopPropagation()}
-                        >
-                            {likeData.like === -1 ? (
-                                <ThumbDownAltIcon />
-                            ) : (
-                                <ThumbDownAltOutlinedIcon />
-                            )}
-                            <Typography variant="button">
-                                {likeData.likeStats.notLike}
-                            </Typography>
-                        </LikeButton> */}
-                    </Like>
+                    <LikeButton id={data.id as string} />
                 </ItemAccordionSummary>
                 <AccordionDetails>
                     <Grid container spacing={1}>

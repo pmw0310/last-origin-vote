@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { gql, useLazyQuery, useMutation } from '@apollo/client';
+
 import EditorForm from '../../components/EditorForm';
 import { GroupInterface } from 'Module';
-import { gql, useLazyQuery, useMutation } from '@apollo/client';
+import { useRouter } from 'next/router';
 
 const GET_GROUP = gql`
     query getGroup($id: String!) {

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+
 import { makeVar } from '@apollo/client';
 
 export const webpVar = makeVar<boolean | undefined>(undefined);

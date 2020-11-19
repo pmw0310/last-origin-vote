@@ -1,27 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
-    registerEnumType,
-    ObjectType,
-    Field,
-    Int,
-    ID,
-    Resolver,
-    Query,
     Args,
     ArgsType,
+    Field,
+    ID,
+    Int,
+    ObjectType,
+    Query,
+    Resolver,
+    registerEnumType,
 } from 'type-graphql';
-import { Min } from 'class-validator';
-import { Types, FilterQuery, PaginateOptions } from 'mongoose';
-import { Character } from '../models/character';
-import { Group } from '../models/group';
 import BasicDataModel, {
+    BasicDataType,
     CharacterModel,
     GroupModel,
-    BasicDataType,
 } from '../../models/basicData';
-import { PageInfo } from '../relayStylePagination';
+import { FilterQuery, PaginateOptions, Types } from 'mongoose';
+
 import { BasicUnion } from '../models/unionType';
+import { Character } from '../models/character';
+import { Group } from '../models/group';
+import { Min } from 'class-validator';
+import { PageInfo } from '../relayStylePagination';
 
 enum FocusType {
     ALL = 'ALL',

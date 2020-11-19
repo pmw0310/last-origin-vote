@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import { gql, useMutation } from '@apollo/client';
+
 import EditorForm from '../../components/EditorForm';
 import { GroupInterface } from 'Module';
-import { gql, useMutation } from '@apollo/client';
+import { useRouter } from 'next/router';
 
 const ADD_GROUP = gql`
     mutation setGroup($data: InputData!) {

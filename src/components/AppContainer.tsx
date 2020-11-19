@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+
 import Container from '@material-ui/core/Container';
+import React from 'react';
 import styled from 'styled-components';
 
 const PaddingContainer = styled(Container)`

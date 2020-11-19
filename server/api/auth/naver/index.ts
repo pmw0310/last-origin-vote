@@ -1,7 +1,8 @@
-import { DefaultState, Context } from 'koa';
+import { Context, DefaultState } from 'koa';
+
 import Router from 'koa-router';
-import passport from 'koa-passport';
 import User from '../../../models/user';
+import passport from 'koa-passport';
 
 const router = new Router<DefaultState, Context>();
 

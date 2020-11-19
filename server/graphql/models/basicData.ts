@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { registerEnumType, ID, InterfaceType, Field, Ctx } from 'type-graphql';
+
+import { Ctx, Field, ID, InterfaceType, registerEnumType } from 'type-graphql';
 import { BasicDataType } from '../../models/basicData';
-import { UserVerifyResult } from '../../models/user';
-import LikeModels from '../../models/like';
 import { LikeData } from './like';
+import LikeModels from '../../models/like';
+import { UserVerifyResult } from '../../models/user';
 
 registerEnumType(BasicDataType, {
     name: 'BasicDataType',

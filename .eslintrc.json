@@ -26,6 +26,20 @@
         }
     },
     "rules": {
+        "sort-imports": [
+            "warn",
+            {
+              "ignoreCase": false,
+              "ignoreDeclarationSort": false,
+              "ignoreMemberSort": false,
+              "memberSyntaxSortOrder": [
+                "none",
+                "all",
+                "multiple",
+                "single"
+              ]
+            }
+        ],
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "warn",
         "import/no-unresolved": 0,
@@ -33,8 +47,6 @@
             2,
             { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
         ],
-        // "react/jsx-indent": [2, "tab"],
-        // "react/jsx-indent-props": [2, "tab"],
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/interface-name-prefix": "off",
         "@typescript-eslint/explicit-function-return-type": "off",

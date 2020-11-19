@@ -1,7 +1,8 @@
-import { createUnionType, ClassType } from 'type-graphql';
+import { ClassType, createUnionType } from 'type-graphql';
+
+import { BasicDataType } from '../../models/basicData';
 import { Character } from './character';
 import { Group } from './group';
-import { BasicDataType } from '../../models/basicData';
 
 export const BasicUnion = createUnionType<
     [ClassType<Character>, ClassType<Group>]

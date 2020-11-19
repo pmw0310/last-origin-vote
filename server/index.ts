@@ -1,29 +1,34 @@
 import 'reflect-metadata';
 
-import Koa, { DefaultState, Context, Next } from 'koa';
-import cors from '@koa/cors';
+import Koa, { Context, DefaultState, Next } from 'koa';
+// import { RateLimit } from 'koa2-ratelimit';
+import { Profile, Strategy } from 'passport-naver';
+import User, { UserTypeModel } from './models/user';
+import { existsSync, mkdirSync } from 'fs';
+import {
+    getCache,
+    init as redisInit,
+    removeAllCache,
+    setCache,
+} from './lib/redis';
+
+import { ApolloServer } from 'apollo-server-koa';
+import Bodyparser from 'koa-bodyparser';
 // import morgan from 'koa-morgan';
 import Router from 'koa-router';
-import Bodyparser from 'koa-bodyparser';
-import staticServe from 'koa-static-server';
+import api from './api';
+import authChecker from './lib/authChecker';
+import cors from '@koa/cors';
+import { graphqlUploadKoa } from 'graphql-upload';
 // import proxy from 'koa-proxies';
 import helmet from 'koa-helmet';
-import passport from 'koa-passport';
-// import { RateLimit } from 'koa2-ratelimit';
-import { Strategy, Profile } from 'passport-naver';
-import { ApolloServer } from 'apollo-server-koa';
-import { graphqlUploadKoa } from 'graphql-upload';
 import mongooseConnect from './lib/mongooseConnect';
 import next from 'next';
-import url from 'url';
-
-import { schema } from './graphql';
-import api from './api';
-import User, { UserTypeModel } from './models/user';
-import authChecker from './lib/authChecker';
-import client, { getCache, setCache, removeAllCache } from './lib/redis';
+import passport from 'koa-passport';
 import path from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { schema } from './graphql';
+import staticServe from 'koa-static-server';
+import url from 'url';
 
 const profileDir: string = path.normalize(`${__dirname}/../assets/profile`);
 !existsSync(profileDir) && mkdirSync(profileDir);
@@ -55,7 +60,6 @@ async function renderAndCache(ctx: Context, next: Next) {
         );
         if (ctx.res.statusCode === 200 && html) {
             await setCache(cacheKey, html, 1000 * 60 * 15);
-            client.sadd('html', cacheKey);
         }
         ctx.body = html;
         await next();
@@ -84,6 +88,7 @@ const authCheck = (roles: Array<string>) => async (
 (async () => {
     await app.prepare();
 
+    await redisInit();
     removeAllCache();
 
     const uri = (process.env.URI as string) || 'http://localhost:4000';

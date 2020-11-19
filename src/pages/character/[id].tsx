@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import EditorForm from '../../components/EditorForm';
-import { CharacterInterface } from 'Module';
+import React, { useEffect, useState } from 'react';
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
+
+import { CharacterInterface } from 'Module';
+import EditorForm from '../../components/EditorForm';
+import { useRouter } from 'next/router';
 
 const GET_CHARACTER = gql`
     query getCharacter($id: String!) {

@@ -1,10 +1,12 @@
 import { AuthChecker, buildSchemaSync } from 'type-graphql';
-import { UserVerifyResult } from '../models/user';
-import UserResolvers from './resolvers/user';
-import SetResolvers from './resolvers/set';
+
+import GetResolver from './resolvers/get';
 import ImageUploadResolver from './resolvers/imageUpload';
 import LikeResolver from './resolvers/like';
-import GetResolver from './resolvers/get';
+import RecommendResolvers from './resolvers/recommend';
+import SetResolvers from './resolvers/set';
+import UserResolvers from './resolvers/user';
+import { UserVerifyResult } from '../models/user';
 import authChecker from '../lib/authChecker';
 
 const customAuthChecker: AuthChecker<{ currentUser: UserVerifyResult }> = (
@@ -23,6 +25,7 @@ export const schema = buildSchemaSync({
         GetResolver,
         ImageUploadResolver,
         LikeResolver,
+        RecommendResolvers,
     ],
     dateScalarMode: 'timestamp',
     authChecker: customAuthChecker,

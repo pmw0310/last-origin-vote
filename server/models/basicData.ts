@@ -1,7 +1,8 @@
-import { Document, Schema, model, Types, PaginateModel } from 'mongoose';
-import mongoosePaginate from 'mongoose-paginate-v2';
+import { Document, PaginateModel, Schema, Types, model } from 'mongoose';
+import { likeStatsSchema, likeStatsTypeModel } from './like';
+
 import enumToArray from '../lib/enumToArray';
-import { likeStatsTypeModel, likeStatsSchema } from './like';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export enum BasicDataType {
     CHARACTER = 'CHARACTER',

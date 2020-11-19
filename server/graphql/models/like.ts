@@ -1,5 +1,6 @@
-import { Field, ObjectType, Int, ID } from 'type-graphql';
-import { Min, Max } from 'class-validator';
+import { Field, ID, Int, ObjectType } from 'type-graphql';
+import { Max, Min } from 'class-validator';
+
 import { BasicUnion } from './unionType';
 import { Character } from './character';
 import { Group } from './group';
@@ -41,8 +42,8 @@ export class Like {
 export class LikeData {
     @Field(() => Int, { description: '좋아요', nullable: false })
     like!: number;
-    @Field(() => Int, { description: '싫어요', nullable: false })
-    notLike!: number;
+    @Field(() => Boolean, { description: '좋아요 선택 상태', nullable: true })
+    state?: boolean;
 }
 
 @ObjectType()
@@ -53,8 +54,6 @@ export class LikeRanking {
     ranking!: number;
     @Field(() => Int, { description: '좋아요', nullable: false })
     like!: number;
-    @Field(() => Int, { description: '싫어요', nullable: false })
-    notLike!: number;
 }
 
 @ObjectType()

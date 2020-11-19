@@ -1,28 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
-import Item from '../components/ListItem';
-import { CharacterInterface, GroupInterface, LikeStats } from 'Module';
 import {
-    Paper,
-    IconButton,
-    InputBase,
-    Grid,
-    FormControl,
-    Select,
-    MenuItem,
-    CircularProgress,
-} from '@material-ui/core';
-import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
-import {
-    Search as SearchIcon,
     AccountCircle as AccountCircleIcon,
     Assignment as AssignmentIcon,
     Close as CloseIcon,
+    Search as SearchIcon,
 } from '@material-ui/icons';
-import styled from 'styled-components';
+import { CharacterInterface, GroupInterface } from 'Module';
+import {
+    CircularProgress,
+    FormControl,
+    Grid,
+    IconButton,
+    InputBase,
+    MenuItem,
+    Paper,
+    Select,
+} from '@material-ui/core';
+import { FeedbackType, useDialogState } from '../components/Feedback';
+import React, { useEffect, useState } from 'react';
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { likeAtom, likeDataType } from '../components/common/LikeButton';
+
+import Item from '../components/ListItem';
 import Pagination from '../components/common/Pagination';
-import { useDialogState, FeedbackType } from '../components/Feedback';
+import Recommend from '../components/Recommend';
+import styled from 'styled-components';
+import { useRecoilState } from 'recoil';
+import { useRouter } from 'next/router';
 
 const AddFabTop = styled.div`
     position: fixed;
@@ -145,14 +149,6 @@ const REMOVE_CHARACTER = gql`
     }
 `;
 
-const SET_LIKE = gql`
-    mutation setLike($target: ID!, $like: Int!) {
-        setLike(target: $target, like: $like) {
-            like
-        }
-    }
-`;
-
 const CharacterList = (): JSX.Element => {
     const dispatch = useDialogState();
 
@@ -161,20 +157,49 @@ const CharacterList = (): JSX.Element => {
     const [sort, setSort] = useState<string>('name');
     const [order, setOrder] = useState<string>('ASC');
     const [search, setSearch] = useState<string>('');
-    const [open, setOpen] = React.useState<boolean>(false);
+    const [open, setOpen] = useState<boolean>(false);
+    const [update, setUpdate] = useState<boolean>(false);
 
     const router = useRouter();
 
     const [removeId, setremoveId] = useState<string>('');
     const [removeCharacter] = useMutation(REMOVE_CHARACTER);
-    const [setLike] = useMutation<{ setLike: LikeStats }>(SET_LIKE);
     const [getList, { data: listData, loading }] = useLazyQuery(GET_LIST, {
         fetchPolicy: 'no-cache',
     });
 
+    const [like, setLikeData] = useRecoilState(likeAtom);
+
     const { data: auth, loading: authLoding } = useQuery(AUTH_CHECKER, {
         fetchPolicy: 'no-cache',
     });
+
+    useEffect(() => {
+        if (!loading && listData) {
+            setUpdate(true);
+        }
+    }, [listData, loading]);
+
+    useEffect(() => {
+        if (!update) {
+            return;
+        }
+
+        const {
+            get: { data },
+        } = listData;
+        const likeData: likeDataType = { ...like };
+
+        for (const {
+            id,
+            like: state,
+            likeStats: { like },
+        } of data) {
+            likeData[id] = { like, state: state === 1 };
+        }
+        setLikeData(likeData);
+        setUpdate(false);
+    }, [like, listData, loading, setLikeData, update]);
 
     const handleDialogOpen = (id: string) => {
         setremoveId(id);
@@ -194,17 +219,6 @@ const CharacterList = (): JSX.Element => {
     const handleOnRemove = async () => {
         await removeCharacter({ variables: { id: removeId } });
         updatePage();
-    };
-
-    const handleOnLike = async (
-        id: string,
-        like: -1 | 1,
-    ): Promise<LikeStats> => {
-        const likeData = await setLike({
-            variables: { target: id, like },
-        });
-
-        return likeData.data?.setLike as LikeStats;
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -322,6 +336,7 @@ const CharacterList = (): JSX.Element => {
 
     return (
         <>
+            <Recommend />
             <Grid container spacing={1}>
                 <Grid item lg={2} md={4}>
                     <TypeForm variant="outlined">
@@ -418,7 +433,6 @@ const CharacterList = (): JSX.Element => {
                             key={data.id}
                             auth={auth?.auth}
                             removeDialogOpen={handleDialogOpen}
-                            onLike={handleOnLike}
                         />
                     ),
                 )}

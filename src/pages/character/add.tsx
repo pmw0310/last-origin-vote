@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import EditorForm from '../../components/EditorForm';
-import { CharacterInterface } from 'Module';
 import { gql, useMutation } from '@apollo/client';
+
+import { CharacterInterface } from 'Module';
+import EditorForm from '../../components/EditorForm';
+import { useRouter } from 'next/router';
 
 const ADD_CHARACTER = gql`
     mutation setCharacter($data: InputData!) {

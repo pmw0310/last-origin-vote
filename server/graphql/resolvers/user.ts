@@ -1,13 +1,13 @@
 import {
-    Resolver,
-    Query,
+    Arg,
+    Authorized,
     Ctx,
     Field,
-    ObjectType,
     ID,
     Int,
-    Authorized,
-    Arg,
+    ObjectType,
+    Query,
+    Resolver,
 } from 'type-graphql';
 import UserModels, { UserVerifyResult } from '../../models/user';
 import authChecker from '../../lib/authChecker';

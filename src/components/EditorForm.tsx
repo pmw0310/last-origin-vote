@@ -1,7 +1,8 @@
-import React, { Dispatch } from 'react';
-import Editor from './Editor';
+import { Button, Divider, Paper, Typography } from '@material-ui/core';
 import { CharacterInterface, GroupInterface } from 'Module';
-import { Paper, Divider, Typography, Button } from '@material-ui/core';
+import React, { Dispatch } from 'react';
+
+import Editor from './Editor';
 import styled from 'styled-components';
 
 const Space = styled.div`

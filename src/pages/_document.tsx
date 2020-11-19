@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+
 import Document, {
     DocumentContext,
     DocumentInitialProps,
-    Html,
     Head,
+    Html,
     Main,
     NextScript,
 } from 'next/document';
+
+import React from 'react';
 import { ServerStyleSheet } from 'styled-components';
 import { ServerStyleSheets } from '@material-ui/styles';
 
@@ -53,25 +55,4 @@ export default class MyDocument extends Document {
             </Html>
         );
     }
-    // static getInitialProps(
-    //     ctx: DocumentContext,
-    // ): Promise<DocumentInitialProps> {
-    //     const sheet = new ServerStyleSheet();
-    //     const page = ctx.renderPage((App) => (props) =>
-    //         sheet.collectStyles(<App {...props} />),
-    //     );
-    //     const styleTags = sheet.getStyleElement();
-    //     return { ...page, styleTags } as any;
-    // }
-    // render() {
-    //     return (
-    //         <Html>
-    //             <Head>{(this.props as any).styleTags}</Head>
-    //             <body>
-    //                 <Main />
-    //                 <NextScript />
-    //             </body>
-    //         </Html>
-    //     );
-    // }
 }

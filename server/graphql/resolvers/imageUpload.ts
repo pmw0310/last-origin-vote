@@ -1,12 +1,12 @@
-import { Resolver, Mutation, Arg } from 'type-graphql';
-import { GraphQLUpload } from 'apollo-server-koa';
-import { GraphQLScalarType } from 'graphql';
+import { Arg, Mutation, Resolver } from 'type-graphql';
 import { createWriteStream, existsSync } from 'fs';
+import { GraphQLScalarType } from 'graphql';
+import { GraphQLUpload } from 'apollo-server-koa';
 import { Stream } from 'stream';
 import { generator } from 'rand-token';
-import path from 'path';
 import imagemin from 'imagemin';
 import imageminWebp from 'imagemin-webp';
+import path from 'path';
 // import cloudinary from 'cloudinary';
 
 export interface Upload {

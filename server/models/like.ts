@@ -9,17 +9,12 @@ export interface LinkTypeModel extends Document {
 
 export interface likeStatsTypeModel {
     like: number;
-    notLike: number;
     updateAt?: Date;
 }
 
 export const likeStatsSchema = new Schema<likeStatsTypeModel>(
     {
         like: {
-            type: Number,
-            default: 0,
-        },
-        notLike: {
             type: Number,
             default: 0,
         },

@@ -1,14 +1,15 @@
-import { useMemo } from 'react';
 import {
     ApolloClient,
     InMemoryCache,
-    makeVar,
-    gql,
     NormalizedCacheObject,
+    gql,
+    makeVar,
 } from '@apollo/client';
-import { createUploadLink } from 'apollo-upload-client';
+
 import { UserInterface } from 'Module';
+import { createUploadLink } from 'apollo-upload-client';
 import { relayStylePagination } from '@apollo/client/utilities';
+import { useMemo } from 'react';
 
 export interface CurrentUserData {
     currentUser: UserInterface;

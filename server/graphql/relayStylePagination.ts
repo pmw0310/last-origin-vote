@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Field, ObjectType, Int, ID, ClassType } from 'type-graphql';
+import { ClassType, Field, ID, Int, ObjectType } from 'type-graphql';
 
 @ObjectType()
 export class PageInfo {

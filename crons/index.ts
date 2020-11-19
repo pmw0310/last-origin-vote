@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import dotenv from 'dotenv-flow';
-import mongooseConnect, { mongooseDisconnect } from './lib/mongooseConnect';
-import BasicDataModel from './models/basicData';
+
 import StatsModel, { StatsType } from './models/stats';
-import path from 'path';
-import url from 'url';
+import mongooseConnect, { mongooseDisconnect } from './lib/mongooseConnect';
+
+import BasicDataModel from './models/basicData';
+import dotenv from 'dotenv-flow';
 import fs from 'fs';
 import { get } from 'https';
 import imagemin from 'imagemin';
 import imageminWebp from 'imagemin-webp';
+import path from 'path';
+import url from 'url';
 
 const arg = process.argv[2];
 

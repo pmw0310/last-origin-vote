@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Resolver, Mutation, ID, Authorized, Arg } from 'type-graphql';
+import { Arg, Authorized, ID, Mutation, Resolver } from 'type-graphql';
 import { ApolloError } from 'apollo-server-koa';
-import { Types } from 'mongoose';
 import BasicDataModel from '../../models/basicData';
 import { InputData } from '../models/inputData';
+import { Types } from 'mongoose';
 
 @Resolver()
 export default class CharacterResolver {

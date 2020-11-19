@@ -1,4 +1,5 @@
-import { DefaultState, Context } from 'koa';
+import { Context, DefaultState } from 'koa';
+
 import Router from 'koa-router';
 import auth from './auth';
 
