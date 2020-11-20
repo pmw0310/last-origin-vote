@@ -34,7 +34,11 @@ export interface UserStaticsModel extends Model<UserTypeModel> {
 }
 
 const UserSchema = new Schema<UserTypeModel>({
-    _id: String,
+    _id: {
+        type: String,
+        unique: true,
+        required: true,
+    },
     uid: {
         type: Number,
         unique: true,
@@ -45,7 +49,6 @@ const UserSchema = new Schema<UserTypeModel>({
     createdAt: {
         type: Date,
         default: Date.now,
-        required: true,
     },
     authority: {
         type: [String],

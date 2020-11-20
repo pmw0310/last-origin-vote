@@ -144,7 +144,7 @@ const authCheck = (roles: Array<string>) => async (
             ctx.res.statusCode = 200;
             await next();
         })
-        .use(cors())
+        .use(cors({ origin: uri, allowMethods: 'GET,POST' }))
         .use(Bodyparser())
         .use(helmet())
         .use(

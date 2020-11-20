@@ -177,7 +177,7 @@ const Recommend = (): JSX.Element => {
                 loop={true}
                 navigation
                 pagination={{ clickable: true }}
-                // autoplay={{ delay: 15000, disableOnInteraction: false }}
+                autoplay={{ delay: 15000, disableOnInteraction: false }}
                 onSwiper={setSwiper}
                 lazy={true}
             >
