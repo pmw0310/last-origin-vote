@@ -23,6 +23,24 @@ const FavoriteIcon = styled(Favorite)`
     color: #ee5162;
 `;
 
+const Icon = styled.div`
+    width: 24px;
+    height: 24px;
+`;
+
+const IconBack = styled(Favorite)`
+    color: white;
+    position: absolute;
+    left: 8px;
+    top: 8px;
+`;
+
+const BorderIcon = styled(FavoriteBorderIcon)`
+    position: absolute;
+    left: 8px;
+    top: 8px;
+`;
+
 const SET_LIKE = gql`
     mutation setLike($target: ID!) {
         setLike(target: $target) {
@@ -116,9 +134,14 @@ const LikeButton: React.FC<LikeButtonProps> = ({
             onFocus={(event) => event.stopPropagation()}
         >
             {like[id] && like[id].state ? (
-                <FavoriteIcon />
-            ) : (
+                <FavoriteIcon className="like-icon" />
+            ) : showCount ? (
                 <FavoriteBorderIcon />
+            ) : (
+                <Icon className="like-icon">
+                    <IconBack />
+                    <BorderIcon />
+                </Icon>
             )}
             {showCount && (
                 <Typography variant="button">
