@@ -122,25 +122,6 @@ const MenuAppBar = (): JSX.Element => {
         </AppBarList>
     );
 
-    // useEffect(() => {
-    //     const image = new Image();
-    //     const webpdata =
-    //         'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
-    //     image.onerror = () => {
-    //         console.log('no-webp');
-    //     };
-    //     image.onload = () => {
-    //         const result = image.width > 0 && image.height > 0;
-    //         if (result) {
-    //             console.log('webp');
-    //         } else {
-    //             console.log('no-webp');
-    //         }
-    //     };
-    //     image.src = webpdata;
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, []);
-
     useEffect(() => {
         if (data?.me) {
             currentUserVar(data.me);
@@ -189,7 +170,7 @@ const MenuAppBar = (): JSX.Element => {
                                             />
                                             <img
                                                 src="/public/naver_logout.png"
-                                                height={36}
+                                                height={38}
                                                 onClick={onLogoutButtonClick}
                                             />
                                         </picture>
@@ -204,7 +185,7 @@ const MenuAppBar = (): JSX.Element => {
                                         />
                                         <img
                                             src="/public/naver_login.png"
-                                            height={36}
+                                            height={38}
                                             onClick={onLoginButtonClick}
                                         />
                                     </picture>

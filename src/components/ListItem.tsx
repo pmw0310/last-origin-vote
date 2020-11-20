@@ -84,6 +84,12 @@ const CharacterInfoChip = styled(Chip)`
     width: 64px;
 `;
 
+const Like = styled.div`
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+`;
+
 const ListItem: React.FC<ListItemProps> = ({
     data,
     auth,
@@ -236,7 +242,9 @@ const ListItem: React.FC<ListItemProps> = ({
                             </Menu>
                         </Auth>
                     )}
-                    <LikeButton id={data.id as string} />
+                    <Like>
+                        <LikeButton id={data.id as string} showCount={true} />
+                    </Like>
                 </ItemAccordionSummary>
                 <AccordionDetails>
                     <Grid container spacing={1}>

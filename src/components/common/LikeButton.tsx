@@ -19,25 +19,6 @@ export const likeAtom = atom<likeDataType>({
     default: {},
 });
 
-const LikeIconButton = styled(IconButton)`
-    width: 62px;
-    height: 62px;
-    .MuiIconButton-label {
-        display: flex;
-        flex-direction: column;
-    }
-    .MuiTypography-root {
-        line-height: 1;
-        padding-top: 3px;
-    }
-`;
-
-const Like = styled.div`
-    position: absolute;
-    bottom: 6px;
-    right: 6px;
-`;
-
 const FavoriteIcon = styled(Favorite)`
     color: #ee5162;
 `;
@@ -53,9 +34,32 @@ const SET_LIKE = gql`
 
 interface LikeButtonProps {
     id: string;
+    showCount: boolean;
 }
 
-const LikeButton: React.FC<LikeButtonProps> = ({ id }): JSX.Element => {
+export const LikeIconButton = styled(IconButton)`
+    &.like-button-show-count {
+        width: 62px;
+        height: 62px;
+    }
+    &.like-button-no-show-count {
+        width: 16px;
+        height: 16px;
+    }
+    &.like-button-show-count .MuiIconButton-label {
+        display: flex;
+        flex-direction: column;
+    }
+    &.like-button-show-count .MuiTypography-root {
+        line-height: 1;
+        padding-top: 3px;
+    }
+`;
+
+const LikeButton: React.FC<LikeButtonProps> = ({
+    id,
+    showCount,
+}): JSX.Element => {
     const [like, setLike] = useRecoilState(likeAtom);
     const [
         mutationLike,
@@ -65,58 +69,63 @@ const LikeButton: React.FC<LikeButtonProps> = ({ id }): JSX.Element => {
     const dispatch = useSnackbarState();
 
     return (
-        <Like>
-            <LikeIconButton
-                onClick={async (event) => {
-                    event.stopPropagation();
+        <LikeIconButton
+            className={
+                showCount
+                    ? 'like-button-show-count'
+                    : 'like-button-no-show-count'
+            }
+            disableFocusRipple={true}
+            disableTouchRipple={true}
+            disableRipple={true}
+            onClick={async (event) => {
+                event.stopPropagation();
 
-                    if (!currentUser) {
-                        dispatch({
-                            type: FeedbackType.OPEN,
-                            option: {
-                                measage: '로그인이 필요합니다.',
-                                severity: 'warning',
-                            },
-                        });
-                        return;
-                    } else if (mutationLoading) {
-                        return;
-                    }
-
-                    const { data } = await mutationLike({
-                        variables: { target: id },
+                if (!currentUser) {
+                    dispatch({
+                        type: FeedbackType.OPEN,
+                        option: {
+                            measage: '로그인이 필요합니다.',
+                            severity: 'warning',
+                        },
                     });
+                    return;
+                } else if (mutationLoading) {
+                    return;
+                }
 
-                    if (mutationError) {
-                        dispatch({
-                            type: FeedbackType.OPEN,
-                            option: {
-                                measage: '작업이 실패하였습니다.',
-                                severity: 'error',
-                            },
-                        });
-                        return;
-                    }
+                const { data } = await mutationLike({
+                    variables: { target: id },
+                });
 
-                    const {
-                        like: likeCount,
-                        state,
-                    } = data?.setLike as LikeStats;
+                if (mutationError) {
+                    dispatch({
+                        type: FeedbackType.OPEN,
+                        option: {
+                            measage: '작업이 실패하였습니다.',
+                            severity: 'error',
+                        },
+                    });
+                    return;
+                }
 
-                    setLike({ ...like, [id]: { like: likeCount, state } });
-                }}
-                onFocus={(event) => event.stopPropagation()}
-            >
-                {like[id] && like[id].state ? (
-                    <FavoriteIcon />
-                ) : (
-                    <FavoriteBorderIcon />
-                )}
+                const { like: likeCount, state } = data?.setLike as LikeStats;
+
+                setLike({ ...like, [id]: { like: likeCount, state } });
+            }}
+            onFocus={(event) => event.stopPropagation()}
+        >
+            {like[id] && like[id].state ? (
+                <FavoriteIcon />
+            ) : (
+                <FavoriteBorderIcon />
+            )}
+            {showCount && (
                 <Typography variant="button">
                     {like[id] ? like[id].like : 0}
                 </Typography>
-            </LikeIconButton>
-        </Like>
+            )}
+        </LikeIconButton>
     );
 };
 

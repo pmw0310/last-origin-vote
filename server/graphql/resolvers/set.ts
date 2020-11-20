@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Arg, Authorized, ID, Mutation, Resolver } from 'type-graphql';
+import { statSync, unlinkSync } from 'fs';
+
 import { ApolloError } from 'apollo-server-koa';
 import BasicDataModel from '../../models/basicData';
 import { InputData } from '../models/inputData';
 import { Types } from 'mongoose';
+import path from 'path';
 
 @Resolver()
 export default class CharacterResolver {
@@ -48,6 +51,27 @@ export default class CharacterResolver {
         @Arg('data', { nullable: false }) data: InputData,
     ): Promise<boolean> {
         try {
+            const profileImage = await BasicDataModel.findById(id)
+                .select('profileImage')
+                .lean()
+                .exec();
+
+            if (
+                profileImage &&
+                profileImage.profileImage &&
+                profileImage.profileImage !== data.profileImage
+            ) {
+                const dir = path.normalize(
+                    `${__dirname}/../../../assets/${profileImage.profileImage}`,
+                );
+                const webpDir = dir
+                    .replace(/.png$/, '.webp')
+                    .replace(/.jpg$/, '.webp');
+
+                statSync(dir) && unlinkSync(dir);
+                statSync(webpDir) && unlinkSync(webpDir);
+            }
+
             const update = {
                 $set: {
                     ...data,

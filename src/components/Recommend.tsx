@@ -1,10 +1,18 @@
 import { CharacterInterface, GroupInterface } from 'Module';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore, { A11y, Autoplay, Navigation, Pagination } from 'swiper';
+import SwiperCore, {
+    A11y,
+    Autoplay,
+    Lazy,
+    Navigation,
+    Pagination,
+} from 'swiper';
 import { gql, useQuery } from '@apollo/client';
 import { likeAtom, likeDataType } from '../components/common/LikeButton';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
+import FiberNewIcon from '@material-ui/icons/FiberNew';
 import LikeButton from '../components/common/LikeButton';
 import { setInterval } from 'timers';
 import styled from 'styled-components';
@@ -12,13 +20,39 @@ import { toProfileImage } from '../lib/info';
 import { useRecoilState } from 'recoil';
 import { webpVar } from '../lib/Webp';
 
-SwiperCore.use([Navigation, Pagination, A11y, Autoplay]);
+SwiperCore.use([Navigation, Pagination, A11y, Autoplay, Lazy]);
 
 const SwiperRoot = styled(Swiper)`
     height: 183px;
     margin-top: 16px;
     margin-left: 8px;
     margin-right: 8px;
+`;
+
+const LoadingRoot = styled.div`
+    height: 183px;
+    width: 100%;
+    margin-top: 16px;
+    margin-left: 8px;
+    margin-right: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
+const Like = styled.div`
+    position: absolute;
+    bottom: 34px;
+    right: 14px;
+`;
+
+const NewIcon = styled(FiberNewIcon)`
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    color: red;
+    width: 32px !important;
+    height: 32px !important;
 `;
 
 const RECOMMEND = gql`
@@ -47,6 +81,10 @@ const RECOMMEND = gql`
         }
     }
 `;
+
+const date = new Date();
+date.setDate(date.getDate() - 12);
+date.setHours(0, 0, 0, 0);
 
 function useWidth(
     elementRef: React.RefObject<HTMLDivElement>,
@@ -124,7 +162,11 @@ const Recommend = (): JSX.Element => {
     }, [width, swiper]);
 
     if (loading) {
-        return <></>;
+        return (
+            <LoadingRoot>
+                <CircularProgress />
+            </LoadingRoot>
+        );
     }
 
     return (
@@ -135,8 +177,9 @@ const Recommend = (): JSX.Element => {
                 loop={true}
                 navigation
                 pagination={{ clickable: true }}
-                // autoplay={{ delay: 15000, disableOnInteraction: false }}
+                autoplay={{ delay: 15000, disableOnInteraction: false }}
                 onSwiper={setSwiper}
+                lazy={true}
             >
                 {data.recommend.map(
                     (recommend: CharacterInterface | GroupInterface) => (
@@ -160,8 +203,17 @@ const Recommend = (): JSX.Element => {
                                 }}
                                 width="150"
                                 height="150"
+                                className="swiper-lazy"
                             />
-                            <LikeButton id={recommend.id as string} />
+                            {(recommend?.createdAt as number) >
+                                date.getTime() && <NewIcon />}
+
+                            <Like>
+                                <LikeButton
+                                    id={recommend.id as string}
+                                    showCount={false}
+                                />
+                            </Like>
                         </SwiperSlide>
                     ),
                 )}
