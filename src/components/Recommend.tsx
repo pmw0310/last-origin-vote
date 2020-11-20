@@ -1,13 +1,7 @@
 import { CharacterInterface, GroupInterface } from 'Module';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore, {
-    A11y,
-    Autoplay,
-    Lazy,
-    Navigation,
-    Pagination,
-} from 'swiper';
+import SwiperCore, { A11y, Autoplay, Lazy, Pagination } from 'swiper';
 import { gql, useQuery } from '@apollo/client';
 import { likeAtom, likeDataType } from '../components/common/LikeButton';
 
@@ -20,7 +14,7 @@ import { toProfileImage } from '../lib/info';
 import { useRecoilState } from 'recoil';
 import { webpVar } from '../lib/Webp';
 
-SwiperCore.use([Navigation, Pagination, A11y, Autoplay, Lazy]);
+SwiperCore.use([Pagination, A11y, Autoplay, Lazy]);
 
 const SwiperRoot = styled(Swiper)`
     height: 183px;
@@ -175,7 +169,6 @@ const Recommend = (): JSX.Element => {
                 spaceBetween={15}
                 slidesPerView={Math.floor((width as number) / (150 + 15))}
                 loop={true}
-                navigation
                 pagination={{ clickable: true }}
                 autoplay={{ delay: 15000, disableOnInteraction: false }}
                 onSwiper={setSwiper}

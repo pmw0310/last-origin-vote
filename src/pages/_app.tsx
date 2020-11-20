@@ -3,7 +3,6 @@
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import 'swiper/swiper.scss';
 import 'swiper/components/a11y/a11y.scss';
-import 'swiper/components/navigation/navigation.scss';
 import 'swiper/components/pagination/pagination.scss';
 import 'swiper/components/lazy/lazy.scss';
 
