@@ -23,7 +23,7 @@ import {
 import React, { useState } from 'react';
 import {
     toGradeImagePaht,
-    toProfileImage,
+    toImage,
     toRoleText,
     toStatureText,
     toWeightText,
@@ -157,8 +157,8 @@ const ListItem: React.FC<ListItemProps> = ({
                     <LazyLoadImage
                         alt="image"
                         src={
-                            toProfileImage(data.profileImage, webp) ||
-                            'https://via.placeholder.com/150x150.png?text=No+Image'
+                            toImage(data.profileImage, webp) ||
+                            toImage('/public/unknown.jpg', webp)
                         }
                         onError={(
                             e: React.SyntheticEvent<HTMLImageElement, Event>,
@@ -267,7 +267,7 @@ const ListItem: React.FC<ListItemProps> = ({
                                             <LazyLoadImage
                                                 alt="https://via.placeholder.com/32x32.png?text=Error"
                                                 src={
-                                                    toProfileImage(
+                                                    toImage(
                                                         (data as CharacterInterface)
                                                             .group
                                                             ?.profileImage,
@@ -381,7 +381,7 @@ const ListItem: React.FC<ListItemProps> = ({
                                             <Avatar
                                                 key={char.id}
                                                 alt={char.name}
-                                                src={toProfileImage(
+                                                src={toImage(
                                                     char.profileImage,
                                                     webp,
                                                 )}

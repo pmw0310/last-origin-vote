@@ -13,7 +13,7 @@ import { gql, useLazyQuery } from '@apollo/client';
 import EchartsCore from 'echarts-for-react/lib/core';
 import Pagination from '../components/common/Pagination';
 import produce from 'immer';
-import { toProfileImage } from '../lib/info';
+import { toImage } from '../lib/info';
 import { webpVar } from '../lib/Webp';
 
 const GET_LIKE_RANKING = gql`
@@ -48,11 +48,13 @@ type LikeRanking = {
     ranking: number;
 };
 
+const likeSvg = 'M5,2.4c2.1-5.9,10.1,0,0,7.6C-5.1,2.4,2.9-3.5,5,2.4z';
+
 const Stats = (): JSX.Element => {
     const [page, setPage] = useState<number>(1);
     const [focus, setFocus] = useState<string>('CHARACTER');
     const [search, setSearch] = useState<string>('');
-    const [max, setMax] = useState<number>(-1);
+    const [max, setMax] = useState<{ [key: string]: number }>({});
     const [update, setUpdate] = useState<boolean>(false);
     const webp = webpVar();
 
@@ -102,16 +104,16 @@ const Stats = (): JSX.Element => {
             formatter: (params): string => {
                 let tooltip = '';
                 for (const param of params as EChartOption.Tooltip.Format[]) {
-                    tooltip += `${param.marker}${param.seriesName}: ${param.value}<br>`;
+                    tooltip += `<svg height="10" width="10" style="margin-right:5px;"><path d="${likeSvg}" fill="${param.color}" /></svg>${param.seriesName}: ${param.value}<br>`;
                 }
                 return tooltip;
             },
         },
         grid: {
-            top: 30,
+            top: 20,
             left: 105,
-            right: 30,
-            bottom: 30,
+            right: 20,
+            bottom: 20,
         },
         legend: {
             data: ['좋아요'],
@@ -121,6 +123,7 @@ const Stats = (): JSX.Element => {
         xAxis: {
             type: 'value',
             max: 10,
+            show: false,
         },
         yAxis: {
             type: 'category',
@@ -164,9 +167,8 @@ const Stats = (): JSX.Element => {
                 height: 40,
                 align: 'center',
                 backgroundColor: {
-                    image:
-                        toProfileImage(data.data.profileImage, webp) ||
-                        'https://via.placeholder.com/40x40.png?text=No+Image',
+                    image: (toImage(data.data.profileImage, webp) ||
+                        toImage('/public/unknown.jpg', webp)) as string,
                 },
             };
         }
@@ -175,11 +177,16 @@ const Stats = (): JSX.Element => {
             name: string;
             type: string;
             data: Array<number>;
+            label: { show: boolean; position: string };
         }> = [
             {
                 name: '좋아요',
                 type: 'bar',
                 data: [],
+                label: {
+                    show: true,
+                    position: 'insideRight',
+                },
             },
         ];
 
@@ -187,13 +194,11 @@ const Stats = (): JSX.Element => {
             seriesData[0].data.push(like);
         }
 
-        let _max: number;
-        if (max === -1) {
-            _max = Math.max.apply(null, seriesData[0].data);
-            setMax(_max);
-        } else {
-            _max = max;
-        }
+        const _max = Math.max.apply(null, [
+            ...seriesData[0].data,
+            max[focus] ? max[focus] : 0,
+        ]);
+        setMax({ ...max, [focus]: _max });
 
         setOption(
             produce(option, (draft) => {
@@ -225,7 +230,7 @@ const Stats = (): JSX.Element => {
             }),
         );
         setUpdate(false);
-    }, [likeRanking, max, option, update, webp]);
+    }, [focus, likeRanking, max, option, update, webp]);
 
     const handleSelectChange = (
         event: React.ChangeEvent<{ name?: string; value: unknown }>,

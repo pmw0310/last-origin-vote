@@ -202,7 +202,9 @@ const removeOldData = async (type: StatsType, date: Date): Promise<void> => {
                 await imagemin(
                     [
                         path
-                            .normalize(`${__dirname}/../assets/public/*.png`)
+                            .normalize(
+                                `${__dirname}/../assets/public/*.{jpg,png}`,
+                            )
                             .replace(/\\/g, '/'),
                     ],
                     {

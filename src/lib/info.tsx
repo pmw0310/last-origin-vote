@@ -92,14 +92,12 @@ export const toWeightText = ({ charWeight }: CharacterInterface): string => {
     }
 };
 
-export const toProfileImage = (
-    profileImage: string | undefined,
+export const toImage = (
+    image: string | undefined,
     webp: boolean = false,
 ): string | undefined => {
-    if (profileImage && webp) {
-        profileImage = profileImage
-            .replace(/.png$/, '.webp')
-            .replace(/.jpg$/, '.webp');
+    if (image && webp) {
+        image = image.replace(/.png$/, '.webp').replace(/.jpg$/, '.webp');
     }
-    return profileImage;
+    return image;
 };

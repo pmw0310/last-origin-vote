@@ -10,7 +10,7 @@ import FiberNewIcon from '@material-ui/icons/FiberNew';
 import LikeButton from '../components/common/LikeButton';
 import { setInterval } from 'timers';
 import styled from 'styled-components';
-import { toProfileImage } from '../lib/info';
+import { toImage } from '../lib/info';
 import { useRecoilState } from 'recoil';
 import { webpVar } from '../lib/Webp';
 
@@ -179,11 +179,8 @@ const Recommend = (): JSX.Element => {
                         <SwiperSlide key={recommend.id}>
                             <img
                                 src={
-                                    toProfileImage(
-                                        recommend.profileImage,
-                                        webp,
-                                    ) ||
-                                    'https://via.placeholder.com/150x150.png?text=No+Image'
+                                    toImage(recommend.profileImage, webp) ||
+                                    toImage('/public/unknown.jpg', webp)
                                 }
                                 onError={(
                                     e: React.SyntheticEvent<
