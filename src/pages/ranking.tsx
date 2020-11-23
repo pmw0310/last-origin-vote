@@ -132,6 +132,8 @@ const Stats = (): JSX.Element => {
         },
         series: [],
         color: ['#ee5162'],
+        animationEasing: 'bounceOut',
+        animationDelayUpdate: (idx: number) => idx * 3,
     });
 
     useEffect(() => {
@@ -177,7 +179,8 @@ const Stats = (): JSX.Element => {
             name: string;
             type: string;
             data: Array<number>;
-            label: { show: boolean; position: string };
+            label: { show: boolean; position: string; fontSize: number };
+            animationDelay: (index: number) => number;
         }> = [
             {
                 name: '좋아요',
@@ -186,7 +189,9 @@ const Stats = (): JSX.Element => {
                 label: {
                     show: true,
                     position: 'insideRight',
+                    fontSize: 16,
                 },
+                animationDelay: (idx) => idx * 50 + 250,
             },
         ];
 

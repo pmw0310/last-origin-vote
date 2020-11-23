@@ -334,6 +334,10 @@ const CharacterList = (): JSX.Element => {
         setOpen(true);
     };
 
+    // console.log(
+    //     `${process.env.REACT_APP_NAME} ${process.env.REACT_APP_VERSION}`,
+    // );
+
     return (
         <>
             <Recommend />
