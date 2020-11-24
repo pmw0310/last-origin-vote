@@ -30,6 +30,28 @@ export default function App({ Component, pageProps }: Props): JSX.Element {
             <ApolloProvider client={apolloClient}>
                 <Head>
                     <title>라스트 오리진 투표</title>
+                    <meta
+                        name="description"
+                        content="라스트 오리진 투표 순위"
+                    />
+                    <meta property="og:type" content="website" />
+                    <meta property="og:title" content="라스트 오리진 투표" />
+                    <meta
+                        property="og:description"
+                        content="라스트 오리진 투표 순위"
+                    />
+                    <meta
+                        property="og:image"
+                        content="https://lov.blackolf.com/lov.png"
+                    />
+                    <meta
+                        property="og:url"
+                        content="https://lov.blackolf.com"
+                    />
+                    <meta
+                        name="naver-site-verification"
+                        content="1d53140e1a1bb4a0d91b75714be63bcd9e824877"
+                    />
                     <link rel="shortcut icon" href="/favicon.ico" />
                 </Head>
                 <Webp />
