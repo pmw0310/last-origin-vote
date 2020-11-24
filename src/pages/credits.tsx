@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
-import { gql, useQuery } from '@apollo/client';
 
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { ReactSVG } from 'react-svg';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import packageJson from '../../package.json';
 import styled from 'styled-components';
 import useWidth from '../lib/useWidth';
 
@@ -139,13 +139,6 @@ const creditsData: Array<{
     },
 ];
 
-const APP_INFO = gql`
-    query appInfo {
-        appVersion
-        appName
-    }
-`;
-
 const Title = styled(GridListTile)`
     display: flex;
     align-items: center;
@@ -159,22 +152,17 @@ const height = 80;
 const Credits = (): JSX.Element => {
     const ref = useRef<HTMLDivElement>(null);
     const [width] = useWidth(ref);
-    const { data, loading } = useQuery(APP_INFO, {
-        fetchPolicy: 'no-cache',
-    });
 
     return (
         <div ref={ref} style={{ backgroundColor: 'rgb(207, 232, 252)' }}>
-            {!loading && (
-                <>
-                    <Typography variant="h3" gutterBottom>
-                        {data.appName}
-                    </Typography>
-                    <Typography variant="h5" gutterBottom>
-                        {data.appVersion}
-                    </Typography>
-                </>
-            )}
+            <>
+                <Typography variant="h3" gutterBottom>
+                    {packageJson.name}
+                </Typography>
+                <Typography variant="h5" gutterBottom>
+                    {packageJson.version}
+                </Typography>
+            </>
             <GridList
                 cellHeight={height}
                 cols={width ? Math.floor(width / height) : 4}
