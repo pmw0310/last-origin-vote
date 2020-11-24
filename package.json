@@ -1,6 +1,6 @@
 {
     "name": "last-origin-vote",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "scripts": {
         "dev": "nodemon",
         "build": "next build && tsc --project tsconfig.server.json",
