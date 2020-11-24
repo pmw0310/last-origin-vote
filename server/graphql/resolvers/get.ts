@@ -188,11 +188,11 @@ export default class GetResolver {
 
     @Query(() => String)
     appVersion(): string {
-        return process.env.REACT_APP_VERSION as string;
+        return process.env.APP_VERSION as string;
     }
 
     @Query(() => String)
     appName(): string {
-        return process.env.REACT_APP_NAME as string;
+        return process.env.APP_NAME as string;
     }
 }
