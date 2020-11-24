@@ -6,6 +6,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Avatar from '@material-ui/core/Avatar';
 import { ButtonBase } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
+import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import EqualizerIcon from '@material-ui/icons/Equalizer';
 import IconButton from '@material-ui/core/IconButton';
@@ -14,6 +15,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import LoyaltyIcon from '@material-ui/icons/Loyalty';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -116,6 +118,15 @@ const MenuAppBar = (): JSX.Element => {
                             <EqualizerIcon />
                         </ListItemIcon>
                         <ListItemText primary="순위" />
+                    </ListItem>
+                </Link>
+                <Divider />
+                <Link href="/credits">
+                    <ListItem button>
+                        <ListItemIcon>
+                            <LoyaltyIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="크레딧" />
                     </ListItem>
                 </Link>
             </List>

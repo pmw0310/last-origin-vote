@@ -129,6 +129,7 @@ const authCheck = (roles: Array<string>) => async (
 
     router.get('/', renderAndCache);
     router.get('/ranking', renderAndCache);
+    router.get('/credits', renderAndCache);
     router.get('/character/add', authCheck(['set']), renderAndCache);
     router.get('/character/:id', authCheck(['set']), renderAndCache);
     router.get('/group/add', authCheck(['set']), renderAndCache);

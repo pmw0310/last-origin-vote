@@ -185,4 +185,14 @@ export default class GetResolver {
 
         return data;
     }
+
+    @Query(() => String)
+    appVersion(): string {
+        return process.env.REACT_APP_VERSION as string;
+    }
+
+    @Query(() => String)
+    appName(): string {
+        return process.env.REACT_APP_NAME as string;
+    }
 }

@@ -1,5 +1,5 @@
 import { CharacterInterface, GroupInterface } from 'Module';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { A11y, Autoplay, Lazy, Pagination } from 'swiper';
 import { gql, useQuery } from '@apollo/client';
@@ -8,10 +8,10 @@ import { likeAtom, likeDataType } from '../components/common/LikeButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FiberNewIcon from '@material-ui/icons/FiberNew';
 import LikeButton from '../components/common/LikeButton';
-import { setInterval } from 'timers';
 import styled from 'styled-components';
 import { toImage } from '../lib/info';
 import { useRecoilState } from 'recoil';
+import useWidth from '../lib/useWidth';
 import { webpVar } from '../lib/Webp';
 
 SwiperCore.use([Pagination, A11y, Autoplay, Lazy]);
@@ -79,39 +79,6 @@ const RECOMMEND = gql`
 const date = new Date();
 date.setDate(date.getDate() - 12);
 date.setHours(0, 0, 0, 0);
-
-function useWidth(
-    elementRef: React.RefObject<HTMLDivElement>,
-): [number | null, () => void] {
-    const [width, setWidth] = useState<number | null>(null);
-    let interval: NodeJS.Timeout | undefined;
-
-    const updateWidth = useCallback(() => {
-        if (elementRef && elementRef?.current) {
-            const { width } = elementRef?.current.getBoundingClientRect();
-            setWidth(width);
-        }
-    }, [elementRef]);
-
-    useEffect(() => {
-        updateWidth();
-        window.addEventListener('resize', updateWidth);
-        return () => {
-            window.removeEventListener('resize', updateWidth);
-        };
-    }, [updateWidth]);
-
-    interval = setInterval(() => {
-        if (width === null) {
-            updateWidth();
-        } else {
-            clearInterval(interval as NodeJS.Timeout);
-            interval = undefined;
-        }
-    }, 10);
-
-    return [width, updateWidth];
-}
 
 const Recommend = (): JSX.Element => {
     const { data, loading } = useQuery(RECOMMEND, {

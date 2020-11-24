@@ -9,5 +9,5 @@ module.exports = {
     },
     webpackDevMiddleware: (config) => {
         return config;
-    },
+    }
 };
