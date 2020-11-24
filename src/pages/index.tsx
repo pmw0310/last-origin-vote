@@ -130,8 +130,7 @@ const GET_LIST = gql`
                 }
             }
             pageInfo {
-                hasPrevPage
-                hasNextPage
+                totalPages
             }
         }
     }
@@ -303,24 +302,6 @@ const CharacterList = (): JSX.Element => {
         });
     };
 
-    const nextPage = (): void => {
-        if (!listData?.get?.pageInfo?.hasNextPage) {
-            return;
-        }
-
-        setPage((page) => page + 1);
-        updatePage({ page: page + 1 });
-    };
-
-    const prevPage = (): void => {
-        if (!listData?.get?.pageInfo?.hasPrevPage) {
-            return;
-        }
-
-        setPage((page) => page - 1);
-        updatePage({ page: page - 1 });
-    };
-
     useEffect(() => {
         updatePage();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -416,13 +397,6 @@ const CharacterList = (): JSX.Element => {
                     </SearchRoot>
                 </Grid>
             </Grid>
-            <Pagination
-                onNext={nextPage}
-                onPrev={prevPage}
-                page={page}
-                hasNextPage={listData?.get?.pageInfo?.hasNextPage}
-                hasPrevPage={listData?.get?.pageInfo?.hasPrevPage}
-            />
             {listData &&
                 !loading &&
                 !authLoding &&
@@ -441,11 +415,12 @@ const CharacterList = (): JSX.Element => {
                 !loading &&
                 !authLoding && (
                     <Pagination
-                        onNext={nextPage}
-                        onPrev={prevPage}
+                        count={listData?.get?.pageInfo?.totalPages}
                         page={page}
-                        hasNextPage={listData?.get?.pageInfo?.hasNextPage}
-                        hasPrevPage={listData?.get?.pageInfo?.hasPrevPage}
+                        onUpdate={(_, page) => {
+                            setPage(page);
+                            updatePage({ page });
+                        }}
                     />
                 )}
             {loading && (

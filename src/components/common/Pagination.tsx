@@ -1,68 +1,44 @@
-import {
-    ArrowBack as ArrowBackIcon,
-    ArrowForward as ArrowForwardIcon,
-} from '@material-ui/icons';
-import { Button, Typography } from '@material-ui/core';
-
+import Pagination from '@material-ui/lab/Pagination';
 import React from 'react';
 import styled from 'styled-components';
+import withWidth from '@material-ui/core/withWidth';
 
-const Page = styled.div`
+const PaginationRoot = styled.div`
+    margin: 12px;
     display: flex;
-    align-items: center;
     justify-content: center;
-
-    .MuiTypography-root {
-        font-size: 1.05rem !important;
-        padding: 0 24px;
-    }
-`;
-
-const PageButton = styled(Button)`
-    padding: 6px !important;
-    border-radius: 18px !important;
-    min-width: 0 !important;
-    .MuiButton-startIcon {
-        margin: 0 !important;
-    }
 `;
 
 interface PaginationProps {
-    onNext: () => void;
-    onPrev: () => void;
+    count: number;
     page: number;
-    hasPrevPage: boolean;
-    hasNextPage: boolean;
+    onUpdate: (event: React.ChangeEvent<unknown>, page: number) => void;
+    width: string;
+    disabled?: boolean;
 }
 
 const CharacterList: React.FC<PaginationProps> = ({
+    count,
     page,
-    onNext,
-    onPrev,
-    hasPrevPage,
-    hasNextPage,
+    onUpdate,
+    width,
+    disabled,
 }): JSX.Element => {
     return (
-        <Page>
-            <PageButton
-                onClick={onPrev}
-                variant="contained"
-                size={'small'}
+        <PaginationRoot>
+            <Pagination
+                count={count}
+                page={page}
+                onChange={onUpdate}
                 color="primary"
-                startIcon={<ArrowBackIcon />}
-                disabled={!hasPrevPage}
+                siblingCount={width === 'xs' ? 1 : 3}
+                boundaryCount={1}
+                hideNextButton
+                hidePrevButton
+                disabled={disabled}
             />
-            <Typography variant="h6">{`Page ${page}`}</Typography>
-            <PageButton
-                onClick={onNext}
-                variant="contained"
-                size={'small'}
-                color="primary"
-                startIcon={<ArrowForwardIcon />}
-                disabled={!hasNextPage}
-            />
-        </Page>
+        </PaginationRoot>
     );
 };
 
-export default CharacterList;
+export default withWidth()(CharacterList);

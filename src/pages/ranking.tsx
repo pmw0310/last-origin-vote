@@ -36,8 +36,7 @@ const GET_LIKE_RANKING = gql`
                 like
             }
             pageInfo {
-                hasPrevPage
-                hasNextPage
+                totalPages
             }
         }
     }
@@ -71,23 +70,6 @@ const Stats = (): JSX.Element => {
                 ...option,
             },
         });
-    };
-    const nextPage = (): void => {
-        if (!likeRanking?.likeRanking?.pageInfo?.hasNextPage) {
-            return;
-        }
-
-        setPage((page) => page + 1);
-        updatePage({ page: page + 1 });
-    };
-
-    const prevPage = (): void => {
-        if (!likeRanking?.likeRanking?.pageInfo?.hasPrevPage) {
-            return;
-        }
-
-        setPage((page) => page - 1);
-        updatePage({ page: page - 1 });
     };
     const [getLikeRanking, { data: likeRanking, loading }] = useLazyQuery(
         GET_LIKE_RANKING,
@@ -333,11 +315,13 @@ const Stats = (): JSX.Element => {
                 style={{ height: '500px' }}
             />
             <Pagination
-                onNext={nextPage}
-                onPrev={prevPage}
+                count={likeRanking?.likeRanking?.pageInfo?.totalPages}
                 page={page}
-                hasNextPage={likeRanking?.likeRanking?.pageInfo?.hasNextPage}
-                hasPrevPage={likeRanking?.likeRanking?.pageInfo?.hasPrevPage}
+                disabled={loading}
+                onUpdate={(_, page) => {
+                    setPage(page);
+                    updatePage({ page });
+                }}
             />
         </Paper>
     );
