@@ -19,6 +19,9 @@ export default class CharacterResolver {
                 charGroupId: data.charGroupId
                     ? Types.ObjectId(data.charGroupId)
                     : undefined,
+                skinCharId: data.skinCharId
+                    ? Types.ObjectId(data.skinCharId)
+                    : undefined,
             });
             await doc.save();
             return true;
@@ -77,6 +80,9 @@ export default class CharacterResolver {
                     ...data,
                     charGroupId: data.charGroupId
                         ? (Types.ObjectId(data.charGroupId) as any)
+                        : undefined,
+                    skinCharId: data.skinCharId
+                        ? Types.ObjectId(data.skinCharId)
                         : undefined,
                     updateAt: new Date(),
                 },

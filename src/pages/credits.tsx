@@ -41,7 +41,7 @@ const creditsData: Array<{
     {
         type: 'svg',
         image: '/public/credits/tsnode.svg',
-        link: 'https://www.npmjs.com/package/ts-node.svg',
+        link: 'https://www.npmjs.com/package/ts-node',
         cols: 3,
         name: 'TSnode',
     },

@@ -16,6 +16,7 @@ import BasicDataModel, {
     BasicDataType,
     CharacterModel,
     GroupModel,
+    SkinModel,
 } from '../../models/basicData';
 import { FilterQuery, PaginateOptions, Types } from 'mongoose';
 
@@ -24,11 +25,13 @@ import { Character } from '../models/character';
 import { Group } from '../models/group';
 import { Min } from 'class-validator';
 import { PageInfo } from '../relayStylePagination';
+import { Skin } from '../models/skin';
 
 enum FocusType {
     ALL = 'ALL',
     CHARACTER = 'CHARACTER',
     GROUP = 'GROUP',
+    SKIN = 'SKIN',
 }
 
 enum OrderType {
@@ -46,6 +49,9 @@ registerEnumType(OrderType, {
     description: '정렬 순서 타임',
 });
 
+type union = Character | Group | Skin;
+type unionModel = CharacterModel | GroupModel | SkinModel;
+
 @ObjectType()
 class GetEdges {
     @Field(() => BasicUnion, { nullable: false })
@@ -61,8 +67,8 @@ class GetRelayStylePagination {
     @Field(() => PageInfo)
     pageInfo?: PageInfo;
     @Field(() => [BasicUnion])
-    data?(): Array<Character | Group> {
-        const data = this.edges?.map<Character | Group>((e: any) => e.node);
+    data?(): Array<union> {
+        const data = this.edges?.map<union>((e: any) => e.node);
         return data ? data : [];
     }
 }
@@ -114,7 +120,7 @@ export default class GetResolver {
         @Args()
         { ids, page, endCursor, search, limit, sort, focus, order }: GetArgs,
     ): Promise<GetRelayStylePagination | undefined> {
-        let query: FilterQuery<CharacterModel | GroupModel> = {};
+        let query: FilterQuery<unionModel> = {};
 
         switch (focus) {
             case FocusType.CHARACTER:
@@ -122,6 +128,9 @@ export default class GetResolver {
                 break;
             case FocusType.GROUP:
                 query = { ...query, type: BasicDataType.GROUP };
+                break;
+            case FocusType.SKIN:
+                query = { ...query, type: BasicDataType.SKIN };
                 break;
         }
 

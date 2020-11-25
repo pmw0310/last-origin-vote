@@ -9,11 +9,12 @@ import {
     TextField,
     Typography,
 } from '@material-ui/core';
-import { CharacterInterface, GroupInterface } from 'Module';
+import { CharacterInterface, GroupInterface, SkinInterface } from 'Module';
 import React, { useEffect, useState } from 'react';
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
 
 import ChipInput from 'material-ui-chip-input';
+import EditorCharacterList from './EditorCharacterList';
 import { EditorProps } from './EditorForm';
 import styled from 'styled-components';
 
@@ -363,6 +364,14 @@ const CharacterEdit: React.FC<EditorProps> = ({
                         </ItemGrid>
                     )}
                 </>
+            )}
+            {type === 'skin' && (
+                <EditorCharacterList
+                    onChange={(id) => {
+                        setData({ ...data, skinCharId: id } as SkinInterface);
+                    }}
+                    defaultId={(data as SkinInterface).skinCharId}
+                />
             )}
             <ItemGrid div={1}>
                 <HR />

@@ -7,6 +7,7 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 export enum BasicDataType {
     CHARACTER = 'CHARACTER',
     GROUP = 'GROUP',
+    SKIN = 'SKIN',
 }
 
 interface BasicData {
@@ -36,6 +37,10 @@ export interface CharacterModel extends Document, BasicData {
 
 export interface GroupModel extends Document, BasicData {}
 
+export interface SkinModel extends Document, BasicData {
+    skinCharId: string | Types.ObjectId;
+}
+
 export enum CharacterGrade {
     B = 1,
     A = 2,
@@ -55,7 +60,7 @@ export enum CharacterRole {
     DEFENDER = 3,
 }
 
-const BasicDataSchema = new Schema<CharacterModel | GroupModel>({
+const BasicDataSchema = new Schema<CharacterModel | GroupModel | SkinModel>({
     name: {
         type: String,
         index: true,
@@ -106,6 +111,7 @@ const BasicDataSchema = new Schema<CharacterModel | GroupModel>({
     charStature: { type: Number, min: 0 },
     charWeight: { type: Number, min: 0 },
     charIsAgs: Boolean,
+    skinCharId: { type: Types.ObjectId },
 });
 
 BasicDataSchema.plugin(mongoosePaginate);

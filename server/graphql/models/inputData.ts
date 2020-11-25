@@ -89,4 +89,9 @@ export class InputData implements BasicDataInput, CharacterInput, GroupInput {
         nullable: true,
     })
     charIsAgs?: boolean;
+    @Field(() => ID, {
+        description: '스킨 착용자 ID',
+        nullable: true,
+    })
+    skinCharId?: string;
 }

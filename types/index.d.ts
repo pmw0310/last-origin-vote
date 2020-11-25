@@ -33,9 +33,10 @@ declare module 'Module' {
         createdAt?: number | Date;
         updateAt?: number | Date;
         group?: GroupInterface;
+        skin?: SkinInterface[];
         likeStats?: LikeStats;
         like?: -1 | 0 | 1;
-        type: 'CHARACTER' | 'GROUP';
+        type: 'CHARACTER' | 'GROUP' | 'SKIN';
     }
 
     export interface GroupInterface {
@@ -46,9 +47,24 @@ declare module 'Module' {
         id?: string;
         createdAt?: number | Date;
         updateAt?: number | Date;
-        character?: CharacterInterface[];
+        member?: CharacterInterface[];
         likeStats?: LikeStats;
         like?: -1 | 0 | 1;
-        type: 'CHARACTER' | 'GROUP';
+        type: 'CHARACTER' | 'GROUP' | 'SKIN';
+    }
+
+    export interface SkinInterface {
+        name?: string;
+        profileImage?: string;
+        tag?: string[];
+        description?: string;
+        id?: string;
+        createdAt?: number | Date;
+        updateAt?: number | Date;
+        character?: CharacterInterface;
+        likeStats?: LikeStats;
+        like?: -1 | 0 | 1;
+        type: 'CHARACTER' | 'GROUP' | 'SKIN';
+        skinCharId?: string;
     }
 }

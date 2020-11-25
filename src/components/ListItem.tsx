@@ -13,7 +13,7 @@ import {
     MenuItem,
     Typography,
 } from '@material-ui/core';
-import { CharacterInterface, GroupInterface } from 'Module';
+import { CharacterInterface, GroupInterface, SkinInterface } from 'Module';
 import {
     Delete as DeleteIcon,
     Edit as EditIcon,
@@ -128,7 +128,7 @@ const ListItem: React.FC<ListItemProps> = ({
     );
     const statureText = toStatureText(data);
     const weightText = toWeightText(data);
-    const type: 'CHARACTER' | 'GROUP' = data.type;
+    const type: 'CHARACTER' | 'GROUP' | 'SKIN' = data.type;
 
     return (
         <Root>
@@ -296,6 +296,36 @@ const ListItem: React.FC<ListItemProps> = ({
                                             </Typography>
                                         </CharacterInfo>
                                     )}
+                                {expanded &&
+                                    (data as CharacterInterface).skin &&
+                                    ((data as CharacterInterface).skin as Array<
+                                        SkinInterface
+                                    >)?.length > 0 && (
+                                        <CharacterInfo item xl={12} xs={12}>
+                                            <Chip
+                                                variant="outlined"
+                                                color="primary"
+                                                label="스킨"
+                                            />
+                                            <AvatarGroup
+                                                max={width === 'xs' ? 5 : 10}
+                                            >
+                                                {((data as CharacterInterface)
+                                                    .skin as Array<
+                                                    SkinInterface
+                                                >).map((skin) => (
+                                                    <Avatar
+                                                        key={skin.id}
+                                                        alt={skin.name}
+                                                        src={toImage(
+                                                            skin.profileImage,
+                                                            webp,
+                                                        )}
+                                                    />
+                                                ))}
+                                            </AvatarGroup>
+                                        </CharacterInfo>
+                                    )}
                                 <CharacterInfo item lg={3} sm={6} xs={6}>
                                     <CharacterInfoChip
                                         variant="outlined"
@@ -364,7 +394,7 @@ const ListItem: React.FC<ListItemProps> = ({
                         )}
                         {type === 'GROUP' &&
                             expanded &&
-                            ((data as GroupInterface).character as Array<
+                            ((data as GroupInterface).member as Array<
                                 CharacterInterface
                             >)?.length > 0 && (
                                 <CharacterInfo item xl={12} xs={12}>
@@ -375,7 +405,7 @@ const ListItem: React.FC<ListItemProps> = ({
                                     />
                                     <AvatarGroup max={width === 'xs' ? 5 : 10}>
                                         {((data as GroupInterface)
-                                            .character as Array<
+                                            .member as Array<
                                             CharacterInterface
                                         >).map((char) => (
                                             <Avatar
@@ -388,6 +418,28 @@ const ListItem: React.FC<ListItemProps> = ({
                                             />
                                         ))}
                                     </AvatarGroup>
+                                </CharacterInfo>
+                            )}
+                        {type === 'SKIN' &&
+                            expanded &&
+                            (data as SkinInterface).character && (
+                                <CharacterInfo item xl={12} xs={12}>
+                                    <Chip
+                                        variant="outlined"
+                                        color="primary"
+                                        label="착용"
+                                    />
+                                    <Avatar
+                                        alt={
+                                            (data as SkinInterface)?.character
+                                                ?.name
+                                        }
+                                        src={toImage(
+                                            (data as SkinInterface)?.character
+                                                ?.profileImage,
+                                            webp,
+                                        )}
+                                    />
                                 </CharacterInfo>
                             )}
                     </Grid>

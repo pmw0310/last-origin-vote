@@ -72,6 +72,16 @@ const RECOMMEND = gql`
                 }
                 like
             }
+            ... on Skin {
+                id
+                profileImage
+                like
+                createdAt
+                likeStats {
+                    like
+                }
+                like
+            }
         }
     }
 `;

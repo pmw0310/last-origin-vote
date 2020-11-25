@@ -21,7 +21,7 @@ export interface EditorProps {
     setData: Dispatch<
         React.SetStateAction<CharacterInterface | GroupInterface>
     >;
-    type: 'character' | 'group';
+    type: 'character' | 'group' | 'skin';
 }
 
 export interface EditorFormProps extends EditorProps {

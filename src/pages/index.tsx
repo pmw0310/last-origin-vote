@@ -1,18 +1,14 @@
 import {
     AccountCircle as AccountCircleIcon,
     Assignment as AssignmentIcon,
-    Close as CloseIcon,
-    Search as SearchIcon,
+    HowToReg as HowToRegIcon,
 } from '@material-ui/icons';
 import { CharacterInterface, GroupInterface } from 'Module';
 import {
     CircularProgress,
     FormControl,
     Grid,
-    IconButton,
-    InputBase,
     MenuItem,
-    Paper,
     Select,
 } from '@material-ui/core';
 import { FeedbackType, useDialogState } from '../components/Feedback';
@@ -24,6 +20,7 @@ import { likeAtom, likeDataType } from '../components/common/LikeButton';
 import Item from '../components/ListItem';
 import Pagination from '../components/common/Pagination';
 import Recommend from '../components/Recommend';
+import SearchInput from '../components/common/SearchInput';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { useRouter } from 'next/router';
@@ -32,23 +29,6 @@ const AddFabTop = styled.div`
     position: fixed;
     bottom: 28px;
     right: 28px;
-`;
-
-export const SearchRoot = styled(Paper)`
-    margin: 12px;
-    padding: 2px 4px;
-    display: flex;
-    align-items: center;
-    width: 400;
-`;
-
-export const SearchIconButton = styled(IconButton)`
-    padding: 10;
-`;
-
-export const SearchInput = styled(InputBase)`
-    flex: 1;
-    margin-left: 8px;
 `;
 
 export const TypeForm = styled(FormControl)`
@@ -107,6 +87,11 @@ const GET_LIST = gql`
                         name
                         profileImage
                     }
+                    skin {
+                        id
+                        name
+                        profileImage
+                    }
                     likeStats {
                         like
                     }
@@ -118,8 +103,23 @@ const GET_LIST = gql`
                     profileImage
                     tag
                     type
-                    character {
+                    member {
                         id
+                        name
+                        profileImage
+                    }
+                    likeStats {
+                        like
+                    }
+                    like
+                }
+                ... on Skin {
+                    id
+                    name
+                    profileImage
+                    tag
+                    type
+                    character {
                         name
                         profileImage
                     }
@@ -155,9 +155,9 @@ const CharacterList = (): JSX.Element => {
     const [focus, setFocus] = useState<string>('CHARACTER');
     const [sort, setSort] = useState<string>('name');
     const [order, setOrder] = useState<string>('ASC');
-    const [search, setSearch] = useState<string>('');
     const [open, setOpen] = useState<boolean>(false);
     const [update, setUpdate] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
 
     const router = useRouter();
 
@@ -220,9 +220,6 @@ const CharacterList = (): JSX.Element => {
         updatePage();
     };
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(event.target.value);
-    };
     const handleSelectChange = (
         event: React.ChangeEvent<{ name?: string; value: unknown }>,
     ) => {
@@ -240,7 +237,7 @@ const CharacterList = (): JSX.Element => {
                 setFocus(value);
                 option.focus = value;
 
-                if (value === 'GROUP') {
+                if (value === 'GROUP' || value === 'SKIN') {
                     setSort('name');
                     option.sort = 'name';
                 }
@@ -257,31 +254,6 @@ const CharacterList = (): JSX.Element => {
 
         setPage(1);
         updatePage(option);
-    };
-
-    const handleSearchKeyPress = (
-        event: React.KeyboardEvent<HTMLInputElement>,
-    ) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            setPage(1);
-            updatePage({ page: 1 });
-        }
-    };
-
-    const handleSearchButton = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        setPage(1);
-        updatePage({ page: 1 });
-    };
-
-    const handleSearchClearButton = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        if (search) {
-            setSearch('');
-            setPage(1);
-            updatePage({ page: 1, search: '' });
-        }
     };
 
     const updatePage = (option?: {
@@ -328,6 +300,7 @@ const CharacterList = (): JSX.Element => {
                             label="유형"
                         >
                             <MenuItem value={'CHARACTER'}>캐릭터</MenuItem>
+                            <MenuItem value={'SKIN'}>스킨</MenuItem>
                             <MenuItem value={'GROUP'}>부대</MenuItem>
                         </Select>
                     </TypeForm>
@@ -348,7 +321,7 @@ const CharacterList = (): JSX.Element => {
                                 <MenuItem value={'charWeight'}>체중</MenuItem>
                             </Select>
                         )}
-                        {focus === 'GROUP' && (
+                        {(focus === 'GROUP' || focus === 'SKIN') && (
                             <Select
                                 value={sort}
                                 name="sort"
@@ -374,27 +347,13 @@ const CharacterList = (): JSX.Element => {
                     </TypeForm>
                 </Grid>
                 <Grid item lg md>
-                    <SearchRoot component="form">
-                        <SearchIconButton
-                            aria-label="search"
-                            onClick={handleSearchButton}
-                        >
-                            <SearchIcon />
-                        </SearchIconButton>
-                        <SearchInput
-                            placeholder="검색..."
-                            inputProps={{ 'aria-label': 'search' }}
-                            value={search}
-                            onChange={handleSearchChange}
-                            onKeyPress={handleSearchKeyPress}
-                        />
-                        <SearchIconButton
-                            aria-label="clear"
-                            onClick={handleSearchClearButton}
-                        >
-                            <CloseIcon />
-                        </SearchIconButton>
-                    </SearchRoot>
+                    <SearchInput
+                        onChange={(search: string) => {
+                            setPage(1);
+                            setSearch(search);
+                            updatePage({ page: 1, search });
+                        }}
+                    />
                 </Grid>
             </Grid>
             {listData &&
@@ -446,6 +405,14 @@ const CharacterList = (): JSX.Element => {
                             onClick={() => {
                                 handleClose();
                                 router.push('/character/add');
+                            }}
+                        />
+                        <SpeedDialAction
+                            icon={<HowToRegIcon />}
+                            tooltipTitle="스킨 추가"
+                            onClick={() => {
+                                handleClose();
+                                router.push('/skin/add');
                             }}
                         />
                         <SpeedDialAction

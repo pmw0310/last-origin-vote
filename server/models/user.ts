@@ -34,11 +34,7 @@ export interface UserStaticsModel extends Model<UserTypeModel> {
 }
 
 const UserSchema = new Schema<UserTypeModel>({
-    _id: {
-        type: String,
-        unique: true,
-        required: true,
-    },
+    _id: String,
     uid: {
         type: Number,
         unique: true,

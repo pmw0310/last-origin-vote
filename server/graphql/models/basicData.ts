@@ -70,8 +70,7 @@ export class BasicData implements BasicDataInput {
     })
     likeStats?: LikeData;
     @Field(() => Number, {
-        description:
-            '사용자가 선택한 좋아요 정보 (0: 선택안함, 1: 좋아요, -1: 싫어요)',
+        description: '사용자가 선택한 좋아요 정보 (0: 선택안함, 1: 좋아요',
         nullable: true,
     })
     async like?(

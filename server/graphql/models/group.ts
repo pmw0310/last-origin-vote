@@ -14,7 +14,7 @@ export class Group extends BasicData implements GroupInput {
         description: '소속된 케릭터 정보',
         nullable: true,
     })
-    async character?(): Promise<Character[]> {
+    async member?(): Promise<Array<Character>> {
         let id = this._id;
         if (!id) {
             id = (this as any)._doc._id;

@@ -1,5 +1,6 @@
+import React, { useEffect, useState } from 'react';
+
 import Pagination from '@material-ui/lab/Pagination';
-import React from 'react';
 import styled from 'styled-components';
 import withWidth from '@material-ui/core/withWidth';
 
@@ -24,10 +25,18 @@ const CharacterList: React.FC<PaginationProps> = ({
     width,
     disabled,
 }): JSX.Element => {
+    const [tempCount, setTempCount] = useState<number>(count);
+
+    useEffect(() => {
+        if (count) {
+            setTempCount(count);
+        }
+    }, [count]);
+
     return (
         <PaginationRoot>
             <Pagination
-                count={count}
+                count={tempCount}
                 page={page}
                 onChange={onUpdate}
                 color="primary"

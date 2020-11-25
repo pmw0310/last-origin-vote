@@ -3,15 +3,15 @@ import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
 
 import { CharacterInterface, GroupInterface } from 'Module';
-import { Close as CloseIcon, Search as SearchIcon } from '@material-ui/icons';
 import { Grid, MenuItem, Paper, Select } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import { SearchIconButton, SearchInput, SearchRoot, TypeForm } from './index';
 import echarts, { EChartOption } from 'echarts/lib/echarts';
 import { gql, useLazyQuery } from '@apollo/client';
 
 import EchartsCore from 'echarts-for-react/lib/core';
 import Pagination from '../components/common/Pagination';
+import SearchInput from '../components/common/SearchInput';
+import { TypeForm } from './index';
 import produce from 'immer';
 import { toImage } from '../lib/info';
 import { webpVar } from '../lib/Webp';
@@ -27,6 +27,11 @@ const GET_LIKE_RANKING = gql`
                         profileImage
                     }
                     ... on Group {
+                        id
+                        name
+                        profileImage
+                    }
+                    ... on Skin {
                         id
                         name
                         profileImage
@@ -239,35 +244,6 @@ const Stats = (): JSX.Element => {
         updatePage(option);
     };
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(event.target.value);
-    };
-
-    const handleSearchKeyPress = (
-        event: React.KeyboardEvent<HTMLInputElement>,
-    ) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            setPage(1);
-            updatePage({ page: 1 });
-        }
-    };
-
-    const handleSearchButton = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        setPage(1);
-        updatePage({ page: 1 });
-    };
-
-    const handleSearchClearButton = (event: React.MouseEvent<HTMLElement>) => {
-        event.preventDefault();
-        if (search) {
-            setSearch('');
-            setPage(1);
-            updatePage({ page: 1, search: '' });
-        }
-    };
-
     return (
         <Paper variant="outlined">
             <Grid container spacing={1}>
@@ -285,27 +261,13 @@ const Stats = (): JSX.Element => {
                     </TypeForm>
                 </Grid>
                 <Grid item lg md>
-                    <SearchRoot component="form">
-                        <SearchIconButton
-                            aria-label="search"
-                            onClick={handleSearchButton}
-                        >
-                            <SearchIcon />
-                        </SearchIconButton>
-                        <SearchInput
-                            placeholder="검색..."
-                            inputProps={{ 'aria-label': 'search' }}
-                            value={search}
-                            onChange={handleSearchChange}
-                            onKeyPress={handleSearchKeyPress}
-                        />
-                        <SearchIconButton
-                            aria-label="clear"
-                            onClick={handleSearchClearButton}
-                        >
-                            <CloseIcon />
-                        </SearchIconButton>
-                    </SearchRoot>
+                    <SearchInput
+                        onChange={(search: string) => {
+                            setPage(1);
+                            setSearch(search);
+                            updatePage({ page: 1, search });
+                        }}
+                    />
                 </Grid>
             </Grid>
             <EchartsCore

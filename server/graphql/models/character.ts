@@ -10,6 +10,7 @@ import { Field, Float, ID, Int, ObjectType } from 'type-graphql';
 
 import { BasicData } from '../models/basicData';
 import { Group } from './group';
+import { Skin } from './skin';
 
 export class CharacterInput {
     charNumber?: number;
@@ -100,5 +101,23 @@ export class Character extends BasicData implements CharacterInput {
             type: BasicDataType.GROUP,
         }).exec();
         return group as Group;
+    }
+
+    @Field(() => [Skin], {
+        description: '스킨 정보',
+        nullable: true,
+    })
+    async skin?(): Promise<Array<Skin>> {
+        let id = this._id;
+        if (!id) {
+            id = (this as any)._doc._id;
+        }
+        const char = await BasicDataModel.find({
+            skinCharId: id,
+            type: BasicDataType.SKIN,
+        })
+            .sort({ name: 1 })
+            .exec();
+        return char as Skin[];
     }
 }
