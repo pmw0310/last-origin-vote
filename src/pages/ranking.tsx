@@ -256,6 +256,7 @@ const Stats = (): JSX.Element => {
                             label="유형"
                         >
                             <MenuItem value={'CHARACTER'}>캐릭터</MenuItem>
+                            <MenuItem value={'SKIN'}>스킨</MenuItem>
                             <MenuItem value={'GROUP'}>부대</MenuItem>
                         </Select>
                     </TypeForm>
