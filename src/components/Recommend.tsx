@@ -150,12 +150,13 @@ const Recommend = (): JSX.Element => {
                 autoplay={{ delay: 15000, disableOnInteraction: false }}
                 onSwiper={setSwiper}
                 lazy={true}
+                preloadImages={false}
             >
                 {data.recommend.map(
                     (recommend: CharacterInterface | GroupInterface) => (
                         <SwiperSlide key={recommend.id}>
                             <img
-                                src={
+                                data-src={
                                     toImage(recommend.profileImage, webp) ||
                                     toImage('/public/unknown.jpg', webp)
                                 }
@@ -172,6 +173,7 @@ const Recommend = (): JSX.Element => {
                                 height="150"
                                 className="swiper-lazy"
                             />
+                            <div className="swiper-lazy-preloader"></div>
                             {(recommend?.createdAt as number) >
                                 date.getTime() && <NewIcon />}
 
