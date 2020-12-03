@@ -1,12 +1,9 @@
-import {
-    Favorite,
-    FavoriteBorder as FavoriteBorderIcon,
-} from '@material-ui/icons';
-import { FeedbackType, useSnackbarState } from '../../components/Feedback';
+import { FeedbackStateType, snackbarAtom } from '../../components/Feedback';
 import { IconButton, Typography } from '@material-ui/core';
-import { atom, useRecoilState } from 'recoil';
+import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import { gql, useMutation } from '@apollo/client';
 
+import { Favorite } from '@material-ui/icons';
 import { LikeStats } from 'Module';
 import React from 'react';
 import { currentUserVar } from '../../lib/apollo';
@@ -23,22 +20,10 @@ const FavoriteIcon = styled(Favorite)`
     color: #ee5162;
 `;
 
-const Icon = styled.div`
-    width: 24px;
-    height: 24px;
-`;
-
-const IconBack = styled(Favorite)`
+const FavoriteBorderIcon = styled(Favorite)`
     color: white;
-    position: absolute;
-    left: 8px;
-    top: 8px;
-`;
-
-const BorderIcon = styled(FavoriteBorderIcon)`
-    position: absolute;
-    left: 8px;
-    top: 8px;
+    stroke: rgba(0, 0, 0, 0.54);
+    stroke-width: 2;
 `;
 
 const SET_LIKE = gql`
@@ -60,10 +45,10 @@ export const LikeIconButton = styled(IconButton)`
         width: 62px;
         height: 62px;
     }
-    &.like-button-no-show-count {
+    /* &.like-button-no-show-count {
         width: 16px;
         height: 16px;
-    }
+    } */
     &.like-button-show-count .MuiIconButton-label {
         display: flex;
         flex-direction: column;
@@ -84,7 +69,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
         { loading: mutationLoading, error: mutationError },
     ] = useMutation<{ setLike: LikeStats }>(SET_LIKE);
     const currentUser = currentUserVar();
-    const dispatch = useSnackbarState();
+    const setSnackbar = useSetRecoilState(snackbarAtom);
 
     return (
         <LikeIconButton
@@ -93,19 +78,14 @@ const LikeButton: React.FC<LikeButtonProps> = ({
                     ? 'like-button-show-count'
                     : 'like-button-no-show-count'
             }
-            disableFocusRipple={true}
-            disableTouchRipple={true}
-            disableRipple={true}
             onClick={async (event) => {
                 event.stopPropagation();
 
                 if (!currentUser) {
-                    dispatch({
-                        type: FeedbackType.OPEN,
-                        option: {
-                            measage: '로그인이 필요합니다.',
-                            severity: 'warning',
-                        },
+                    setSnackbar({
+                        state: FeedbackStateType.OPEN,
+                        measage: '로그인이 필요합니다.',
+                        severity: 'warning',
                     });
                     return;
                 } else if (mutationLoading) {
@@ -117,12 +97,10 @@ const LikeButton: React.FC<LikeButtonProps> = ({
                 });
 
                 if (mutationError) {
-                    dispatch({
-                        type: FeedbackType.OPEN,
-                        option: {
-                            measage: '작업이 실패하였습니다.',
-                            severity: 'error',
-                        },
+                    setSnackbar({
+                        state: FeedbackStateType.OPEN,
+                        measage: '작업이 실패하였습니다.',
+                        severity: 'error',
                     });
                     return;
                 }
@@ -135,13 +113,8 @@ const LikeButton: React.FC<LikeButtonProps> = ({
         >
             {like[id] && like[id].state ? (
                 <FavoriteIcon className="like-icon" />
-            ) : showCount ? (
-                <FavoriteBorderIcon />
             ) : (
-                <Icon className="like-icon">
-                    <IconBack />
-                    <BorderIcon />
-                </Icon>
+                <FavoriteBorderIcon />
             )}
             {showCount && (
                 <Typography variant="button">

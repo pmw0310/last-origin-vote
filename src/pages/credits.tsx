@@ -47,7 +47,7 @@ const creditsData: Array<{
     },
     {
         type: 'image',
-        image: '/public/credits/koa.jpg',
+        image: '/public/credits/koa.png',
         link: 'https://koajs.com',
         cols: 2,
         name: 'koa',

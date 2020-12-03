@@ -12,7 +12,6 @@ router.get(
     '/callback',
     passport.authenticate('naver', {
         session: false,
-        failureRedirect: '/end',
     }),
     async (ctx: Context) => {
         const exists = await User.findOne({
@@ -44,7 +43,7 @@ router.get(
             await user.generateRefreshToken(ctx);
         }
 
-        ctx.redirect('/');
+        ctx.redirect(process.env.APP_URI as string);
     },
 );
 

@@ -1,43 +1,27 @@
-import { CharacterInterface, GroupInterface } from 'Module';
-import React, { useEffect, useRef, useState } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore, { A11y, Autoplay, Lazy, Pagination } from 'swiper';
-import { gql, useQuery } from '@apollo/client';
+import { CharacterInterface, GroupInterface, LikeStats } from 'Module';
+import React, { useEffect } from 'react';
 import { likeAtom, likeDataType } from '../components/common/LikeButton';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { AutoPlay } from '@egjs/flicking-plugins';
 import FiberNewIcon from '@material-ui/icons/FiberNew';
+import Flicking from '@egjs/react-flicking';
+import Image from 'next/image';
 import LikeButton from '../components/common/LikeButton';
+import { gql } from '@apollo/client';
 import styled from 'styled-components';
 import { toImage } from '../lib/info';
 import { useRecoilState } from 'recoil';
-import useWidth from '../lib/useWidth';
-import { webpVar } from '../lib/Webp';
 
-SwiperCore.use([Pagination, A11y, Autoplay, Lazy]);
-
-const SwiperRoot = styled(Swiper)`
-    height: 183px;
+const FlickingRoot = styled(Flicking)`
     margin-top: 16px;
     margin-left: 8px;
     margin-right: 8px;
-`;
-
-const LoadingRoot = styled.div`
-    height: 183px;
-    width: 100%;
-    margin-top: 16px;
-    margin-left: 8px;
-    margin-right: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 `;
 
 const Like = styled.div`
     position: absolute;
-    bottom: 34px;
-    right: 14px;
+    bottom: 1px;
+    right: 1px;
 `;
 
 const NewIcon = styled(FiberNewIcon)`
@@ -49,7 +33,12 @@ const NewIcon = styled(FiberNewIcon)`
     height: 32px !important;
 `;
 
-const RECOMMEND = gql`
+const RecommendItem = styled.div`
+    width: 150px;
+    height: 150px;
+`;
+
+export const RECOMMEND = gql`
     query recommend {
         recommend {
             ... on Character {
@@ -86,109 +75,74 @@ const RECOMMEND = gql`
     }
 `;
 
+interface RecommendProps {
+    data: Array<CharacterInterface>;
+}
+
 const date = new Date();
 date.setDate(date.getDate() - 12);
 date.setHours(0, 0, 0, 0);
 
-const Recommend = (): JSX.Element => {
-    const { data, loading } = useQuery(RECOMMEND, {
-        fetchPolicy: 'no-cache',
-    });
-    const ref = useRef<HTMLDivElement>(null);
-    const [swiper, setSwiper] = useState<SwiperCore | null>(null);
-    const [width] = useWidth(ref);
+const plugins = [new AutoPlay({ duration: 5000 }, 'NEXT')];
+
+const Recommend: React.FC<RecommendProps> = ({ data }): JSX.Element => {
     const [like, setLikeData] = useRecoilState(likeAtom);
-    const [update, setUpdate] = useState<boolean>(false);
-    const webp = webpVar();
 
     useEffect(() => {
-        if (!loading && data) {
-            setUpdate(true);
-        }
-    }, [data, loading]);
-
-    useEffect(() => {
-        if (!update) {
-            return;
-        }
-
-        const { recommend } = data;
         const likeData: likeDataType = { ...like };
 
-        for (const {
-            id,
-            like: state,
-            likeStats: { like },
-        } of recommend) {
-            likeData[id] = { like, state: state === 1 };
+        for (const { id, like: state, likeStats } of data) {
+            const { like } = likeStats as LikeStats;
+            likeData[id as string] = { like, state: state === 1 };
         }
         setLikeData(likeData);
-        setUpdate(false);
-    }, [data, like, loading, setLikeData, update]);
-
-    useEffect(() => {
-        if (width && swiper) {
-            swiper.slideToLoop(0, 0);
-        }
-    }, [width, swiper]);
-
-    if (loading) {
-        return (
-            <LoadingRoot>
-                <CircularProgress />
-            </LoadingRoot>
-        );
-    }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
-        <div ref={ref}>
-            <SwiperRoot
-                spaceBetween={15}
-                slidesPerView={Math.floor((width as number) / (150 + 15))}
-                loop={true}
-                pagination={{ clickable: true }}
-                autoplay={{ delay: 15000, disableOnInteraction: false }}
-                onSwiper={setSwiper}
-                lazy={true}
-                preloadImages={false}
-            >
-                {data.recommend.map(
-                    (recommend: CharacterInterface | GroupInterface) => (
-                        <SwiperSlide key={recommend.id}>
-                            <img
-                                data-src={
-                                    toImage(recommend.profileImage, webp) ||
-                                    toImage('/public/unknown.jpg', webp)
-                                }
-                                onError={(
-                                    e: React.SyntheticEvent<
-                                        HTMLImageElement,
-                                        Event
-                                    >,
-                                ) => {
-                                    e.currentTarget.src =
-                                        'https://via.placeholder.com/150x150.png?text=Error';
-                                }}
-                                width="150"
-                                height="150"
-                                className="swiper-lazy"
-                            />
-                            <div className="swiper-lazy-preloader"></div>
-                            {(recommend?.createdAt as number) >
-                                date.getTime() && <NewIcon />}
-
-                            <Like>
-                                <LikeButton
-                                    id={recommend.id as string}
-                                    showCount={false}
-                                />
-                            </Like>
-                        </SwiperSlide>
-                    ),
-                )}
-            </SwiperRoot>
-        </div>
+        <FlickingRoot
+            circular={true}
+            gap={12}
+            autoResize={true}
+            collectStatistics={false}
+            plugins={plugins}
+            zIndex={0}
+            isEqualSize={true}
+            isConstantSize={true}
+        >
+            {data.map((recommend: CharacterInterface | GroupInterface) => (
+                <RecommendItem key={recommend.id}>
+                    <Image
+                        alt="image"
+                        src={
+                            (toImage(recommend.profileImage) as string) ||
+                            (toImage('/public/unknown.jpg') as string)
+                        }
+                        layout="fill"
+                        loading="eager"
+                        onError={(
+                            e: React.SyntheticEvent<HTMLImageElement, Event>,
+                        ) => {
+                            const url =
+                                'https://via.placeholder.com/150x150.png?text=Error';
+                            e.currentTarget.decoding = 'sync';
+                            e.currentTarget.src = url;
+                            e.currentTarget.srcset = url;
+                        }}
+                    />
+                    {(recommend?.createdAt as number) > date.getTime() && (
+                        <NewIcon />
+                    )}
+                    <Like>
+                        <LikeButton
+                            id={recommend.id as string}
+                            showCount={false}
+                        />
+                    </Like>
+                </RecommendItem>
+            ))}
+        </FlickingRoot>
     );
 };
 
-export default Recommend;
+export default React.memo(Recommend);

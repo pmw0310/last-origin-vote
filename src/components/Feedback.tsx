@@ -8,17 +8,26 @@ import {
     Snackbar,
 } from '@material-ui/core';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
-import React, { createContext, useContext, useEffect, useReducer } from 'react';
+import { atom, useRecoilState } from 'recoil';
+
+import React from 'react';
 
 function Alert(props: AlertProps) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
+export enum FeedbackStateType {
+    CLOSE,
+    OPEN,
+}
+
 export type snackbarOption = {
+    state: FeedbackStateType;
     severity?: 'success' | 'info' | 'warning' | 'error';
     measage?: string;
 };
 export type dialogOption = {
+    state: FeedbackStateType;
     title: string;
     contentText?: string;
     noButtonText: string;
@@ -27,91 +36,32 @@ export type dialogOption = {
     onAgree: (event?: React.MouseEvent<HTMLElement>) => void;
 };
 
-export type snackbarAction = { type: FeedbackType; option?: snackbarOption };
-export type dialogAction = { type: FeedbackType; option?: dialogOption };
+const snackbarAtomDefault: snackbarOption = {
+    state: FeedbackStateType.CLOSE,
+};
 
-export enum FeedbackType {
-    CLOSE,
-    OPEN,
-}
-
-const snackbarInitialState: snackbarOption = {};
-const dialogInitialState: dialogOption = {
+const dialogAtomDefault: dialogOption = {
+    state: FeedbackStateType.CLOSE,
     title: '',
     noButtonText: '',
     yesButtonText: '',
     onAgree: () => undefined,
 };
 
-const snackbarReducer = (
-    state: snackbarOption,
-    action: snackbarAction,
-): snackbarOption => {
-    switch (action.type) {
-        case FeedbackType.OPEN:
-            let severity = action.option?.severity;
-            if (!severity) {
-                severity = 'info';
-            }
-            return { ...action.option, severity };
-        case FeedbackType.CLOSE:
-            return { ...state, measage: undefined };
-        default:
-            return state;
-    }
-};
-const dialogReducer = (
-    state: dialogOption,
-    action: dialogAction,
-): dialogOption => {
-    switch (action.type) {
-        case FeedbackType.OPEN:
-            return { ...(action.option as dialogOption) };
-        case FeedbackType.CLOSE:
-            return {
-                title: '',
-                noButtonText: '',
-                yesButtonText: '',
-                onAgree: () => undefined,
-            };
-        default:
-            return state;
-    }
-};
-
-const snackbarContext = createContext<React.Dispatch<snackbarAction> | null>(
-    null,
-);
-const dialogContext = createContext<React.Dispatch<dialogAction> | null>(null);
+export const snackbarAtom = atom<snackbarOption>({
+    key: 'feedback/snackbar',
+    default: snackbarAtomDefault,
+});
+export const dialogAtom = atom<dialogOption>({
+    key: 'feedback/dialog',
+    default: dialogAtomDefault,
+});
 
 const GlobalFeedback: React.FC<{
     children: React.ReactNode;
 }> = ({ children }): JSX.Element => {
-    const [snackbarState, snackbarDispatch] = useReducer<
-        snackbarOption,
-        snackbarAction
-    >(snackbarReducer, snackbarInitialState);
-    const [dialogState, dialogDispatch] = useReducer<
-        dialogOption,
-        dialogAction
-    >(dialogReducer, dialogInitialState);
-
-    const [snackbarOpen, setSnackbarOpen] = React.useState<boolean>(false);
-    const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
-
-    useEffect(() => {
-        const { measage } = snackbarState;
-        if (measage) {
-            setSnackbarOpen(true);
-        }
-    }, [snackbarState]);
-
-    useEffect(() => {
-        const { title, noButtonText, yesButtonText } = dialogState;
-        if (title && noButtonText && yesButtonText) {
-            setDialogOpen(true);
-        }
-    }, [dialogState]);
+    const [snackbar, setSnackbar] = useRecoilState(snackbarAtom);
+    const [dialog, setDialog] = useRecoilState(dialogAtom);
 
     const handleSnackbarClose = (
         _event?: React.SyntheticEvent,
@@ -121,95 +71,66 @@ const GlobalFeedback: React.FC<{
             return;
         }
 
-        setSnackbarOpen(false);
-        snackbarDispatch({
-            type: FeedbackType.CLOSE,
-            option: {},
-        });
+        setSnackbar({ ...snackbarAtomDefault, severity: snackbar.severity });
     };
     const handleDialogClose = () => {
-        setDialogOpen(false);
-        dialogDispatch({
-            type: FeedbackType.CLOSE,
-            option: {
-                title: '',
-                noButtonText: '',
-                yesButtonText: '',
-                onClose: () => undefined,
-                onAgree: () => undefined,
-            },
-        });
+        setDialog(dialogAtomDefault);
     };
     const handleOnDialogClose = (event: React.MouseEvent<HTMLElement>) => {
         handleDialogClose();
-        if (dialogState.onClose) {
-            dialogState.onClose(event);
+        if (dialog.onClose) {
+            dialog.onClose(event);
         }
     };
     const handleOnDialogAgree = (event: React.MouseEvent<HTMLElement>) => {
         handleDialogClose();
-        dialogState.onAgree(event);
+        dialog.onAgree(event);
     };
 
     return (
-        <dialogContext.Provider value={dialogDispatch}>
-            <snackbarContext.Provider value={snackbarDispatch}>
-                {children}
-                <Dialog
-                    open={dialogOpen}
-                    onClose={handleOnDialogClose}
-                    aria-labelledby="dialog-title"
-                    aria-describedby="dialog-description"
-                >
-                    <DialogTitle id="dialog-title">
-                        {dialogState.title}
-                    </DialogTitle>
-                    {dialogState.contentText && (
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
-                                {dialogState.contentText}
-                            </DialogContentText>
-                        </DialogContent>
-                    )}
-                    <DialogActions>
-                        <Button onClick={handleOnDialogClose} color="secondary">
-                            {dialogState.noButtonText}
-                        </Button>
-                        <Button
-                            onClick={handleOnDialogAgree}
-                            color="primary"
-                            autoFocus
-                        >
-                            {dialogState.yesButtonText}
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-                <Snackbar
-                    open={snackbarOpen}
-                    autoHideDuration={5000}
-                    onClose={handleSnackbarClose}
-                >
-                    <Alert
-                        onClose={handleSnackbarClose}
-                        severity={snackbarState.severity}
+        <>
+            {children}
+            <Dialog
+                open={dialog.state === FeedbackStateType.OPEN}
+                onClose={handleOnDialogClose}
+                aria-labelledby="dialog-title"
+                aria-describedby="dialog-description"
+            >
+                <DialogTitle id="dialog-title">{dialog.title}</DialogTitle>
+                {dialog.contentText && (
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            {dialog.contentText}
+                        </DialogContentText>
+                    </DialogContent>
+                )}
+                <DialogActions>
+                    <Button onClick={handleOnDialogClose} color="secondary">
+                        {dialog.noButtonText}
+                    </Button>
+                    <Button
+                        onClick={handleOnDialogAgree}
+                        color="primary"
+                        autoFocus
                     >
-                        {snackbarState.measage}
-                    </Alert>
-                </Snackbar>
-            </snackbarContext.Provider>
-        </dialogContext.Provider>
+                        {dialog.yesButtonText}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Snackbar
+                open={snackbar.state === FeedbackStateType.OPEN}
+                autoHideDuration={5000}
+                onClose={handleSnackbarClose}
+            >
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={snackbar.severity}
+                >
+                    {snackbar.measage}
+                </Alert>
+            </Snackbar>
+        </>
     );
 };
 
 export default React.memo(GlobalFeedback);
-
-export function useSnackbarState(): React.Dispatch<snackbarAction> {
-    const state = useContext(snackbarContext);
-    if (!state) throw new Error('Cannot find snackbarContext');
-    return state;
-}
-export function useDialogState(): React.Dispatch<dialogAction> {
-    const state = useContext(dialogContext);
-    if (!state) throw new Error('Cannot find snackbarContext');
-    return state;
-}

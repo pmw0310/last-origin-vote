@@ -10,6 +10,7 @@ import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import EqualizerIcon from '@material-ui/icons/Equalizer';
 import IconButton from '@material-ui/core/IconButton';
+import Image from 'next/image';
 import Link from 'next/link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -22,6 +23,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { UserInterface } from 'Module';
 import ViewListIcon from '@material-ui/icons/ViewList';
 import { currentUserVar } from '../lib/apollo';
+import { toImage } from '../lib/info';
 
 const GlobalStyles = createGlobalStyle`
        html body {
@@ -76,10 +78,10 @@ const MenuAppBar = (): JSX.Element => {
     const { loading, data } = useQuery<{ me: UserInterface }>(ME);
     const [state, setState] = React.useState<boolean>(false);
     const onLoginButtonClick = () => {
-        window.location.href = '/api/auth/naver';
+        window.location.href = `${process.env.SERVER_URI}/api/auth/naver`;
     };
     const onLogoutButtonClick = () => {
-        window.location.href = '/api/auth/logout';
+        window.location.href = `${process.env.SERVER_URI}/api/auth/logout`;
     };
 
     const toggleDrawer = (open: boolean) => (
@@ -174,32 +176,32 @@ const MenuAppBar = (): JSX.Element => {
                                         />
                                     </Tooltip>
                                     <ButtonBase>
-                                        <picture>
-                                            <source
-                                                srcSet="/public/naver_logout.webp"
-                                                type="image/webp"
-                                            />
-                                            <img
-                                                src="/public/naver_logout.png"
-                                                height={38}
-                                                onClick={onLogoutButtonClick}
-                                            />
-                                        </picture>
+                                        <Image
+                                            alt="naver_logout"
+                                            src={
+                                                toImage(
+                                                    '/public/naver_logout.png',
+                                                ) as string
+                                            }
+                                            width={116}
+                                            height={40}
+                                            onClick={onLogoutButtonClick}
+                                        />
                                     </ButtonBase>
                                 </>
                             ) : (
                                 <ButtonBase>
-                                    <picture>
-                                        <source
-                                            srcSet="/public/naver_login.webp"
-                                            type="image/webp"
-                                        />
-                                        <img
-                                            src="/public/naver_login.png"
-                                            height={38}
-                                            onClick={onLoginButtonClick}
-                                        />
-                                    </picture>
+                                    <Image
+                                        alt="naver_login"
+                                        src={
+                                            toImage(
+                                                '/public/naver_login.png',
+                                            ) as string
+                                        }
+                                        width={105}
+                                        height={40}
+                                        onClick={onLoginButtonClick}
+                                    />
                                 </ButtonBase>
                             )}
                         </Auth>

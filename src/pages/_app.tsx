@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import 'react-lazy-load-image-component/src/effects/blur.css';
-import 'swiper/swiper.scss';
-import 'swiper/components/a11y/a11y.scss';
-import 'swiper/components/pagination/pagination.scss';
-import 'swiper/components/lazy/lazy.scss';
 
 import { ApolloProvider } from '@apollo/client';
 import AppBar from '../components/AppBar';
@@ -23,7 +19,7 @@ interface Props {
 }
 
 export default function App({ Component, pageProps }: Props): JSX.Element {
-    const apolloClient = useApollo(pageProps.initialApolloState);
+    const apolloClient = useApollo(pageProps);
 
     return (
         <RecoilRoot>

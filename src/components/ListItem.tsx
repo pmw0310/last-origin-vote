@@ -30,11 +30,10 @@ import {
 } from '../lib/info';
 
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import Image from 'next/image';
 import LikeButton from '../components/common/LikeButton';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
-import { webpVar } from '../lib/Webp';
 import withWidth from '@material-ui/core/withWidth';
 
 export interface ListItemProps {
@@ -69,11 +68,13 @@ const TagChip = styled(Chip)`
 const AuthButton = styled(IconButton)`
     background-color: transparent !important;
 `;
-const GradeIcon = styled.img`
+const GradeIcon = styled.div`
     position: absolute;
     z-index: 100;
     top: 6px;
     left: 6px;
+    width: 60px;
+    height: 36px;
 `;
 const CharacterInfo = styled(Grid)`
     display: flex;
@@ -119,12 +120,10 @@ const ListItem: React.FC<ListItemProps> = ({
 
     const router = useRouter();
 
-    const webp = webpVar();
     const roleText = toRoleText(data);
     const gradeImage = toGradeImagePaht(
         data,
         (data as CharacterInterface).charGrade as number,
-        webp,
     );
     const statureText = toStatureText(data);
     const weightText = toWeightText(data);
@@ -139,36 +138,46 @@ const ListItem: React.FC<ListItemProps> = ({
                     id="panel1c-header"
                 >
                     {type === 'CHARACTER' && gradeImage && (
-                        <GradeIcon
-                            alt="grade"
-                            src={gradeImage}
-                            onError={(
-                                e: React.SyntheticEvent<
-                                    HTMLImageElement,
-                                    Event
-                                >,
-                            ) => {
-                                e.currentTarget.src =
-                                    'https://via.placeholder.com/35x35.png?text=Error';
-                            }}
-                            height="35"
-                        />
+                        <GradeIcon>
+                            <Image
+                                alt="grade"
+                                src={gradeImage}
+                                layout="fill"
+                                objectFit="contain"
+                                objectPosition="left"
+                                onError={(
+                                    e: React.SyntheticEvent<
+                                        HTMLImageElement,
+                                        Event
+                                    >,
+                                ) => {
+                                    const url =
+                                        'https://via.placeholder.com/36x36.png?text=Error';
+                                    e.currentTarget.decoding = 'sync';
+                                    e.currentTarget.src = url;
+                                    e.currentTarget.srcset = url;
+                                }}
+                            />
+                        </GradeIcon>
                     )}
-                    <LazyLoadImage
+                    <Image
                         alt="image"
                         src={
-                            toImage(data.profileImage, webp) ||
-                            toImage('/public/unknown.jpg', webp)
+                            (toImage(data.profileImage) as string) ||
+                            (toImage('/public/unknown.jpg') as string)
                         }
+                        width="150"
+                        height="150"
+                        quality={90}
                         onError={(
                             e: React.SyntheticEvent<HTMLImageElement, Event>,
                         ) => {
-                            e.currentTarget.src =
+                            const url =
                                 'https://via.placeholder.com/150x150.png?text=Error';
+                            e.currentTarget.decoding = 'sync';
+                            e.currentTarget.src = url;
+                            e.currentTarget.srcset = url;
                         }}
-                        effect="blur"
-                        width="150"
-                        height="150"
                     />
                     <Info>
                         <Typography
@@ -264,18 +273,16 @@ const ListItem: React.FC<ListItemProps> = ({
                                                 color="primary"
                                                 label="소속 부대"
                                             />
-                                            <LazyLoadImage
-                                                alt="https://via.placeholder.com/32x32.png?text=Error"
+                                            <Image
+                                                alt="group"
                                                 src={
                                                     toImage(
                                                         (data as CharacterInterface)
                                                             .group
                                                             ?.profileImage,
-                                                        webp,
                                                     ) ||
                                                     'https://via.placeholder.com/32x32.png?text=None'
                                                 }
-                                                effect="blur"
                                                 width="32"
                                                 height="32"
                                                 onError={(
@@ -284,8 +291,12 @@ const ListItem: React.FC<ListItemProps> = ({
                                                         Event
                                                     >,
                                                 ) => {
-                                                    e.currentTarget.src =
-                                                        'https://via.placeholder.com/35x35.png?text=Error';
+                                                    const url =
+                                                        'https://via.placeholder.com/32x32.png?text=Error';
+                                                    e.currentTarget.decoding =
+                                                        'sync';
+                                                    e.currentTarget.src = url;
+                                                    e.currentTarget.srcset = url;
                                                 }}
                                             />
                                             <Typography variant="subtitle2">
@@ -316,12 +327,35 @@ const ListItem: React.FC<ListItemProps> = ({
                                                 >).map((skin) => (
                                                     <Avatar
                                                         key={skin.id}
-                                                        alt={skin.name}
-                                                        src={toImage(
-                                                            skin.profileImage,
-                                                            webp,
-                                                        )}
-                                                    />
+                                                        alt="skin"
+                                                    >
+                                                        <Image
+                                                            alt="image"
+                                                            src={
+                                                                (toImage(
+                                                                    skin.profileImage,
+                                                                ) as string) ||
+                                                                (toImage(
+                                                                    '/public/unknown.jpg',
+                                                                ) as string)
+                                                            }
+                                                            width="36"
+                                                            height="36"
+                                                            onError={(
+                                                                e: React.SyntheticEvent<
+                                                                    HTMLImageElement,
+                                                                    Event
+                                                                >,
+                                                            ) => {
+                                                                const url =
+                                                                    'https://via.placeholder.com/36x36.png?text=Error';
+                                                                e.currentTarget.decoding =
+                                                                    'sync';
+                                                                e.currentTarget.src = url;
+                                                                e.currentTarget.srcset = url;
+                                                            }}
+                                                        />
+                                                    </Avatar>
                                                 ))}
                                             </AvatarGroup>
                                         </CharacterInfo>
@@ -411,10 +445,7 @@ const ListItem: React.FC<ListItemProps> = ({
                                             <Avatar
                                                 key={char.id}
                                                 alt={char.name}
-                                                src={toImage(
-                                                    char.profileImage,
-                                                    webp,
-                                                )}
+                                                src={toImage(char.profileImage)}
                                             />
                                         ))}
                                     </AvatarGroup>
@@ -437,7 +468,6 @@ const ListItem: React.FC<ListItemProps> = ({
                                         src={toImage(
                                             (data as SkinInterface)?.character
                                                 ?.profileImage,
-                                            webp,
                                         )}
                                     />
                                 </CharacterInfo>

@@ -1,5 +1,6 @@
 import { CharacterInterface } from 'Module';
 
+const serverUri = process.env.SERVER_URI;
 const isNone = (txt?: number): boolean => {
     return !txt;
 };
@@ -49,7 +50,6 @@ export const toRoleText = ({
 export const toGradeImagePaht = (
     { charRole }: CharacterInterface,
     grade: number,
-    webp: boolean = false,
 ): string => {
     const isGrade = !isNone(grade);
     const isRole = !isNone(charRole);
@@ -60,11 +60,11 @@ export const toGradeImagePaht = (
 
     switch (charRole) {
         case 1:
-            return `/public/a${grade}.${webp ? 'webp' : 'png'}`;
+            return `${serverUri}/public/a${grade}.png`;
         case 2:
-            return `/public/s${grade}.${webp ? 'webp' : 'png'}`;
+            return `${serverUri}/public/s${grade}.png`;
         case 3:
-            return `/public/d${grade}.${webp ? 'webp' : 'png'}`;
+            return `${serverUri}/public/d${grade}.png`;
         default:
             return '';
     }
@@ -92,12 +92,9 @@ export const toWeightText = ({ charWeight }: CharacterInterface): string => {
     }
 };
 
-export const toImage = (
-    image: string | undefined,
-    webp: boolean = false,
-): string | undefined => {
-    if (image && webp) {
-        image = image.replace(/.png$/, '.webp').replace(/.jpg$/, '.webp');
+export const toImage = (image: string | undefined): string | undefined => {
+    if (image) {
+        return `${serverUri}${image}`;
     }
     return image;
 };

@@ -11,19 +11,27 @@ import {
     MenuItem,
     Select,
 } from '@material-ui/core';
-import { FeedbackType, useDialogState } from '../components/Feedback';
+import { FeedbackStateType, dialogAtom } from '../components/Feedback';
 import React, { useEffect, useState } from 'react';
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { likeAtom, likeDataType } from '../components/common/LikeButton';
 
+import { GetStaticPropsResult } from 'next';
 import Item from '../components/ListItem';
 import Pagination from '../components/common/Pagination';
-import Recommend from '../components/Recommend';
+import { RECOMMEND } from '../components/Recommend';
 import SearchInput from '../components/common/SearchInput';
+import dynamic from 'next/dynamic';
+import { initializeApollo } from '../lib/apollo';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { useRouter } from 'next/router';
+import { useSetRecoilState } from 'recoil';
+
+const Recommend = dynamic(() => import('../components/Recommend'), {
+    ssr: false,
+});
 
 const AddFabTop = styled.div`
     position: fixed;
@@ -148,8 +156,12 @@ const REMOVE_CHARACTER = gql`
     }
 `;
 
-const CharacterList = (): JSX.Element => {
-    const dispatch = useDialogState();
+interface ListProps {
+    recommend: Array<CharacterInterface>;
+}
+
+const List: React.FC<ListProps> = ({ recommend }): JSX.Element => {
+    const setDialog = useSetRecoilState(dialogAtom);
 
     const [page, setPage] = useState<number>(1);
     const [focus, setFocus] = useState<string>('CHARACTER');
@@ -202,15 +214,13 @@ const CharacterList = (): JSX.Element => {
 
     const handleDialogOpen = (id: string) => {
         setremoveId(id);
-        dispatch({
-            type: FeedbackType.OPEN,
-            option: {
-                title: '삭제 하시겠습니까?',
-                yesButtonText: '예',
-                noButtonText: '아니오',
-                onAgree: () => {
-                    handleOnRemove();
-                },
+        setDialog({
+            state: FeedbackStateType.OPEN,
+            title: '삭제 하시겠습니까?',
+            yesButtonText: '예',
+            noButtonText: '아니오',
+            onAgree: () => {
+                handleOnRemove();
             },
         });
     };
@@ -289,7 +299,7 @@ const CharacterList = (): JSX.Element => {
 
     return (
         <>
-            <Recommend />
+            <Recommend data={recommend} />
             <Grid container spacing={1}>
                 <Grid item lg={2} md={4}>
                     <TypeForm variant="outlined">
@@ -430,4 +440,22 @@ const CharacterList = (): JSX.Element => {
     );
 };
 
-export default CharacterList;
+export const getStaticProps = async (): Promise<
+    GetStaticPropsResult<ListProps>
+> => {
+    const apolloClient = initializeApollo();
+
+    const {
+        data: { recommend },
+    } = await apolloClient.query({
+        query: RECOMMEND,
+    });
+
+    return {
+        props: {
+            recommend,
+        },
+    };
+};
+
+export default List;
