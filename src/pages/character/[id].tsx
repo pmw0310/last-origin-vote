@@ -1,7 +1,7 @@
+import { CharacterInterface, Type } from '../../module';
 import React, { useEffect, useState } from 'react';
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
 
-import { CharacterInterface } from 'Module';
 import EditorForm from '../../components/EditorForm';
 import { useRouter } from 'next/router';
 
@@ -57,7 +57,7 @@ const UpdateCharacter = (): JSX.Element => {
         charStature: 0,
         charWeight: 0,
         charIsAgs: false,
-        type: 'CHARACTER',
+        type: Type.CHARACTER,
     });
     const [getCharacter, { data: char, error }] = useLazyQuery(GET_CHARACTER, {
         fetchPolicy: 'no-cache',

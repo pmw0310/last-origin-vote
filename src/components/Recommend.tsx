@@ -1,15 +1,17 @@
-import { CharacterInterface, GroupInterface, LikeStats } from 'Module';
+import {
+    CharacterInterface,
+    GroupInterface,
+    LikeStats,
+    SkinInterface,
+} from '../module';
 import React, { useEffect } from 'react';
-import { likeAtom, likeDataType } from '../components/common/LikeButton';
+import { likeAtom, likeDataType } from '../state/like';
 
 import { AutoPlay } from '@egjs/flicking-plugins';
-import FiberNewIcon from '@material-ui/icons/FiberNew';
 import Flicking from '@egjs/react-flicking';
-import Image from 'next/image';
-import LikeButton from '../components/common/LikeButton';
+import RecommendItem from './RecommendItem';
 import { gql } from '@apollo/client';
 import styled from 'styled-components';
-import { toImage } from '../lib/info';
 import { useRecoilState } from 'recoil';
 
 const FlickingRoot = styled(Flicking)`
@@ -18,31 +20,13 @@ const FlickingRoot = styled(Flicking)`
     margin-right: 8px;
 `;
 
-const Like = styled.div`
-    position: absolute;
-    bottom: 1px;
-    right: 1px;
-`;
-
-const NewIcon = styled(FiberNewIcon)`
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    color: red;
-    width: 32px !important;
-    height: 32px !important;
-`;
-
-const RecommendItem = styled.div`
-    width: 150px;
-    height: 150px;
-`;
-
 export const RECOMMEND = gql`
     query recommend {
         recommend {
             ... on Character {
                 id
+                name
+                type
                 profileImage
                 like
                 createdAt
@@ -53,6 +37,8 @@ export const RECOMMEND = gql`
             }
             ... on Group {
                 id
+                name
+                type
                 profileImage
                 like
                 createdAt
@@ -63,6 +49,8 @@ export const RECOMMEND = gql`
             }
             ... on Skin {
                 id
+                name
+                type
                 profileImage
                 like
                 createdAt
@@ -76,7 +64,7 @@ export const RECOMMEND = gql`
 `;
 
 interface RecommendProps {
-    data: Array<CharacterInterface>;
+    data: Array<CharacterInterface | GroupInterface | SkinInterface>;
 }
 
 const date = new Date();
@@ -87,6 +75,8 @@ const plugins = [new AutoPlay({ duration: 5000 }, 'NEXT')];
 
 const Recommend: React.FC<RecommendProps> = ({ data }): JSX.Element => {
     const [like, setLikeData] = useRecoilState(likeAtom);
+    let onMove: boolean = false;
+    let onHold: boolean = false;
 
     useEffect(() => {
         const likeData: likeDataType = { ...like };
@@ -99,47 +89,40 @@ const Recommend: React.FC<RecommendProps> = ({ data }): JSX.Element => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const isPlaying = (): boolean => {
+        return onMove || onHold;
+    };
+
     return (
         <FlickingRoot
             circular={true}
-            gap={12}
+            gap={16}
             autoResize={true}
             collectStatistics={false}
             plugins={plugins}
             zIndex={0}
             isEqualSize={true}
             isConstantSize={true}
+            onMoveStart={() => {
+                onMove = true;
+            }}
+            onMoveEnd={() => {
+                onMove = false;
+            }}
+            onHoldStart={() => {
+                onHold = true;
+            }}
+            onHoldEnd={() => {
+                onHold = false;
+            }}
         >
-            {data.map((recommend: CharacterInterface | GroupInterface) => (
-                <RecommendItem key={recommend.id}>
-                    <Image
-                        alt="image"
-                        src={
-                            (toImage(recommend.profileImage) as string) ||
-                            (toImage('/public/unknown.jpg') as string)
-                        }
-                        layout="fill"
-                        loading="eager"
-                        onError={(
-                            e: React.SyntheticEvent<HTMLImageElement, Event>,
-                        ) => {
-                            const url =
-                                'https://via.placeholder.com/150x150.png?text=Error';
-                            e.currentTarget.decoding = 'sync';
-                            e.currentTarget.src = url;
-                            e.currentTarget.srcset = url;
-                        }}
-                    />
-                    {(recommend?.createdAt as number) > date.getTime() && (
-                        <NewIcon />
-                    )}
-                    <Like>
-                        <LikeButton
-                            id={recommend.id as string}
-                            showCount={false}
-                        />
-                    </Like>
-                </RecommendItem>
+            {data.map((recommend) => (
+                <RecommendItem
+                    data={recommend}
+                    date={date}
+                    isPlaying={isPlaying}
+                    key={recommend.id}
+                />
             ))}
         </FlickingRoot>
     );

@@ -3,7 +3,7 @@ import {
     Assignment as AssignmentIcon,
     HowToReg as HowToRegIcon,
 } from '@material-ui/icons';
-import { CharacterInterface, GroupInterface } from 'Module';
+import { CharacterInterface, GroupInterface, Type } from '../module';
 import {
     CircularProgress,
     FormControl,
@@ -12,26 +12,21 @@ import {
     Select,
 } from '@material-ui/core';
 import { FeedbackStateType, dialogAtom } from '../components/Feedback';
-import React, { useEffect, useState } from 'react';
+import { Order, Sort, listOption } from '../state/list';
+import React, { useCallback, useEffect, useState } from 'react';
+import Recommend, { RECOMMEND } from '../components/Recommend';
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { likeAtom, likeDataType } from '../components/common/LikeButton';
+import { likeAtom, likeDataType } from '../state/like';
+import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil';
 
 import { GetStaticPropsResult } from 'next';
 import Item from '../components/ListItem';
 import Pagination from '../components/common/Pagination';
-import { RECOMMEND } from '../components/Recommend';
 import SearchInput from '../components/common/SearchInput';
-import dynamic from 'next/dynamic';
 import { initializeApollo } from '../lib/apollo';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
 import { useRouter } from 'next/router';
-import { useSetRecoilState } from 'recoil';
-
-const Recommend = dynamic(() => import('../components/Recommend'), {
-    ssr: false,
-});
 
 const AddFabTop = styled.div`
     position: fixed;
@@ -60,7 +55,7 @@ const Progress = styled.div`
     height: 50vh;
 `;
 
-const GET_LIST = gql`
+export const GET_LIST = gql`
     query getList(
         $page: Int!
         $focus: FocusType!
@@ -94,11 +89,13 @@ const GET_LIST = gql`
                     group {
                         name
                         profileImage
+                        type
                     }
                     skin {
                         id
                         name
                         profileImage
+                        type
                     }
                     likeStats {
                         like
@@ -115,6 +112,7 @@ const GET_LIST = gql`
                         id
                         name
                         profileImage
+                        type
                     }
                     likeStats {
                         like
@@ -130,6 +128,7 @@ const GET_LIST = gql`
                     character {
                         name
                         profileImage
+                        type
                     }
                     likeStats {
                         like
@@ -161,15 +160,12 @@ interface ListProps {
 }
 
 const List: React.FC<ListProps> = ({ recommend }): JSX.Element => {
-    const setDialog = useSetRecoilState(dialogAtom);
+    useResetRecoilState(listOption);
 
-    const [page, setPage] = useState<number>(1);
-    const [focus, setFocus] = useState<string>('CHARACTER');
-    const [sort, setSort] = useState<string>('name');
-    const [order, setOrder] = useState<string>('ASC');
+    const setDialog = useSetRecoilState(dialogAtom);
+    const [option, setOption] = useRecoilState(listOption);
     const [open, setOpen] = useState<boolean>(false);
     const [update, setUpdate] = useState<boolean>(false);
-    const [search, setSearch] = useState<string>('');
 
     const router = useRouter();
 
@@ -235,59 +231,34 @@ const List: React.FC<ListProps> = ({ recommend }): JSX.Element => {
     ) => {
         const value: string = event.target.value as string;
 
-        const option = {
-            page: 1,
-            focus,
-            sort,
-            order,
-        };
-
         switch (event.target.name) {
             case 'focus':
-                setFocus(value);
-                option.focus = value;
-
-                if (value === 'GROUP' || value === 'SKIN') {
-                    setSort('name');
-                    option.sort = 'name';
-                }
+                setOption({
+                    ...option,
+                    page: 1,
+                    focus: value as Type,
+                    sort: value !== Type.CHARACTER ? Sort.name : option.sort,
+                    search: '',
+                });
                 break;
             case 'sort':
-                setSort(value);
-                option.sort = value;
+                setOption({ ...option, page: 1, sort: value as Sort });
                 break;
             case 'order':
-                setOrder(value);
-                option.order = value;
+                setOption({ ...option, page: 1, order: value as Order });
                 break;
         }
-
-        setPage(1);
-        updatePage(option);
     };
 
-    const updatePage = (option?: {
-        page?: number;
-        focus?: string;
-        search?: string;
-        order?: string;
-    }): void => {
+    const updatePage = useCallback((): void => {
         getList({
-            variables: {
-                page,
-                focus,
-                search,
-                sort,
-                order,
-                ...option,
-            },
+            variables: option,
         });
-    };
+    }, [getList, option]);
 
     useEffect(() => {
         updatePage();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [option, updatePage]);
 
     const handleClose = () => {
         setOpen(false);
@@ -304,41 +275,48 @@ const List: React.FC<ListProps> = ({ recommend }): JSX.Element => {
                 <Grid item lg={2} md={4}>
                     <TypeForm variant="outlined">
                         <Select
-                            value={focus}
+                            value={option.focus}
                             name="focus"
                             onChange={handleSelectChange}
                             label="유형"
                         >
-                            <MenuItem value={'CHARACTER'}>캐릭터</MenuItem>
-                            <MenuItem value={'SKIN'}>스킨</MenuItem>
-                            <MenuItem value={'GROUP'}>부대</MenuItem>
+                            <MenuItem value={Type.CHARACTER}>캐릭터</MenuItem>
+                            <MenuItem value={Type.SKIN}>스킨</MenuItem>
+                            <MenuItem value={Type.GROUP}>부대</MenuItem>
                         </Select>
                     </TypeForm>
                 </Grid>
                 <Grid item lg={2} md={4}>
                     <TypeForm variant="outlined">
-                        {focus === 'CHARACTER' && (
+                        {option.focus === 'CHARACTER' && (
                             <Select
-                                value={sort}
+                                value={option.sort}
                                 name="sort"
                                 onChange={handleSelectChange}
                                 label="정렬"
                             >
-                                <MenuItem value={'name'}>이름</MenuItem>
-                                <MenuItem value={'charNumber'}>번호</MenuItem>
-                                <MenuItem value={'charGrade'}>등급</MenuItem>
-                                <MenuItem value={'charStature'}>신장</MenuItem>
-                                <MenuItem value={'charWeight'}>체중</MenuItem>
+                                <MenuItem value={Sort.name}>이름</MenuItem>
+                                <MenuItem value={Sort.charNumber}>
+                                    번호
+                                </MenuItem>
+                                <MenuItem value={Sort.charGrade}>등급</MenuItem>
+                                <MenuItem value={Sort.charStature}>
+                                    신장
+                                </MenuItem>
+                                <MenuItem value={Sort.charWeight}>
+                                    체중
+                                </MenuItem>
                             </Select>
                         )}
-                        {(focus === 'GROUP' || focus === 'SKIN') && (
+                        {(option.focus === 'GROUP' ||
+                            option.focus === 'SKIN') && (
                             <Select
-                                value={sort}
+                                value={option.sort}
                                 name="sort"
                                 onChange={handleSelectChange}
                                 label="정렬"
                             >
-                                <MenuItem value={'name'}>이름</MenuItem>
+                                <MenuItem value={Sort.name}>이름</MenuItem>
                             </Select>
                         )}
                     </TypeForm>
@@ -346,22 +324,20 @@ const List: React.FC<ListProps> = ({ recommend }): JSX.Element => {
                 <Grid item lg={2} md={4}>
                     <TypeForm variant="outlined">
                         <Select
-                            value={order}
+                            value={option.order}
                             name="order"
                             onChange={handleSelectChange}
                             label="정렬 순서"
                         >
-                            <MenuItem value={'ASC'}>오름차순</MenuItem>
-                            <MenuItem value={'DESC'}>내림차순</MenuItem>
+                            <MenuItem value={Order.ASC}>오름차순</MenuItem>
+                            <MenuItem value={Order.DESC}>내림차순</MenuItem>
                         </Select>
                     </TypeForm>
                 </Grid>
                 <Grid item lg md>
                     <SearchInput
                         onChange={(search: string) => {
-                            setPage(1);
-                            setSearch(search);
-                            updatePage({ page: 1, search });
+                            setOption({ ...option, page: 1, search });
                         }}
                     />
                 </Grid>
@@ -385,10 +361,9 @@ const List: React.FC<ListProps> = ({ recommend }): JSX.Element => {
                 !authLoding && (
                     <Pagination
                         count={listData?.get?.pageInfo?.totalPages}
-                        page={page}
+                        page={option.page}
                         onUpdate={(_, page) => {
-                            setPage(page);
-                            updatePage({ page });
+                            setOption({ ...option, page });
                         }}
                     />
                 )}

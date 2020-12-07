@@ -3,7 +3,6 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
-    Avatar,
     Chip,
     Grid,
     IconButton,
@@ -13,7 +12,12 @@ import {
     MenuItem,
     Typography,
 } from '@material-ui/core';
-import { CharacterInterface, GroupInterface, SkinInterface } from 'Module';
+import {
+    CharacterInterface,
+    GroupInterface,
+    SkinInterface,
+    Type,
+} from '../module';
 import {
     Delete as DeleteIcon,
     Edit as EditIcon,
@@ -29,6 +33,7 @@ import {
     toWeightText,
 } from '../lib/info';
 
+import Avatar from '../components/common/Avatar';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Image from 'next/image';
 import LikeButton from '../components/common/LikeButton';
@@ -127,7 +132,7 @@ const ListItem: React.FC<ListItemProps> = ({
     );
     const statureText = toStatureText(data);
     const weightText = toWeightText(data);
-    const type: 'CHARACTER' | 'GROUP' | 'SKIN' = data.type;
+    const type: Type = data.type as Type;
 
     return (
         <Root>
@@ -273,31 +278,21 @@ const ListItem: React.FC<ListItemProps> = ({
                                                 color="primary"
                                                 label="소속 부대"
                                             />
-                                            <Image
-                                                alt="group"
-                                                src={
-                                                    toImage(
-                                                        (data as CharacterInterface)
-                                                            .group
-                                                            ?.profileImage,
-                                                    ) ||
-                                                    'https://via.placeholder.com/32x32.png?text=None'
+                                            <Avatar
+                                                alt={
+                                                    (data as CharacterInterface)
+                                                        .group?.name as string
                                                 }
-                                                width="32"
-                                                height="32"
-                                                onError={(
-                                                    e: React.SyntheticEvent<
-                                                        HTMLImageElement,
-                                                        Event
-                                                    >,
-                                                ) => {
-                                                    const url =
-                                                        'https://via.placeholder.com/32x32.png?text=Error';
-                                                    e.currentTarget.decoding =
-                                                        'sync';
-                                                    e.currentTarget.src = url;
-                                                    e.currentTarget.srcset = url;
-                                                }}
+                                                src={
+                                                    (data as CharacterInterface)
+                                                        .group
+                                                        ?.profileImage as string
+                                                }
+                                                data={
+                                                    (data as CharacterInterface)
+                                                        .group
+                                                }
+                                                variant="square"
                                             />
                                             <Typography variant="subtitle2">
                                                 {
@@ -328,34 +323,11 @@ const ListItem: React.FC<ListItemProps> = ({
                                                     <Avatar
                                                         key={skin.id}
                                                         alt="skin"
-                                                    >
-                                                        <Image
-                                                            alt="image"
-                                                            src={
-                                                                (toImage(
-                                                                    skin.profileImage,
-                                                                ) as string) ||
-                                                                (toImage(
-                                                                    '/public/unknown.jpg',
-                                                                ) as string)
-                                                            }
-                                                            width="36"
-                                                            height="36"
-                                                            onError={(
-                                                                e: React.SyntheticEvent<
-                                                                    HTMLImageElement,
-                                                                    Event
-                                                                >,
-                                                            ) => {
-                                                                const url =
-                                                                    'https://via.placeholder.com/36x36.png?text=Error';
-                                                                e.currentTarget.decoding =
-                                                                    'sync';
-                                                                e.currentTarget.src = url;
-                                                                e.currentTarget.srcset = url;
-                                                            }}
-                                                        />
-                                                    </Avatar>
+                                                        data={skin}
+                                                        src={
+                                                            skin.profileImage as string
+                                                        }
+                                                    />
                                                 ))}
                                             </AvatarGroup>
                                         </CharacterInfo>
@@ -444,8 +416,11 @@ const ListItem: React.FC<ListItemProps> = ({
                                         >).map((char) => (
                                             <Avatar
                                                 key={char.id}
-                                                alt={char.name}
-                                                src={toImage(char.profileImage)}
+                                                alt={char.name as string}
+                                                data={char}
+                                                src={
+                                                    char.profileImage as string
+                                                }
                                             />
                                         ))}
                                     </AvatarGroup>
@@ -463,12 +438,15 @@ const ListItem: React.FC<ListItemProps> = ({
                                     <Avatar
                                         alt={
                                             (data as SkinInterface)?.character
-                                                ?.name
+                                                ?.name as string
                                         }
-                                        src={toImage(
+                                        src={
                                             (data as SkinInterface)?.character
-                                                ?.profileImage,
-                                        )}
+                                                ?.profileImage as string
+                                        }
+                                        data={
+                                            (data as SkinInterface)?.character
+                                        }
                                     />
                                 </CharacterInfo>
                             )}

@@ -1,5 +1,5 @@
 import { Button, Divider, Paper, Typography } from '@material-ui/core';
-import { CharacterInterface, GroupInterface } from 'Module';
+import { CharacterInterface, GroupInterface } from '../module';
 import React, { Dispatch } from 'react';
 
 import Editor from './Editor';

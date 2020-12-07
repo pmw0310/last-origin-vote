@@ -9,7 +9,7 @@ import {
     TextField,
     Typography,
 } from '@material-ui/core';
-import { CharacterInterface, GroupInterface, SkinInterface } from 'Module';
+import { CharacterInterface, GroupInterface, SkinInterface } from '../module';
 import React, { useEffect, useState } from 'react';
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
 

@@ -34,8 +34,8 @@ const dev = process.env.NODE_ENV !== 'production';
     await redisInit();
     removeAllCache();
 
-    const appUri = (process.env.APP_URI as string) || 'http://localhost:4001';
-    const port = parseInt(process.env.PORT || '4000', 10);
+    const appUri = (process.env.APP_URI as string) || 'http://localhost:4000';
+    const port = parseInt(process.env.PORT || '4001', 10);
 
     const server = new Koa();
     // server.use(

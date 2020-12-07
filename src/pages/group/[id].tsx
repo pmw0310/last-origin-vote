@@ -1,8 +1,8 @@
+import { GroupInterface, Type } from '../../module';
 import React, { useEffect, useState } from 'react';
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
 
 import EditorForm from '../../components/EditorForm';
-import { GroupInterface } from 'Module';
 import { useRouter } from 'next/router';
 
 const GET_GROUP = gql`
@@ -35,7 +35,7 @@ const UpdateGroup = (): JSX.Element => {
         profileImage: '',
         tag: [],
         description: '',
-        type: 'GROUP',
+        type: Type.GROUP,
     });
     const [getGroup, { data: group, error }] = useLazyQuery(GET_GROUP, {
         fetchPolicy: 'no-cache',

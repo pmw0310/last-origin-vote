@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
 
 import Button from '@material-ui/core/Button';
-import { CharacterInterface } from 'Module';
+import { CharacterInterface } from '../module';
 import Pagination from './common/Pagination';
 import SearchInput from './common/SearchInput';
 import styled from 'styled-components';

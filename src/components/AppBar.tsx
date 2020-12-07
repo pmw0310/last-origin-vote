@@ -20,7 +20,7 @@ import LoyaltyIcon from '@material-ui/icons/Loyalty';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
-import { UserInterface } from 'Module';
+import { UserInterface } from '../module';
 import ViewListIcon from '@material-ui/icons/ViewList';
 import { currentUserVar } from '../lib/apollo';
 import { toImage } from '../lib/info';

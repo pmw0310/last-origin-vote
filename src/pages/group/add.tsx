@@ -1,8 +1,8 @@
+import { GroupInterface, Type } from '../../module';
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 
 import EditorForm from '../../components/EditorForm';
-import { GroupInterface } from 'Module';
 import { useRouter } from 'next/router';
 
 const ADD_GROUP = gql`
@@ -17,7 +17,7 @@ const AddGroup = (): JSX.Element => {
         tag: [],
         profileImage: '',
         description: '',
-        type: 'GROUP',
+        type: Type.GROUP,
     });
 
     const [addGroup] = useMutation(ADD_GROUP);

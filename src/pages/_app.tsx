@@ -10,7 +10,6 @@ import Feedback from '../components/Feedback';
 import Head from 'next/head';
 import React from 'react';
 import { RecoilRoot } from 'recoil';
-import Webp from '../lib/Webp';
 import { useApollo } from '../lib/apollo';
 
 interface Props {
@@ -50,7 +49,6 @@ export default function App({ Component, pageProps }: Props): JSX.Element {
                     />
                     <link rel="shortcut icon" href="/favicon.ico" />
                 </Head>
-                <Webp />
                 {pageProps.statusCode === 404 ? (
                     <Component {...pageProps} />
                 ) : (

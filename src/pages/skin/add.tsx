@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import { SkinInterface, Type } from '../../module';
 import { gql, useMutation } from '@apollo/client';
 
 import EditorForm from '../../components/EditorForm';
-import { SkinInterface } from 'Module';
 import { useRouter } from 'next/router';
 
 const ADD_GROUP = gql`
@@ -17,7 +17,7 @@ const AddSkin = (): JSX.Element => {
         tag: [],
         profileImage: '',
         description: '',
-        type: 'SKIN',
+        type: Type.SKIN,
         skinCharId: '',
     });
 

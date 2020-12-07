@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { SkinInterface, Type } from '../../module';
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
 
 import EditorForm from '../../components/EditorForm';
-import { SkinInterface } from 'Module';
 import { useRouter } from 'next/router';
 
 const GET_SKIN = gql`
@@ -36,7 +36,7 @@ const UpdateSkin = (): JSX.Element => {
         profileImage: '',
         tag: [],
         description: '',
-        type: 'SKIN',
+        type: Type.SKIN,
         skinCharId: '',
     });
     const [getSkin, { data: group, error }] = useLazyQuery(GET_SKIN, {

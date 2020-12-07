@@ -1,7 +1,7 @@
+import { CharacterInterface, Type } from '../../module';
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 
-import { CharacterInterface } from 'Module';
 import EditorForm from '../../components/EditorForm';
 import { useRouter } from 'next/router';
 
@@ -28,7 +28,7 @@ const AddCharacter = (): JSX.Element => {
         charStature: 0,
         charWeight: 0,
         charIsAgs: false,
-        type: 'CHARACTER',
+        type: Type.CHARACTER,
     });
 
     const [addCharacter] = useMutation(ADD_CHARACTER);

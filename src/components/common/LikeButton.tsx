@@ -1,20 +1,14 @@
 import { FeedbackStateType, snackbarAtom } from '../../components/Feedback';
 import { IconButton, Typography } from '@material-ui/core';
-import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import { gql, useMutation } from '@apollo/client';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
 import { Favorite } from '@material-ui/icons';
-import { LikeStats } from 'Module';
+import { LikeStats } from '../../module';
 import React from 'react';
 import { currentUserVar } from '../../lib/apollo';
+import { likeAtom } from '../../state/like';
 import styled from 'styled-components';
-
-export type likeDataType = { [id: string]: LikeStats };
-
-export const likeAtom = atom<likeDataType>({
-    key: 'like',
-    default: {},
-});
 
 const FavoriteIcon = styled(Favorite)`
     color: #ee5162;

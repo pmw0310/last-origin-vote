@@ -1,6 +1,8 @@
-import { CharacterInterface } from 'Module';
+import { CharacterInterface } from '../module';
 
-const serverUri = process.env.SERVER_URI;
+const serverUri = process.env.IMAGE_URI
+    ? (process.env.IMAGE_URI as string)
+    : (process.env.SERVER_URI as string);
 const isNone = (txt?: number): boolean => {
     return !txt;
 };
@@ -92,9 +94,22 @@ export const toWeightText = ({ charWeight }: CharacterInterface): string => {
     }
 };
 
-export const toImage = (image: string | undefined): string | undefined => {
+export const toImage = (image?: string): string | undefined => {
     if (image) {
         return `${serverUri}${image}`;
     }
     return image;
+};
+
+export const toNextImage = (
+    image?: string,
+    quality: number = 75,
+    size: number = 640,
+): string | undefined => {
+    if (!image) {
+        return;
+    }
+
+    const uri = toImage(image) as string;
+    return encodeURI(`/_next/image?url=${uri}&w=${size}&q=${quality}`);
 };

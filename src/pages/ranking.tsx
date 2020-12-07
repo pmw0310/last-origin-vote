@@ -2,7 +2,7 @@ import 'echarts/lib/chart/bar';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
 
-import { CharacterInterface, GroupInterface } from 'Module';
+import { CharacterInterface, GroupInterface } from '../module';
 import { Grid, MenuItem, Paper, Select } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import echarts, { EChartOption } from 'echarts/lib/echarts';
@@ -13,8 +13,7 @@ import Pagination from '../components/common/Pagination';
 import SearchInput from '../components/common/SearchInput';
 import { TypeForm } from './index';
 import produce from 'immer';
-import { toImage } from '../lib/info';
-import { webpVar } from '../lib/Webp';
+import { toNextImage } from '../lib/info';
 
 const GET_LIKE_RANKING = gql`
     query likeRanking($page: Int!, $focus: BasicDataType!, $search: String) {
@@ -60,7 +59,6 @@ const Stats = (): JSX.Element => {
     const [search, setSearch] = useState<string>('');
     const [max, setMax] = useState<{ [key: string]: number }>({});
     const [update, setUpdate] = useState<boolean>(false);
-    const webp = webpVar();
 
     const updatePage = (option?: {
         page?: number;
@@ -156,8 +154,8 @@ const Stats = (): JSX.Element => {
                 height: 40,
                 align: 'center',
                 backgroundColor: {
-                    image: (toImage(data.data.profileImage, webp) ||
-                        toImage('/public/unknown.jpg', webp)) as string,
+                    image: (toNextImage(data.data.profileImage, 80) ||
+                        toNextImage('/public/unknown.jpg', 80)) as string,
                 },
             };
         }
@@ -222,7 +220,7 @@ const Stats = (): JSX.Element => {
             }),
         );
         setUpdate(false);
-    }, [focus, likeRanking, max, option, update, webp]);
+    }, [focus, likeRanking, max, option, update]);
 
     const handleSelectChange = (
         event: React.ChangeEvent<{ name?: string; value: unknown }>,
@@ -275,6 +273,7 @@ const Stats = (): JSX.Element => {
                 echarts={echarts}
                 option={option}
                 showLoading={loading}
+                opts={{ renderer: 'svg' }}
                 style={{ height: '500px' }}
             />
             <Pagination
