@@ -7,7 +7,7 @@ import {
 } from '@apollo/client';
 
 import { GetStaticPropsResult } from 'next';
-import { UserInterface } from 'Module';
+import { UserInterface } from '../module';
 import { createUploadLink } from 'apollo-upload-client';
 import merge from 'deepmerge';
 import { relayStylePagination } from '@apollo/client/utilities';
