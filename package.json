@@ -1,6 +1,6 @@
 {
     "name": "last-origin-vote",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "scripts": {
         "dev": "next dev -p 4000",
         "build": "APP_ENV=prodcution next build",

@@ -2,11 +2,13 @@ import React, { useRef } from 'react';
 
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
+import Image from 'next/image';
 import { ReactSVG } from 'react-svg';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import packageJson from '../../package.json';
 import styled from 'styled-components';
+import { toImage } from '../lib/info';
 import useWidth from '../lib/useWidth';
 
 const creditsData: Array<{
@@ -21,35 +23,30 @@ const creditsData: Array<{
         type: 'svg',
         image: '/public/credits/nodejs.svg',
         link: 'https://nodejs.org/ko',
-        cols: 2,
         name: 'Node.js',
     },
     {
         type: 'image',
         image: '/public/credits/Nextjs-logo.png',
         link: 'https://nextjs.org',
-        cols: 2,
         name: 'Next.js',
     },
     {
         type: 'image',
         image: '/public/credits/Typescript.png',
         link: 'https://www.typescriptlang.org',
-        cols: 1,
         name: 'Typescript',
     },
     {
         type: 'svg',
         image: '/public/credits/tsnode.svg',
         link: 'https://www.npmjs.com/package/ts-node',
-        cols: 3,
         name: 'TSnode',
     },
     {
         type: 'image',
         image: '/public/credits/koa.png',
         link: 'https://koajs.com',
-        cols: 2,
         name: 'koa',
     },
     {
@@ -62,21 +59,18 @@ const creditsData: Array<{
         type: 'image',
         image: '/public/credits/mongodb.png',
         link: 'https://www.mongodb.com',
-        cols: 1,
         name: 'mongoDB',
     },
     {
         type: 'image',
         image: '/public/credits/mongoos.png',
         link: 'https://mongoosejs.com',
-        cols: 3,
         name: 'mongoos',
     },
     {
         type: 'image',
         image: '/public/credits/apollo.png',
         link: 'https://www.apollographql.com',
-        cols: 3,
         name: 'Apollo',
     },
     {
@@ -89,7 +83,6 @@ const creditsData: Array<{
         type: 'image',
         image: '/public/credits/typegraphql.png',
         link: 'https://www.npmjs.com/package/type-graphql',
-        cols: 2,
         name: 'TypeGraphQL',
     },
     {
@@ -108,28 +101,25 @@ const creditsData: Array<{
         type: 'svg',
         image: '/public/credits/immer-logo.svg',
         link: 'https://www.npmjs.com/package/immer',
-        cols: 2,
         name: 'immer',
     },
     {
         type: 'image',
         image: '/public/credits/redis.png',
         link: 'https://redis.io',
-        cols: 2,
         name: 'redis',
     },
     {
         type: 'image',
         image: '/public/credits/echarts.png',
         link: 'https://echarts.apache.org/en/index.html',
-        cols: 1,
         name: 'Echarts',
     },
     {
         type: 'svg',
-        image: '/public/credits/swiper.svg',
-        link: 'https://swiperjs.com',
-        name: 'Swiper',
+        image: '/public/credits/egjs.svg',
+        link: 'https://naver.github.io/egjs',
+        name: 'egjs',
     },
     {
         type: 'svg',
@@ -147,7 +137,7 @@ const Title = styled(GridListTile)`
     cursor: pointer;
 `;
 
-const height = 80;
+const height = 90;
 
 const Credits = (): JSX.Element => {
     const ref = useRef<HTMLDivElement>(null);
@@ -165,7 +155,7 @@ const Credits = (): JSX.Element => {
             </>
             <GridList
                 cellHeight={height}
-                cols={width ? Math.floor(width / height) : 4}
+                cols={width ? Math.floor(width / (height * 2.5)) : 4}
             >
                 {creditsData.map((data, index) => {
                     return (
@@ -178,16 +168,27 @@ const Credits = (): JSX.Element => {
                         >
                             <Tooltip title={data.name}>
                                 {data.type === 'image' ? (
-                                    <img
-                                        src={data.image}
+                                    <div
                                         style={{
-                                            width: 'auto',
+                                            width: `${
+                                                (width as number) /
+                                                Math.floor(
+                                                    (width as number) /
+                                                        (height * 2.5),
+                                                )
+                                            }px`,
                                             height: `${height - 20}px`,
                                         }}
-                                    />
+                                    >
+                                        <Image
+                                            src={toImage(data.image) as string}
+                                            layout="fill"
+                                            objectFit="contain"
+                                        />
+                                    </div>
                                 ) : data.type === 'svg' ? (
                                     <ReactSVG
-                                        src={data.image as string}
+                                        src={toImage(data.image) as string}
                                         beforeInjection={(svg) => {
                                             svg.setAttribute(
                                                 'style',

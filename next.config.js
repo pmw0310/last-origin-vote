@@ -16,6 +16,6 @@ module.exports = {
     },
     env: {
         SERVER_URI: isProd ? 'https://lovs.blackolf.myds.me' : 'http://localhost:4001',
-        IMAGE_URI: isProd ? undefined : 'https://lovs.blackolf.myds.me',
+        // IMAGE_URI: isProd ? undefined : 'https://lovs.blackolf.myds.me',
     }
 };

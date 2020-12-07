@@ -60,7 +60,7 @@ const ItemAccordionSummary = styled(AccordionSummary)`
 const Info = styled.div`
     display: flex;
     flex-direction: column;
-    margin: 12px;
+    margin: 12px 0 12px 12px;
 `;
 const Auth = styled.div`
     position: absolute;
@@ -80,6 +80,10 @@ const GradeIcon = styled.div`
     left: 6px;
     width: 60px;
     height: 36px;
+`;
+const ProfileImage = styled.div`
+    width: 150px;
+    height: 150px;
 `;
 const CharacterInfo = styled(Grid)`
     display: flex;
@@ -165,25 +169,31 @@ const ListItem: React.FC<ListItemProps> = ({
                             />
                         </GradeIcon>
                     )}
-                    <Image
-                        alt="image"
-                        src={
-                            (toImage(data.profileImage) as string) ||
-                            (toImage('/public/unknown.jpg') as string)
-                        }
-                        width="150"
-                        height="150"
-                        quality={90}
-                        onError={(
-                            e: React.SyntheticEvent<HTMLImageElement, Event>,
-                        ) => {
-                            const url =
-                                'https://via.placeholder.com/150x150.png?text=Error';
-                            e.currentTarget.decoding = 'sync';
-                            e.currentTarget.src = url;
-                            e.currentTarget.srcset = url;
-                        }}
-                    />
+                    <ProfileImage>
+                        <Image
+                            alt="image"
+                            src={
+                                (toImage(data.profileImage) as string) ||
+                                (toImage('/public/unknown.jpg') as string)
+                            }
+                            layout="fixed"
+                            width={150}
+                            height={150}
+                            quality={90}
+                            onError={(
+                                e: React.SyntheticEvent<
+                                    HTMLImageElement,
+                                    Event
+                                >,
+                            ) => {
+                                const url =
+                                    'https://via.placeholder.com/150x150.png?text=Error';
+                                e.currentTarget.decoding = 'sync';
+                                e.currentTarget.src = url;
+                                e.currentTarget.srcset = url;
+                            }}
+                        />
+                    </ProfileImage>
                     <Info>
                         <Typography
                             variant={width === 'xs' ? 'h6' : 'h5'}
