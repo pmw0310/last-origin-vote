@@ -14,17 +14,17 @@ import {
 import { FeedbackStateType, dialogAtom } from '../components/Feedback';
 import { Order, Sort, listOption } from '../state/list';
 import React, { useCallback, useEffect, useState } from 'react';
-import Recommend, { RECOMMEND } from '../components/Recommend';
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { likeAtom, likeDataType } from '../state/like';
 import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil';
 
-import { GetStaticPropsResult } from 'next';
+// import { GetStaticPropsResult } from 'next';
 import Item from '../components/ListItem';
 import Pagination from '../components/common/Pagination';
+import Recommend from '../components/Recommend';
 import SearchInput from '../components/common/SearchInput';
-import { initializeApollo } from '../lib/apollo';
+// import { initializeApollo } from '../lib/apollo';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
@@ -155,11 +155,11 @@ const REMOVE_CHARACTER = gql`
     }
 `;
 
-interface ListProps {
-    recommend: Array<CharacterInterface>;
-}
+// interface ListProps {
+//     recommend: Array<CharacterInterface>;
+// }
 
-const List: React.FC<ListProps> = ({ recommend }): JSX.Element => {
+const List: React.FC = (): JSX.Element => {
     useResetRecoilState(listOption);
 
     const setDialog = useSetRecoilState(dialogAtom);
@@ -270,7 +270,7 @@ const List: React.FC<ListProps> = ({ recommend }): JSX.Element => {
 
     return (
         <>
-            <Recommend data={recommend} />
+            <Recommend />
             <Grid container spacing={1}>
                 <Grid item lg={2} md={4}>
                     <TypeForm variant="outlined">
@@ -415,22 +415,22 @@ const List: React.FC<ListProps> = ({ recommend }): JSX.Element => {
     );
 };
 
-export const getStaticProps = async (): Promise<
-    GetStaticPropsResult<ListProps>
-> => {
-    const apolloClient = initializeApollo();
+// export const getStaticProps = async (): Promise<
+//     GetStaticPropsResult<ListProps>
+// > => {
+//     const apolloClient = initializeApollo();
 
-    const {
-        data: { recommend },
-    } = await apolloClient.query({
-        query: RECOMMEND,
-    });
+//     const {
+//         data: { recommend },
+//     } = await apolloClient.query({
+//         query: RECOMMEND,
+//     });
 
-    return {
-        props: {
-            recommend,
-        },
-    };
-};
+//     return {
+//         props: {
+//             recommend,
+//         },
+//     };
+// };
 
 export default List;
