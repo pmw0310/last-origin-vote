@@ -10,8 +10,7 @@ module.exports = {
             watch: false,
             autorestart: true,
             env: {
-                NODE_ENV: 'production',
-                SERVER_URI: ''
+                NODE_ENV: 'production'
             },
         }, {
             name: 'last-origin-server',

@@ -120,7 +120,7 @@ const Recommend: React.FC = (): JSX.Element => {
         return onMove || onHold;
     };
 
-    if (loading) {
+    if (loading || !data) {
         return (
             <LoadingRoot>
                 <CircularProgress />
