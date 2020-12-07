@@ -15,7 +15,7 @@ module.exports = {
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     },
     env: {
-        SERVER_URI: isProd ? 'https://lov.blackolf.com' : 'http://localhost:4001',
-        IMAGE_URI: isProd ? undefined : 'https://lov.blackolf.com',
+        SERVER_URI: isProd ? 'https://lovs.blackolf.myds.me' : 'http://localhost:4001',
+        // IMAGE_URI: isProd ? undefined : 'https://lov.blackolf.com',
     }
 };
