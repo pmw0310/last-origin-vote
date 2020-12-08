@@ -16,11 +16,17 @@ router.get('/logout', async (ctx: Context) => {
     ctx.cookies.set('access_token', '', {
         httpOnly: true,
         domain,
+        path: '/',
+        sameSite: 'lax',
+        overwrite: true,
     });
 
     ctx.cookies.set('refresh_token', '', {
         httpOnly: true,
         domain,
+        path: '/',
+        sameSite: 'lax',
+        overwrite: true,
     });
     ctx.redirect(process.env.APP_URI as string);
 });
