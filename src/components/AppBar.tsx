@@ -22,6 +22,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
 import { UserInterface } from '../module';
 import ViewListIcon from '@material-ui/icons/ViewList';
+import axios from 'axios';
 import { currentUserVar } from '../lib/apollo';
 import { toImage } from '../lib/info';
 
@@ -81,7 +82,13 @@ const MenuAppBar = (): JSX.Element => {
         window.location.href = `${process.env.SERVER_URI}/api/auth/naver`;
     };
     const onLogoutButtonClick = () => {
-        window.location.href = `${process.env.SERVER_URI}/api/auth/logout`;
+        axios
+            .get(`${process.env.SERVER_URI}/api/auth/logout`, {
+                withCredentials: true,
+            })
+            .finally(() => {
+                window.location.href = '/';
+            });
     };
 
     const toggleDrawer = (open: boolean) => (

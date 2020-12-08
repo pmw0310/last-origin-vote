@@ -19,7 +19,7 @@ const Test = (): JSX.Element => {
                 { withCredentials: true },
             )
             .finally(() => {
-                // location.href = '/';
+                location.href = '/';
             });
     }, [router]);
 
