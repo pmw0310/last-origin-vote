@@ -43,9 +43,9 @@ router.get(
             await user.generateRefreshToken(ctx);
         }
 
-        await next();
-
         ctx.redirect(process.env.APP_URI as string);
+
+        await next();
     },
 );
 

@@ -15,6 +15,8 @@ import { uid } from 'rand-token';
 
 const domain = (process.env.APP_DOMAIN as string) || 'localhost';
 
+console.log('domain', domain);
+
 export interface UserTypeModel extends Document {
     _id: string;
     uid: number;
