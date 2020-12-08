@@ -13,7 +13,7 @@ import { Context } from 'koa';
 import autoIncrement from 'mongoose-auto-increment';
 import { uid } from 'rand-token';
 
-const domain = (process.env.APP_DOMAIN as string) || 'localhost';
+// const domain = (process.env.APP_DOMAIN as string) || 'localhost';
 
 export interface UserTypeModel extends Document {
     _id: string;
