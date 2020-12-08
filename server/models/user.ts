@@ -75,9 +75,9 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
             maxAge: 1000 * 60 * 10,
             domain: 'https://lov.blackolf.com',
             path: '/',
-            sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production',
-            signed: true,
+            sameSite: 'strict',
+            // secure: process.env.NODE_ENV === 'production',
+            // signed: true,
             overwrite: true,
         });
     }
@@ -112,9 +112,9 @@ UserSchema.methods.generateRefreshToken = async function (
             maxAge: 1000 * 60 * 60 * 24,
             domain: 'https://lov.blackolf.com',
             path: '/',
-            sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production',
-            signed: true,
+            sameSite: 'strict',
+            // secure: process.env.NODE_ENV === 'production',
+            // signed: true,
             overwrite: true,
         });
     }
