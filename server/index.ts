@@ -16,7 +16,7 @@ import cors from '@koa/cors';
 import dotenv from 'dotenv-flow';
 import { graphqlUploadKoa } from 'graphql-upload';
 // import proxy from 'koa-proxies';
-import helmet from 'koa-helmet';
+// import helmet from 'koa-helmet';
 import mongooseConnect from './lib/mongooseConnect';
 import passport from 'koa-passport';
 import path from 'path';
@@ -86,25 +86,25 @@ const dev = process.env.NODE_ENV !== 'production';
             }),
         )
         .use(Bodyparser())
-        .use(helmet())
-        .use(
-            helmet.contentSecurityPolicy({
-                directives: {
-                    baseUri: [appUri],
-                    connectSrc: [appUri],
-                    imgSrc: [
-                        appUri,
-                        'data:',
-                        'https://via.placeholder.com',
-                        'https://phinf.pstatic.net',
-                        'https://ssl.pstatic.net',
-                    ],
-                    scriptSrc: ["'unsafe-eval'", appUri],
-                    mediaSrc: ["'none'"],
-                    objectSrc: ["'none'"],
-                },
-            }),
-        )
+        // .use(helmet())
+        // .use(
+        //     helmet.contentSecurityPolicy({
+        //         directives: {
+        //             baseUri: [appUri],
+        //             connectSrc: [appUri],
+        //             imgSrc: [
+        //                 appUri,
+        //                 'data:',
+        //                 'https://via.placeholder.com',
+        //                 'https://phinf.pstatic.net',
+        //                 'https://ssl.pstatic.net',
+        //             ],
+        //             scriptSrc: ["'unsafe-eval'", appUri],
+        //             mediaSrc: ["'none'"],
+        //             objectSrc: ["'none'"],
+        //         },
+        //     }),
+        // )
         .use(
             staticServe({
                 rootDir: path.normalize(`${__dirname}/../assets/public`),

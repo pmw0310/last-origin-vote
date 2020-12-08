@@ -74,6 +74,7 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
             httpOnly: true,
             maxAge: 1000 * 60 * 10,
             domain,
+            path: '/',
             sameSite: 'lax',
         });
     }
@@ -107,6 +108,7 @@ UserSchema.methods.generateRefreshToken = async function (
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24,
             domain,
+            path: '/',
             sameSite: 'lax',
         });
     }
