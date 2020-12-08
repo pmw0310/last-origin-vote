@@ -13,7 +13,7 @@ import { Context } from 'koa';
 import autoIncrement from 'mongoose-auto-increment';
 import { uid } from 'rand-token';
 
-const domain = (process.env.APP_DOMAIN as string) || 'localhost';
+// const domain = (process.env.APP_DOMAIN as string) || 'localhost';
 
 export interface UserTypeModel extends Document {
     _id: string;
@@ -73,7 +73,7 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
         ctx.cookies.set('access_token', token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 10,
-            domain: '.blackolf.com',
+            domain: 'lov.blackolf.com',
             path: '/',
             sameSite: 'lax',
             secure: process.env.NODE_ENV === 'production',
@@ -110,7 +110,7 @@ UserSchema.methods.generateRefreshToken = async function (
         ctx.cookies.set('refresh_token', token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24,
-            domain,
+            domain: 'lov.blackolf.com',
             path: '/',
             sameSite: 'lax',
             secure: process.env.NODE_ENV === 'production',
