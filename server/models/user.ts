@@ -71,10 +71,9 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
 
     if (ctx) {
         ctx.cookies.set('access_token', token, {
-            httpOnly: true,
+            httpOnly: false,
             maxAge: 1000 * 60 * 10,
             domain: 'https://lov.blackolf.com',
-            path: '/',
             sameSite: 'strict',
             // secure: process.env.NODE_ENV === 'production',
             // signed: true,
@@ -108,10 +107,9 @@ UserSchema.methods.generateRefreshToken = async function (
 
     if (ctx) {
         ctx.cookies.set('refresh_token', token, {
-            httpOnly: true,
+            httpOnly: false,
             maxAge: 1000 * 60 * 60 * 24,
             domain: 'https://lov.blackolf.com',
-            path: '/',
             sameSite: 'strict',
             // secure: process.env.NODE_ENV === 'production',
             // signed: true,
