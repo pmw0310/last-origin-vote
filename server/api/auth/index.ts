@@ -18,6 +18,8 @@ router.get('/logout', async (ctx: Context) => {
         domain,
         path: '/',
         sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        signed: true,
         overwrite: true,
     });
 
@@ -26,6 +28,8 @@ router.get('/logout', async (ctx: Context) => {
         domain,
         path: '/',
         sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        signed: true,
         overwrite: true,
     });
     ctx.redirect(process.env.APP_URI as string);

@@ -76,7 +76,7 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
             domain,
             path: '/',
             sameSite: 'lax',
-            secure: true,
+            secure: process.env.NODE_ENV === 'production',
             signed: true,
             overwrite: true,
         });
@@ -113,7 +113,7 @@ UserSchema.methods.generateRefreshToken = async function (
             domain,
             path: '/',
             sameSite: 'lax',
-            secure: true,
+            secure: process.env.NODE_ENV === 'production',
             signed: true,
             overwrite: true,
         });

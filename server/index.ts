@@ -45,6 +45,7 @@ const dev = process.env.NODE_ENV !== 'production';
     //     }),
     // );
     server.proxy = true;
+    server.keys = ['test'];
     const router = new Router<DefaultState, Context>();
     const apolloServer = new ApolloServer({
         schema,
