@@ -1,4 +1,4 @@
-import { Context, DefaultState } from 'koa';
+import { Context, DefaultState, Next } from 'koa';
 
 import Router from 'koa-router';
 import User from '../../../models/user';
@@ -13,7 +13,7 @@ router.get(
     passport.authenticate('naver', {
         session: false,
     }),
-    async (ctx: Context) => {
+    async (ctx: Context, next: Next) => {
         const exists = await User.findOne({
             _id: `naver::${ctx.state.user.id}`,
         });
@@ -42,6 +42,8 @@ router.get(
             user.generateAccessToken(ctx);
             await user.generateRefreshToken(ctx);
         }
+
+        await next();
 
         ctx.redirect(process.env.APP_URI as string);
     },
