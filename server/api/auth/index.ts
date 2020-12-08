@@ -6,7 +6,6 @@ import User from '../../models/user';
 import naver from './naver';
 
 const router = new Router<DefaultState, Context>();
-const domain = (process.env.APP_DOMAIN as string) || 'localhost';
 
 router.use('/naver', naver.routes());
 
@@ -67,7 +66,6 @@ router.get('/logout', async (ctx: Context) => {
     }
     ctx.cookies.set('access_token', '', {
         httpOnly: true,
-        domain,
         path: '/',
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
@@ -77,7 +75,6 @@ router.get('/logout', async (ctx: Context) => {
 
     ctx.cookies.set('refresh_token', '', {
         httpOnly: true,
-        domain,
         path: '/',
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
