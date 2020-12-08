@@ -18,7 +18,7 @@ const Test = (): JSX.Element => {
                 `${process.env.SERVER_URI}/api/auth/login?auth=${router.query.auth}`,
                 { withCredentials: true },
             )
-            .then(() => {
+            .finally(() => {
                 location.href = '/';
             });
     }, [router]);

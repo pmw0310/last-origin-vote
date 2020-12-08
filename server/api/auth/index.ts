@@ -56,6 +56,8 @@ router.get('/login', async (ctx: Context, next: Next) => {
         user.generateAccessToken(ctx);
         await user.generateRefreshToken(ctx);
     }
+    ctx.res.setHeader('Access-Control-Allow-Origin', '*');
+    ctx.res.setHeader('Access-Control-Allow-Credentials', 'true');
     ctx.status = 200;
     return next();
 });
