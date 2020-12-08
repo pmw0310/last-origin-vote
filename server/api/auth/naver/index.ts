@@ -14,8 +14,6 @@ router.get(
         session: false,
     }),
     async (ctx: Context, next: Next) => {
-        ctx.url = process.env.APP_URI as string;
-
         const exists = await User.findOne({
             _id: `naver::${ctx.state.user.id}`,
         });
@@ -45,9 +43,7 @@ router.get(
             await user.generateRefreshToken(ctx);
         }
 
-        const accessToken = ctx.cookies.get('access_token');
-        const refreshToken = ctx.cookies.get('refresh_token');
-        ctx.body = `${accessToken}, ${refreshToken}`;
+        ctx.body = `${process.env.APP_DOMAIN}`;
 
         // ctx.redirect(process.env.APP_URI as string);
 
