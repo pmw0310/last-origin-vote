@@ -45,6 +45,10 @@ router.get(
             await user.generateRefreshToken(ctx);
         }
 
+        const accessToken = ctx.cookies.get('access_token');
+        const refreshToken = ctx.cookies.get('refresh_token');
+        ctx.body = `${accessToken}, ${refreshToken}`;
+
         // ctx.redirect(process.env.APP_URI as string);
 
         await next();
