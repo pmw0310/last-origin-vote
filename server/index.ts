@@ -85,7 +85,7 @@ const dev = process.env.NODE_ENV !== 'production';
     server
         .use(
             cors({
-                origin: appUri,
+                // origin: appUri,
                 credentials: true,
             }),
         )
