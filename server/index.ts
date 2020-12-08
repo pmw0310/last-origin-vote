@@ -131,7 +131,7 @@ const dev = process.env.NODE_ENV !== 'production';
             {
                 clientID: process.env.NAVER_CLIENT_ID as string,
                 clientSecret: process.env.NAVER_CLIENT_SECRET as string,
-                callbackURL: `/api/auth/naver/callback`,
+                callbackURL: process.env.NAVER_CLIENT_CALLBACK as string,
             },
             (
                 _accessToken: string,

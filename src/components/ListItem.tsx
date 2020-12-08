@@ -24,7 +24,6 @@ import {
     ExpandMore as ExpandMoreIcon,
     MoreVert as MoreVertIcon,
 } from '@material-ui/icons';
-import React, { useState } from 'react';
 import {
     toGradeImagePaht,
     toImage,
@@ -37,6 +36,7 @@ import Avatar from '../components/common/Avatar';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Image from 'next/image';
 import LikeButton from '../components/common/LikeButton';
+import React from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import withWidth from '@material-ui/core/withWidth';
@@ -106,17 +106,8 @@ const ListItem: React.FC<ListItemProps> = ({
     removeDialogOpen,
     width,
 }): JSX.Element => {
-    const [expanded, setExpanded] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-
-    const handleChangeAccordion = (
-        _event: React.ChangeEvent<any>,
-        expanded: boolean,
-    ): void => {
-        if (open) return;
-        setExpanded(expanded);
-    };
 
     const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
@@ -140,7 +131,7 @@ const ListItem: React.FC<ListItemProps> = ({
 
     return (
         <Root>
-            <Accordion expanded={expanded} onChange={handleChangeAccordion}>
+            <Accordion>
                 <ItemAccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1c-content"
@@ -186,6 +177,8 @@ const ListItem: React.FC<ListItemProps> = ({
                                     Event
                                 >,
                             ) => {
+                                console.log(e);
+                                console.log(e.currentTarget);
                                 const url =
                                     'https://via.placeholder.com/150x150.png?text=Error';
                                 e.currentTarget.decoding = 'sync';
@@ -274,46 +267,44 @@ const ListItem: React.FC<ListItemProps> = ({
                     <Grid container spacing={1}>
                         {type === 'CHARACTER' && (
                             <>
-                                {expanded &&
-                                    (data as CharacterInterface).group && (
-                                        <CharacterInfo
-                                            item
-                                            xl={12}
-                                            lg={12}
-                                            sm={12}
-                                            xs={12}
-                                        >
-                                            <Chip
-                                                variant="outlined"
-                                                color="primary"
-                                                label="소속 부대"
-                                            />
-                                            <Avatar
-                                                alt={
-                                                    (data as CharacterInterface)
-                                                        .group?.name as string
-                                                }
-                                                src={
-                                                    (data as CharacterInterface)
-                                                        .group
-                                                        ?.profileImage as string
-                                                }
-                                                data={
-                                                    (data as CharacterInterface)
-                                                        .group
-                                                }
-                                                variant="square"
-                                            />
-                                            <Typography variant="subtitle2">
-                                                {
-                                                    (data as CharacterInterface)
-                                                        .group?.name
-                                                }
-                                            </Typography>
-                                        </CharacterInfo>
-                                    )}
-                                {expanded &&
-                                    (data as CharacterInterface).skin &&
+                                {(data as CharacterInterface).group && (
+                                    <CharacterInfo
+                                        item
+                                        xl={12}
+                                        lg={12}
+                                        sm={12}
+                                        xs={12}
+                                    >
+                                        <Chip
+                                            variant="outlined"
+                                            color="primary"
+                                            label="소속 부대"
+                                        />
+                                        <Avatar
+                                            alt={
+                                                (data as CharacterInterface)
+                                                    .group?.name as string
+                                            }
+                                            src={
+                                                (data as CharacterInterface)
+                                                    .group
+                                                    ?.profileImage as string
+                                            }
+                                            data={
+                                                (data as CharacterInterface)
+                                                    .group
+                                            }
+                                            variant="square"
+                                        />
+                                        <Typography variant="subtitle2">
+                                            {
+                                                (data as CharacterInterface)
+                                                    .group?.name
+                                            }
+                                        </Typography>
+                                    </CharacterInfo>
+                                )}
+                                {(data as CharacterInterface).skin &&
                                     ((data as CharacterInterface).skin as Array<
                                         SkinInterface
                                     >)?.length > 0 && (
@@ -409,7 +400,6 @@ const ListItem: React.FC<ListItemProps> = ({
                             </>
                         )}
                         {type === 'GROUP' &&
-                            expanded &&
                             ((data as GroupInterface).member as Array<
                                 CharacterInterface
                             >)?.length > 0 && (
@@ -436,30 +426,26 @@ const ListItem: React.FC<ListItemProps> = ({
                                     </AvatarGroup>
                                 </CharacterInfo>
                             )}
-                        {type === 'SKIN' &&
-                            expanded &&
-                            (data as SkinInterface).character && (
-                                <CharacterInfo item xl={12} xs={12}>
-                                    <Chip
-                                        variant="outlined"
-                                        color="primary"
-                                        label="착용"
-                                    />
-                                    <Avatar
-                                        alt={
-                                            (data as SkinInterface)?.character
-                                                ?.name as string
-                                        }
-                                        src={
-                                            (data as SkinInterface)?.character
-                                                ?.profileImage as string
-                                        }
-                                        data={
-                                            (data as SkinInterface)?.character
-                                        }
-                                    />
-                                </CharacterInfo>
-                            )}
+                        {type === 'SKIN' && (data as SkinInterface).character && (
+                            <CharacterInfo item xl={12} xs={12}>
+                                <Chip
+                                    variant="outlined"
+                                    color="primary"
+                                    label="착용"
+                                />
+                                <Avatar
+                                    alt={
+                                        (data as SkinInterface)?.character
+                                            ?.name as string
+                                    }
+                                    src={
+                                        (data as SkinInterface)?.character
+                                            ?.profileImage as string
+                                    }
+                                    data={(data as SkinInterface)?.character}
+                                />
+                            </CharacterInfo>
+                        )}
                     </Grid>
                 </AccordionDetails>
             </Accordion>
