@@ -49,7 +49,8 @@ export default function App({ Component, pageProps }: Props): JSX.Element {
                     />
                     <link rel="shortcut icon" href="/favicon.ico" />
                 </Head>
-                {pageProps.statusCode === 404 ? (
+                {pageProps.statusCode === 404 &&
+                pageProps.statusCode === 303 ? (
                     <Component {...pageProps} />
                 ) : (
                     <Feedback>

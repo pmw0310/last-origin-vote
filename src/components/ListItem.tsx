@@ -177,8 +177,6 @@ const ListItem: React.FC<ListItemProps> = ({
                                     Event
                                 >,
                             ) => {
-                                console.log(e);
-                                console.log(e.currentTarget);
                                 const url =
                                     'https://via.placeholder.com/150x150.png?text=Error';
                                 e.currentTarget.decoding = 'sync';

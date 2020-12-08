@@ -1,8 +1,9 @@
-import { Context, DefaultState, Next } from 'koa';
+import { Context, DefaultState } from 'koa';
 
 import Router from 'koa-router';
-import User from '../../../models/user';
+import bcrypt from 'bcrypt';
 import passport from 'koa-passport';
+import { setCache } from '../../../lib/redis';
 
 const router = new Router<DefaultState, Context>();
 
@@ -13,39 +14,20 @@ router.get(
     passport.authenticate('naver', {
         session: false,
     }),
-    async (ctx: Context, next: Next) => {
-        const exists = await User.findOne({
-            _id: `naver::${ctx.state.user.id}`,
-        });
+    async (ctx: Context) => {
+        const id = `naver::${ctx.state.user.id}`;
+        const nickname = ctx.state.user._json.nickname;
+        const profileImage = ctx.state.user._json.profile_image;
 
-        if (exists) {
-            exists.nickname = ctx.state.user._json.nickname;
-            exists.profileImage = ctx.state.user._json.profile_image;
-            await exists.save();
+        const hash = await bcrypt.hash(`${id}+${Date.now()}`, 10);
 
-            exists.generateAccessToken(ctx);
-            await exists.generateRefreshToken(ctx);
-        } else {
-            const count = await User.count({});
+        await setCache(
+            `hash_${hash}`,
+            { id, nickname, profileImage },
+            1000 * 60,
+        );
 
-            const user = new User({
-                _id: `naver::${ctx.state.user.id}`,
-                nickname: ctx.state.user._json.nickname,
-                profileImage: ctx.state.user._json.profile_image,
-            });
-
-            if (count === 0) {
-                user.authority = ['admin'];
-            }
-            await user.save();
-
-            user.generateAccessToken(ctx);
-            await user.generateRefreshToken(ctx);
-        }
-
-        ctx.redirect(process.env.APP_URI as string);
-
-        await next();
+        ctx.redirect(`${process.env.APP_URI as string}/auth?auth=${hash}`);
     },
 );
 

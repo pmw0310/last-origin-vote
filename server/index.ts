@@ -44,8 +44,10 @@ const dev = process.env.NODE_ENV !== 'production';
     //         max: 150,
     //     }),
     // );
+
     server.proxy = true;
     server.keys = ['test'];
+
     const router = new Router<DefaultState, Context>();
     const apolloServer = new ApolloServer({
         schema,
