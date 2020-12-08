@@ -71,9 +71,9 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
 
     if (ctx) {
         ctx.cookies.set('access_token', token, {
-            httpOnly: true,
+            // httpOnly: true,
             maxAge: 1000 * 60 * 10,
-            domain,
+            // domain,
         });
     }
 
@@ -103,9 +103,9 @@ UserSchema.methods.generateRefreshToken = async function (
 
     if (ctx) {
         ctx.cookies.set('refresh_token', token, {
-            httpOnly: true,
+            // httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24,
-            domain,
+            // domain,
         });
     }
 
