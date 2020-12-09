@@ -21,11 +21,7 @@ router.get(
 
         const hash = await bcrypt.hash(`${id}+${Date.now()}`, 10);
 
-        await setCache(
-            `hash_${hash}`,
-            { id, nickname, profileImage },
-            1000 * 60,
-        );
+        await setCache(`hash_${hash}`, { id, nickname, profileImage }, 1000 * 60);
 
         ctx.redirect(`${process.env.APP_URI as string}/auth?auth=${hash}`);
     },

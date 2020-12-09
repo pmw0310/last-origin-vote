@@ -18,9 +18,7 @@ const AddPaper = styled(Paper)`
 
 export interface EditorProps {
     data: CharacterInterface | GroupInterface;
-    setData: Dispatch<
-        React.SetStateAction<CharacterInterface | GroupInterface>
-    >;
+    setData: Dispatch<React.SetStateAction<CharacterInterface | GroupInterface>>;
     type: 'character' | 'group' | 'skin';
 }
 
@@ -30,14 +28,7 @@ export interface EditorFormProps extends EditorProps {
     onClickSave: () => Promise<void>;
 }
 
-const EditorForm: React.FC<EditorFormProps> = ({
-    data,
-    setData,
-    type,
-    title,
-    subtitle,
-    onClickSave,
-}): JSX.Element => {
+const EditorForm: React.FC<EditorFormProps> = ({ data, setData, type, title, subtitle, onClickSave }): JSX.Element => {
     return (
         <AddPaper>
             <Space>
@@ -45,19 +36,11 @@ const EditorForm: React.FC<EditorFormProps> = ({
                     <Typography variant="h5" gutterBottom>
                         {title}
                     </Typography>
-                    <Typography
-                        variant="caption"
-                        color="textSecondary"
-                        gutterBottom
-                    >
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
                         {subtitle}
                     </Typography>
                 </div>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={onClickSave}
-                >
+                <Button variant="contained" color="primary" onClick={onClickSave}>
                     저장
                 </Button>
             </Space>

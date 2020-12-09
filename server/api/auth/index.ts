@@ -66,20 +66,20 @@ router.get('/logout', async (ctx: Context) => {
     }
     ctx.cookies.set('access_token', '', {
         httpOnly: true,
-        path: '/',
-        sameSite: 'none',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
         secure: process.env.NODE_ENV === 'production',
+        signed: process.env.NODE_ENV === 'production',
         overwrite: true,
     });
 
     ctx.cookies.set('refresh_token', '', {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
         secure: process.env.NODE_ENV === 'production',
-        signed: true,
+        signed: process.env.NODE_ENV === 'production',
         overwrite: true,
     });
-    ctx.redirect(process.env.APP_URI as string);
+    ctx.status = 200;
 });
 
 export default router;

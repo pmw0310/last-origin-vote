@@ -1,12 +1,4 @@
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Snackbar,
-} from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar } from '@material-ui/core';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import { atom, useRecoilState } from 'recoil';
 
@@ -63,10 +55,7 @@ const GlobalFeedback: React.FC<{
     const [snackbar, setSnackbar] = useRecoilState(snackbarAtom);
     const [dialog, setDialog] = useRecoilState(dialogAtom);
 
-    const handleSnackbarClose = (
-        _event?: React.SyntheticEvent,
-        reason?: string,
-    ) => {
+    const handleSnackbarClose = (_event?: React.SyntheticEvent, reason?: string) => {
         if (reason === 'clickaway') {
             return;
         }
@@ -90,42 +79,24 @@ const GlobalFeedback: React.FC<{
     return (
         <>
             {children}
-            <Dialog
-                open={dialog.state === FeedbackStateType.OPEN}
-                onClose={handleOnDialogClose}
-                aria-labelledby="dialog-title"
-                aria-describedby="dialog-description"
-            >
+            <Dialog open={dialog.state === FeedbackStateType.OPEN} onClose={handleOnDialogClose} aria-labelledby="dialog-title" aria-describedby="dialog-description">
                 <DialogTitle id="dialog-title">{dialog.title}</DialogTitle>
                 {dialog.contentText && (
                     <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            {dialog.contentText}
-                        </DialogContentText>
+                        <DialogContentText id="alert-dialog-description">{dialog.contentText}</DialogContentText>
                     </DialogContent>
                 )}
                 <DialogActions>
                     <Button onClick={handleOnDialogClose} color="secondary">
                         {dialog.noButtonText}
                     </Button>
-                    <Button
-                        onClick={handleOnDialogAgree}
-                        color="primary"
-                        autoFocus
-                    >
+                    <Button onClick={handleOnDialogAgree} color="primary" autoFocus>
                         {dialog.yesButtonText}
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Snackbar
-                open={snackbar.state === FeedbackStateType.OPEN}
-                autoHideDuration={5000}
-                onClose={handleSnackbarClose}
-            >
-                <Alert
-                    onClose={handleSnackbarClose}
-                    severity={snackbar.severity}
-                >
+            <Snackbar open={snackbar.state === FeedbackStateType.OPEN} autoHideDuration={5000} onClose={handleSnackbarClose}>
+                <Alert onClose={handleSnackbarClose} severity={snackbar.severity}>
                     {snackbar.measage}
                 </Alert>
             </Snackbar>

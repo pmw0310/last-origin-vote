@@ -96,12 +96,7 @@ const dev = process.env.NODE_ENV !== 'production';
                 directives: {
                     baseUri: [appUri],
                     connectSrc: [appUri],
-                    imgSrc: [
-                        appUri,
-                        'https://via.placeholder.com',
-                        'https://phinf.pstatic.net',
-                        'https://ssl.pstatic.net',
-                    ],
+                    imgSrc: [appUri, 'https://via.placeholder.com', 'https://phinf.pstatic.net', 'https://ssl.pstatic.net'],
                     scriptSrc: ["'unsafe-eval'", appUri],
                     mediaSrc: ["'none'"],
                     objectSrc: ["'none'"],
@@ -136,12 +131,7 @@ const dev = process.env.NODE_ENV !== 'production';
                 clientSecret: process.env.NAVER_CLIENT_SECRET as string,
                 callbackURL: process.env.NAVER_CLIENT_CALLBACK as string,
             },
-            (
-                _accessToken: string,
-                _refreshToken: string,
-                profile: Profile,
-                done: (error: null, user: Profile) => void,
-            ): void => {
+            (_accessToken: string, _refreshToken: string, profile: Profile, done: (error: null, user: Profile) => void): void => {
                 process.nextTick(async () => {
                     return done(null, profile);
                 });
@@ -150,8 +140,6 @@ const dev = process.env.NODE_ENV !== 'production';
     );
 
     server.listen(port, () => {
-        console.log(
-            `> GraphQL on http://localhost:${port}${apolloServer.graphqlPath}`,
-        );
+        console.log(`> GraphQL on http://localhost:${port}${apolloServer.graphqlPath}`);
     });
 })();

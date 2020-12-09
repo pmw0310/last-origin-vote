@@ -1,12 +1,6 @@
 import { Document, Model, Schema, connection, model } from 'mongoose';
 import { decrypt, encrypt } from '../lib/aes256cbc';
-import {
-    delCache,
-    existsCache,
-    getCache,
-    getCacheDate,
-    setCache,
-} from '../lib/redis';
+import { delCache, existsCache, getCache, getCacheDate, setCache } from '../lib/redis';
 import jwt, { VerifyErrors } from 'jsonwebtoken';
 
 import { Context } from 'koa';
@@ -73,8 +67,9 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
         ctx.cookies.set('access_token', token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 10,
-            sameSite: 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
             secure: process.env.NODE_ENV === 'production',
+            signed: process.env.NODE_ENV === 'production',
             overwrite: true,
         });
     }
@@ -82,9 +77,7 @@ UserSchema.methods.generateAccessToken = function (ctx: Context): string {
     return token;
 };
 
-UserSchema.methods.generateRefreshToken = async function (
-    ctx: Context,
-): Promise<string> {
+UserSchema.methods.generateRefreshToken = async function (ctx: Context): Promise<string> {
     let token: string;
 
     while (true) {
@@ -107,8 +100,9 @@ UserSchema.methods.generateRefreshToken = async function (
         ctx.cookies.set('refresh_token', token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24,
-            sameSite: 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
             secure: process.env.NODE_ENV === 'production',
+            signed: process.env.NODE_ENV === 'production',
             overwrite: true,
         });
     }
@@ -116,9 +110,7 @@ UserSchema.methods.generateRefreshToken = async function (
     return token;
 };
 
-UserSchema.statics.verify = async function (
-    ctx: Context,
-): Promise<UserVerifyResult> {
+UserSchema.statics.verify = async function (ctx: Context): Promise<UserVerifyResult> {
     const accessToken = ctx.cookies.get('access_token');
     const refreshToken = ctx.cookies.get('refresh_token');
 
@@ -133,10 +125,7 @@ UserSchema.statics.verify = async function (
         exp: number;
     };
 
-    const jwtVerify = <T>(
-        token: string,
-        secret: string,
-    ): Promise<JwtVerify<T>> => {
+    const jwtVerify = <T>(token: string, secret: string): Promise<JwtVerify<T>> => {
         return new Promise((resolve) => {
             jwt.verify(token, secret, (error, decoded) => {
                 return resolve({ error, decoded: decoded as T | undefined });
@@ -146,10 +135,7 @@ UserSchema.statics.verify = async function (
 
     try {
         if (accessToken) {
-            const accessTokenVerify = await jwtVerify<Access>(
-                decrypt(accessToken as string),
-                process.env.JWT_SECRET as string,
-            );
+            const accessTokenVerify = await jwtVerify<Access>(decrypt(accessToken as string), process.env.JWT_SECRET as string);
 
             if (accessTokenVerify.error) {
                 return { error: accessTokenVerify.error.message };
@@ -210,8 +196,4 @@ UserSchema.plugin(autoIncrement.plugin, {
     increment: 1,
 });
 
-export default model<UserTypeModel, UserStaticsModel>(
-    'User',
-    UserSchema,
-    'user',
-);
+export default model<UserTypeModel, UserStaticsModel>('User', UserSchema, 'user');

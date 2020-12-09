@@ -1,36 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
-    Chip,
-    Grid,
-    IconButton,
-    ListItemIcon,
-    ListItemText,
-    Menu,
-    MenuItem,
-    Typography,
-} from '@material-ui/core';
-import {
-    CharacterInterface,
-    GroupInterface,
-    SkinInterface,
-    Type,
-} from '../module';
-import {
-    Delete as DeleteIcon,
-    Edit as EditIcon,
-    ExpandMore as ExpandMoreIcon,
-    MoreVert as MoreVertIcon,
-} from '@material-ui/icons';
-import {
-    toGradeImagePaht,
-    toImage,
-    toRoleText,
-    toStatureText,
-    toWeightText,
-} from '../lib/info';
+import { Accordion, AccordionDetails, AccordionSummary, Chip, Grid, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Typography } from '@material-ui/core';
+import { CharacterInterface, GroupInterface, SkinInterface, Type } from '../module';
+import { Delete as DeleteIcon, Edit as EditIcon, ExpandMore as ExpandMoreIcon, MoreVert as MoreVertIcon } from '@material-ui/icons';
+import { toGradeImagePaht, toImage, toRoleText, toStatureText, toWeightText } from '../lib/info';
 
 import Avatar from '../components/common/Avatar';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
@@ -100,12 +72,7 @@ const Like = styled.div`
     right: 6px;
 `;
 
-const ListItem: React.FC<ListItemProps> = ({
-    data,
-    auth,
-    removeDialogOpen,
-    width,
-}): JSX.Element => {
+const ListItem: React.FC<ListItemProps> = ({ data, auth, removeDialogOpen, width }): JSX.Element => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -121,10 +88,7 @@ const ListItem: React.FC<ListItemProps> = ({
     const router = useRouter();
 
     const roleText = toRoleText(data);
-    const gradeImage = toGradeImagePaht(
-        data,
-        (data as CharacterInterface).charGrade as number,
-    );
+    const gradeImage = toGradeImagePaht(data, (data as CharacterInterface).charGrade as number);
     const statureText = toStatureText(data);
     const weightText = toWeightText(data);
     const type: Type = data.type as Type;
@@ -132,11 +96,7 @@ const ListItem: React.FC<ListItemProps> = ({
     return (
         <Root>
             <Accordion>
-                <ItemAccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1c-content"
-                    id="panel1c-header"
-                >
+                <ItemAccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1c-content" id="panel1c-header">
                     {type === 'CHARACTER' && gradeImage && (
                         <GradeIcon>
                             <Image
@@ -145,14 +105,8 @@ const ListItem: React.FC<ListItemProps> = ({
                                 layout="fill"
                                 objectFit="contain"
                                 objectPosition="left"
-                                onError={(
-                                    e: React.SyntheticEvent<
-                                        HTMLImageElement,
-                                        Event
-                                    >,
-                                ) => {
-                                    const url =
-                                        'https://via.placeholder.com/36x36.png?text=Error';
+                                onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                                    const url = 'https://via.placeholder.com/36x36.png?text=Error';
                                     e.currentTarget.decoding = 'sync';
                                     e.currentTarget.src = url;
                                     e.currentTarget.srcset = url;
@@ -163,22 +117,13 @@ const ListItem: React.FC<ListItemProps> = ({
                     <ProfileImage>
                         <Image
                             alt="image"
-                            src={
-                                (toImage(data.profileImage) as string) ||
-                                (toImage('/public/unknown.jpg') as string)
-                            }
+                            src={(toImage(data.profileImage) as string) || (toImage('/public/unknown.jpg') as string)}
                             layout="fixed"
                             width={150}
                             height={150}
                             quality={90}
-                            onError={(
-                                e: React.SyntheticEvent<
-                                    HTMLImageElement,
-                                    Event
-                                >,
-                            ) => {
-                                const url =
-                                    'https://via.placeholder.com/150x150.png?text=Error';
+                            onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                                const url = 'https://via.placeholder.com/150x150.png?text=Error';
                                 e.currentTarget.decoding = 'sync';
                                 e.currentTarget.src = url;
                                 e.currentTarget.srcset = url;
@@ -186,10 +131,7 @@ const ListItem: React.FC<ListItemProps> = ({
                         />
                     </ProfileImage>
                     <Info>
-                        <Typography
-                            variant={width === 'xs' ? 'h6' : 'h5'}
-                            gutterBottom
-                        >
+                        <Typography variant={width === 'xs' ? 'h6' : 'h5'} gutterBottom>
                             {data.name}
                         </Typography>
                         {type === 'CHARACTER' && roleText && (
@@ -199,40 +141,21 @@ const ListItem: React.FC<ListItemProps> = ({
                         )}
                         <div>
                             {data.tag?.map((tag, index) => (
-                                <TagChip
-                                    variant="outlined"
-                                    size="small"
-                                    label={`#${tag}`}
-                                    key={`${data.name}-${index}`}
-                                />
+                                <TagChip variant="outlined" size="small" label={`#${tag}`} key={`${data.name}-${index}`} />
                             ))}
                         </div>
                     </Info>
                     {auth && (
                         <Auth>
-                            <AuthButton
-                                aria-label="more"
-                                aria-controls="auth-menu"
-                                aria-haspopup="true"
-                                onClick={handleMenuClick}
-                                onFocus={(event) => event.stopPropagation()}
-                            >
+                            <AuthButton aria-label="more" aria-controls="auth-menu" aria-haspopup="true" onClick={handleMenuClick} onFocus={(event) => event.stopPropagation()}>
                                 <MoreVertIcon />
                             </AuthButton>
-                            <Menu
-                                anchorEl={anchorEl}
-                                keepMounted
-                                open={open}
-                                onClose={handleMenuClose}
-                            >
+                            <Menu anchorEl={anchorEl} keepMounted open={open} onClose={handleMenuClose}>
                                 <MenuItem
                                     onClick={(event) => {
                                         event.stopPropagation();
                                         handleMenuClose();
-                                        router.push(
-                                            `/${type.toLowerCase()}/[id]`,
-                                            `/${type.toLowerCase()}/${data.id}`,
-                                        );
+                                        router.push(`/${type.toLowerCase()}/[id]`, `/${type.toLowerCase()}/${data.id}`);
                                     }}
                                     onFocus={(event) => event.stopPropagation()}
                                 >
@@ -266,180 +189,65 @@ const ListItem: React.FC<ListItemProps> = ({
                         {type === 'CHARACTER' && (
                             <>
                                 {(data as CharacterInterface).group && (
-                                    <CharacterInfo
-                                        item
-                                        xl={12}
-                                        lg={12}
-                                        sm={12}
-                                        xs={12}
-                                    >
-                                        <Chip
-                                            variant="outlined"
-                                            color="primary"
-                                            label="소속 부대"
-                                        />
+                                    <CharacterInfo item xl={12} lg={12} sm={12} xs={12}>
+                                        <Chip variant="outlined" color="primary" label="소속 부대" />
                                         <Avatar
-                                            alt={
-                                                (data as CharacterInterface)
-                                                    .group?.name as string
-                                            }
-                                            src={
-                                                (data as CharacterInterface)
-                                                    .group
-                                                    ?.profileImage as string
-                                            }
-                                            data={
-                                                (data as CharacterInterface)
-                                                    .group
-                                            }
+                                            alt={(data as CharacterInterface).group?.name as string}
+                                            src={(data as CharacterInterface).group?.profileImage as string}
+                                            data={(data as CharacterInterface).group}
                                             variant="square"
                                         />
-                                        <Typography variant="subtitle2">
-                                            {
-                                                (data as CharacterInterface)
-                                                    .group?.name
-                                            }
-                                        </Typography>
+                                        <Typography variant="subtitle2">{(data as CharacterInterface).group?.name}</Typography>
                                     </CharacterInfo>
                                 )}
-                                {(data as CharacterInterface).skin &&
-                                    ((data as CharacterInterface).skin as Array<
-                                        SkinInterface
-                                    >)?.length > 0 && (
-                                        <CharacterInfo item xl={12} xs={12}>
-                                            <Chip
-                                                variant="outlined"
-                                                color="primary"
-                                                label="스킨"
-                                            />
-                                            <AvatarGroup
-                                                max={width === 'xs' ? 5 : 10}
-                                            >
-                                                {((data as CharacterInterface)
-                                                    .skin as Array<
-                                                    SkinInterface
-                                                >).map((skin) => (
-                                                    <Avatar
-                                                        key={skin.id}
-                                                        alt="skin"
-                                                        data={skin}
-                                                        src={
-                                                            skin.profileImage as string
-                                                        }
-                                                    />
-                                                ))}
-                                            </AvatarGroup>
-                                        </CharacterInfo>
-                                    )}
+                                {(data as CharacterInterface).skin && ((data as CharacterInterface).skin as Array<SkinInterface>)?.length > 0 && (
+                                    <CharacterInfo item xl={12} xs={12}>
+                                        <Chip variant="outlined" color="primary" label="스킨" />
+                                        <AvatarGroup max={width === 'xs' ? 5 : 10}>
+                                            {((data as CharacterInterface).skin as Array<SkinInterface>).map((skin) => (
+                                                <Avatar key={skin.id} alt="skin" data={skin} src={skin.profileImage as string} />
+                                            ))}
+                                        </AvatarGroup>
+                                    </CharacterInfo>
+                                )}
                                 <CharacterInfo item lg={3} sm={6} xs={6}>
-                                    <CharacterInfoChip
-                                        variant="outlined"
-                                        color="primary"
-                                        label={
-                                            (data as CharacterInterface)
-                                                .charIsAgs
-                                                ? '전고'
-                                                : '신장'
-                                        }
-                                        size="small"
-                                    />
-                                    <Typography variant="subtitle2">
-                                        {statureText}
-                                    </Typography>
+                                    <CharacterInfoChip variant="outlined" color="primary" label={(data as CharacterInterface).charIsAgs ? '전고' : '신장'} size="small" />
+                                    <Typography variant="subtitle2">{statureText}</Typography>
                                 </CharacterInfo>
                                 <CharacterInfo item lg={3} sm={6} xs={6}>
-                                    <CharacterInfoChip
-                                        variant="outlined"
-                                        color="primary"
-                                        label={
-                                            (data as CharacterInterface)
-                                                .charIsAgs
-                                                ? '중량'
-                                                : '체중'
-                                        }
-                                        size="small"
-                                    />
-                                    <Typography variant="subtitle2">
-                                        {weightText}
-                                    </Typography>
+                                    <CharacterInfoChip variant="outlined" color="primary" label={(data as CharacterInterface).charIsAgs ? '중량' : '체중'} size="small" />
+                                    <Typography variant="subtitle2">{weightText}</Typography>
                                 </CharacterInfo>
                                 {(data as CharacterInterface).charClass && (
                                     <CharacterInfo item lg={3} sm={6} xs={6}>
-                                        <CharacterInfoChip
-                                            variant="outlined"
-                                            color="primary"
-                                            label="클래스"
-                                            size="small"
-                                        />
-                                        <Typography variant="subtitle2">
-                                            {
-                                                (data as CharacterInterface)
-                                                    .charClass
-                                            }
-                                        </Typography>
+                                        <CharacterInfoChip variant="outlined" color="primary" label="클래스" size="small" />
+                                        <Typography variant="subtitle2">{(data as CharacterInterface).charClass}</Typography>
                                     </CharacterInfo>
                                 )}
                                 {(data as CharacterInterface).charArm && (
                                     <CharacterInfo item lg={3} sm={6} xs={6}>
-                                        <CharacterInfoChip
-                                            variant="outlined"
-                                            color="primary"
-                                            label="무장"
-                                            size="small"
-                                        />
-                                        <Typography variant="subtitle2">
-                                            {
-                                                (data as CharacterInterface)
-                                                    .charArm
-                                            }
-                                        </Typography>
+                                        <CharacterInfoChip variant="outlined" color="primary" label="무장" size="small" />
+                                        <Typography variant="subtitle2">{(data as CharacterInterface).charArm}</Typography>
                                     </CharacterInfo>
                                 )}
                             </>
                         )}
-                        {type === 'GROUP' &&
-                            ((data as GroupInterface).member as Array<
-                                CharacterInterface
-                            >)?.length > 0 && (
-                                <CharacterInfo item xl={12} xs={12}>
-                                    <Chip
-                                        variant="outlined"
-                                        color="primary"
-                                        label="소속 인원"
-                                    />
-                                    <AvatarGroup max={width === 'xs' ? 5 : 10}>
-                                        {((data as GroupInterface)
-                                            .member as Array<
-                                            CharacterInterface
-                                        >).map((char) => (
-                                            <Avatar
-                                                key={char.id}
-                                                alt={char.name as string}
-                                                data={char}
-                                                src={
-                                                    char.profileImage as string
-                                                }
-                                            />
-                                        ))}
-                                    </AvatarGroup>
-                                </CharacterInfo>
-                            )}
+                        {type === 'GROUP' && ((data as GroupInterface).member as Array<CharacterInterface>)?.length > 0 && (
+                            <CharacterInfo item xl={12} xs={12}>
+                                <Chip variant="outlined" color="primary" label="소속 인원" />
+                                <AvatarGroup max={width === 'xs' ? 5 : 10}>
+                                    {((data as GroupInterface).member as Array<CharacterInterface>).map((char) => (
+                                        <Avatar key={char.id} alt={char.name as string} data={char} src={char.profileImage as string} />
+                                    ))}
+                                </AvatarGroup>
+                            </CharacterInfo>
+                        )}
                         {type === 'SKIN' && (data as SkinInterface).character && (
                             <CharacterInfo item xl={12} xs={12}>
-                                <Chip
-                                    variant="outlined"
-                                    color="primary"
-                                    label="착용"
-                                />
+                                <Chip variant="outlined" color="primary" label="착용" />
                                 <Avatar
-                                    alt={
-                                        (data as SkinInterface)?.character
-                                            ?.name as string
-                                    }
-                                    src={
-                                        (data as SkinInterface)?.character
-                                            ?.profileImage as string
-                                    }
+                                    alt={(data as SkinInterface)?.character?.name as string}
+                                    src={(data as SkinInterface)?.character?.profileImage as string}
                                     data={(data as SkinInterface)?.character}
                                 />
                             </CharacterInfo>
